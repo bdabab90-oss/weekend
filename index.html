@@ -1082,6 +1082,12 @@
                 details: b.details, total: b.total, deposit: b.deposit,
                 receipt_data: b.receiptData,
                 pickup_location: b.pickupLocation || null, dropoff_location: b.dropoffLocation || null,
+                // هاي الأعمدة الثلاثة هي اللي بتخليّ قاعدة البيانات نفسها (مش الكود بالمتصفح)
+                // ترفض أي حجز متعارض، حتى لو اثنين ضغطوا "تأكيد" بنفس اللحظة تماماً.
+                // راجع قيد bookings_no_overlap بالقاعدة (Postgres exclusion constraint).
+                booking_date: b.bookingDate || null,
+                hour_from: (b.hourFrom !== undefined && b.hourFrom !== null) ? b.hourFrom : null,
+                hour_to: (b.hourTo !== undefined && b.hourTo !== null) ? b.hourTo : null,
                 status
             };
         }
@@ -2150,11 +2156,24 @@
                     details: detailsStr,
                     total, deposit,
                     receiptData: currentUploadedReceiptBase64 || 'https://via.placeholder.com/150',
-                    pickupLocation, dropoffLocation
+                    pickupLocation, dropoffLocation,
+                    bookingDate: tripDate, hourFrom: 0, hourTo: 24 // النقل بيحجز اليوم كامل
                 };
                 pendingBookings.push(newBooking);
-                db.from('bookings').insert(bookingToRow(newBooking, 'pending'))
-                    .then(({ error }) => { if (error) console.error('تعذر حفظ الحجز بالقاعدة:', error); });
+                {
+                    const { error } = await db.from('bookings').insert(bookingToRow(newBooking, 'pending'));
+                    if (error) {
+                        pendingBookings = pendingBookings.filter(b => b !== newBooking);
+                        if (error.code === '23P01') {
+                            alert('عذراً، حجز شخص آخر لنفس وسيلة النقل والتاريخ وصل للقاعدة قبلك بلحظات. جرب تاريخاً آخر.');
+                        } else {
+                            console.error('تعذر حفظ الحجز بالقاعدة:', error);
+                            alert('حصل خطأ أثناء حفظ الحجز، حاول مرة أخرى.');
+                        }
+                        await refreshBookingsForItem(selectedItem.id);
+                        return;
+                    }
+                }
                 playAdminBeep();
                 closeModal('booking-modal');
                 showToast('✅ تم إرسال طلب الحجز!');
@@ -2164,6 +2183,7 @@
                 return;
             }
 
+            let bookingDateForDb = null, hourFromForDb = null, hourToForDb = null;
             if (isPitch) {
                 const date  = document.getElementById('booking-date').value;
                 const hours = parseInt(document.getElementById('pitch-hours').value) || 0;
@@ -2189,6 +2209,7 @@
                 deposit = 5.0;
                 const startLabel = startHour < 12 ? `${startHour}:00ص` : (startHour === 12 ? '12:00ظ' : `${startHour-12}:00م`);
                 detailsStr = `${date} — ${hours} ساعة بدءاً من ${startLabel} (${hours} × ${hourlyRate} JOD)`;
+                bookingDateForDb = date; hourFromForDb = startHour; hourToForDb = endHour;
             } else {
                 // Farm / chalet
                 const date = document.getElementById('booking-date').value;
@@ -2209,6 +2230,11 @@
                 total   = basePrice * multiplier;
                 deposit = total * 0.15;
                 detailsStr = `${date} (${selectedShiftType})`;
+                // نمثّل الشفتات كمدى ساعات على مقياس 0-24 حتى يقدر قيد القاعدة (exclusion constraint)
+                // يكتشف تلقائياً إنو "يوم كامل" بيتقاطع مع "صباحي" أو "مسائي"
+                bookingDateForDb = date;
+                hourFromForDb = selectedShiftType === 'evening' ? 12 : 0;
+                hourToForDb   = selectedShiftType === 'morning' ? 12 : 24;
             }
 
             const newBooking = {
@@ -2218,11 +2244,26 @@
                 details: detailsStr,
                 total, deposit,
                 receiptData: currentUploadedReceiptBase64 || 'https://via.placeholder.com/150',
-                isPitchBooking: isPitch
+                isPitchBooking: isPitch,
+                bookingDate: bookingDateForDb, hourFrom: hourFromForDb, hourTo: hourToForDb
             };
             pendingBookings.push(newBooking);
-            db.from('bookings').insert(bookingToRow(newBooking, 'pending'))
-                .then(({ error }) => { if (error) console.error('تعذر حفظ الحجز بالقاعدة:', error); });
+            {
+                const { error } = await db.from('bookings').insert(bookingToRow(newBooking, 'pending'));
+                if (error) {
+                    pendingBookings = pendingBookings.filter(b => b !== newBooking);
+                    if (error.code === '23P01') {
+                        alert(isPitch
+                            ? 'عذراً، حجز آخر لنفس الملعب والموعد وصل للقاعدة قبلك بلحظات. جرب وقتاً مختلفاً.'
+                            : 'عذراً، حجز آخر لنفس الشفت والتاريخ وصل للقاعدة قبلك بلحظات. جرب موعداً آخر.');
+                    } else {
+                        console.error('تعذر حفظ الحجز بالقاعدة:', error);
+                        alert('حصل خطأ أثناء حفظ الحجز، حاول مرة أخرى.');
+                    }
+                    await refreshBookingsForItem(selectedItem.id);
+                    return;
+                }
+            }
             playAdminBeep();
             closeModal('booking-modal');
             showToast('✅ تم إرسال طلب الحجز!');
