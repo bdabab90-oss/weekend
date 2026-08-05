@@ -751,7 +751,7 @@
             <div id="det-map-section" class="map-section" style="display:none;">
                 <h5>📍 الموقع على الخريطة</h5>
                 <div id="det-map" class="map-container"></div>
-                <a id="det-map-link" href="#" target="_blank" class="map-link">🗺️ فتح في خرائط Google</a>
+                <a id="det-map-link" href="#" target="_blank" rel="noopener noreferrer" class="map-link">🗺️ فتح في خرائط Google</a>
             </div>
 
             <!-- Availability Calendar -->
@@ -975,7 +975,7 @@
                 <div class="chat-options">
                     <button class="chat-opt-btn" onclick="sendChatMsg('طريقة دفع العربون؟', 'يمكنك دفع العربون عبر CliQ باسم المستعار WEEKEND119 - بنك الاتحاد، أو برقم الهاتف 0781929509.')">💳 كيف أدفع العربون؟</button>
                     <button class="chat-opt-btn" onclick="sendChatMsg('رقم الشكاوى والدعم الفني', 'يمكنك التواصل مع الدعم على الرقم 0781929509')">📞 رقم الشكاوى والدعم</button>
-                    <a href="https://wa.me/962781929509" target="_blank" style="text-decoration:none;"><button class="chat-opt-btn" style="background:#25D366;color:white;width:100%;font-weight:600;">💬 فتح محادثة واتساب مباشرة</button></a>
+                    <a href="https://wa.me/962781929509" target="_blank" rel="noopener noreferrer" style="text-decoration:none;"><button class="chat-opt-btn" style="background:#25D366;color:white;width:100%;font-weight:600;">💬 فتح محادثة واتساب مباشرة</button></a>
                 </div>
             </div>
         </div>
@@ -2178,7 +2178,7 @@
                 closeModal('booking-modal');
                 showToast('✅ تم إرسال طلب الحجز!');
                 const waText = encodeURIComponent(`🌴 *تأكيد طلب الحجز - منصة Weekend*\n\nالاسم: ${clientName}\nالخدمة: ${selectedItem.nameAr}\nالتفاصيل: ${detailsStr}\nموقع الانطلاق: ${pickupLocation}\nموقع الوصول: ${dropoffLocation}\nالإجمالي: ${total.toFixed(2)} JOD\nالعربون: ${deposit.toFixed(2)} JOD\n\nشكراً لاختيارك منصة Weekend 🙏`);
-                setTimeout(() => { const shareToast = document.createElement('div'); shareToast.style.cssText = 'position:fixed;bottom:80px;right:20px;background:#0D2818;color:white;padding:1rem 1.5rem;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.25);z-index:3100;display:flex;align-items:center;gap:12px;max-width:360px;font-size:0.88rem;'; shareToast.innerHTML = `<span style="flex:1;">شارك ملخص الحجز عبر واتساب:</span><a href="https://wa.me/?text=${waText}" target="_blank" style="background:#25D366;color:white;padding:6px 14px;border-radius:8px;text-decoration:none;font-weight:700;white-space:nowrap;font-size:0.85rem;">💬 واتساب</a><button onclick="this.parentElement.remove()" style="background:none;border:none;color:#aaa;font-size:1.3rem;cursor:pointer;padding:0 4px;">&times;</button>`; document.body.appendChild(shareToast); setTimeout(() => { if (shareToast.parentElement) shareToast.remove(); }, 8000); }, 500);
+                setTimeout(() => { const shareToast = document.createElement('div'); shareToast.style.cssText = 'position:fixed;bottom:80px;right:20px;background:#0D2818;color:white;padding:1rem 1.5rem;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.25);z-index:3100;display:flex;align-items:center;gap:12px;max-width:360px;font-size:0.88rem;'; shareToast.innerHTML = `<span style="flex:1;">شارك ملخص الحجز عبر واتساب:</span><a href="https://wa.me/?text=${waText}" target="_blank" rel="noopener noreferrer" style="background:#25D366;color:white;padding:6px 14px;border-radius:8px;text-decoration:none;font-weight:700;white-space:nowrap;font-size:0.85rem;">💬 واتساب</a><button onclick="this.parentElement.remove()" style="background:none;border:none;color:#aaa;font-size:1.3rem;cursor:pointer;padding:0 4px;">&times;</button>`; document.body.appendChild(shareToast); setTimeout(() => { if (shareToast.parentElement) shareToast.remove(); }, 8000); }, 500);
                 if (isAdminLoggedIn) renderAdminPanel();
                 return;
             }
@@ -2272,7 +2272,7 @@
             setTimeout(() => {
                 const shareToast = document.createElement('div');
                 shareToast.style.cssText = 'position:fixed;bottom:80px;right:20px;background:#0D2818;color:white;padding:1rem 1.5rem;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.25);z-index:3100;display:flex;align-items:center;gap:12px;max-width:360px;font-size:0.88rem;';
-                shareToast.innerHTML = `<span style="flex:1;">شارك ملخص الحجز عبر واتساب:</span><a href="https://wa.me/?text=${waText}" target="_blank" style="background:#25D366;color:white;padding:6px 14px;border-radius:8px;text-decoration:none;font-weight:700;white-space:nowrap;font-size:0.85rem;">💬 واتساب</a><button onclick="this.parentElement.remove()" style="background:none;border:none;color:#aaa;font-size:1.3rem;cursor:pointer;padding:0 4px;">&times;</button>`;
+                shareToast.innerHTML = `<span style="flex:1;">شارك ملخص الحجز عبر واتساب:</span><a href="https://wa.me/?text=${waText}" target="_blank" rel="noopener noreferrer" style="background:#25D366;color:white;padding:6px 14px;border-radius:8px;text-decoration:none;font-weight:700;white-space:nowrap;font-size:0.85rem;">💬 واتساب</a><button onclick="this.parentElement.remove()" style="background:none;border:none;color:#aaa;font-size:1.3rem;cursor:pointer;padding:0 4px;">&times;</button>`;
                 document.body.appendChild(shareToast);
                 setTimeout(() => { if (shareToast.parentElement) shareToast.remove(); }, 8000);
             }, 500);
@@ -2554,8 +2554,8 @@
                         locationInfoHtml = `
                             <div class="location-link-box" style="margin-top:6px;font-size:0.82rem;">
                                 <strong>📍 مواقع الرحلة:</strong>
-                                ${b.pickupLocation ? `<div>📌 <strong>الانطلاق:</strong> <a href="${escapeHtml(b.pickupLocation.startsWith('http') ? b.pickupLocation : 'https://maps.google.com/search?q='+encodeURIComponent(b.pickupLocation))}" target="_blank">${escapeHtml(b.pickupLocation)}</a></div>` : ''}
-                                ${b.dropoffLocation ? `<div>🏁 <strong>الوصول:</strong> <a href="${escapeHtml(b.dropoffLocation.startsWith('http') ? b.dropoffLocation : 'https://maps.google.com/search?q='+encodeURIComponent(b.dropoffLocation))}" target="_blank">${escapeHtml(b.dropoffLocation)}</a></div>` : ''}
+                                ${b.pickupLocation ? `<div>📌 <strong>الانطلاق:</strong> <a href="${escapeHtml(b.pickupLocation.startsWith('http') ? b.pickupLocation : 'https://maps.google.com/search?q='+encodeURIComponent(b.pickupLocation))}" target="_blank" rel="noopener noreferrer">${escapeHtml(b.pickupLocation)}</a></div>` : ''}
+                                ${b.dropoffLocation ? `<div>🏁 <strong>الوصول:</strong> <a href="${escapeHtml(b.dropoffLocation.startsWith('http') ? b.dropoffLocation : 'https://maps.google.com/search?q='+encodeURIComponent(b.dropoffLocation))}" target="_blank" rel="noopener noreferrer">${escapeHtml(b.dropoffLocation)}</a></div>` : ''}
                             </div>`;
                     }
 
@@ -2565,11 +2565,11 @@
                         <td>${escapeHtml(b.phone)}</td>
                         <td>${escapeHtml(itemName)}</td>
                         <td><small>${escapeHtml(b.details)}</small>${locationInfoHtml}${conflictBadge}</td>
-                        <td><img src="${escapeHtml(b.receiptData)}" class="receipt-thumb" onclick="openImageModal('${b.receiptData}')"></td>
+                        <td><img src="${escapeHtml(b.receiptData)}" class="receipt-thumb" data-receipt="${escapeHtml(b.receiptData)}" onclick="openImageModal(this.dataset.receipt)"></td>
                         <td>
                             <div class="action-menu-inline">
                                 <button class="icon-btn approve" title="تأكيد الحجز" onclick="approveBooking(${idx})">✓</button>
-                                <a href="${waUrl}" target="_blank" class="icon-btn whatsapp" title="واتساب">💬</a>
+                                <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="icon-btn whatsapp" title="واتساب">💬</a>
                                 <button class="icon-btn danger" title="حذف" onclick="deleteBooking('pending', ${idx})">🗑️</button>
                             </div>
                         </td>`;
@@ -2595,8 +2595,8 @@
                         locationInfoHtml = `
                             <div class="location-link-box" style="margin-top:6px;font-size:0.82rem;">
                                 <strong>📍 مواقع الرحلة:</strong>
-                                ${b.pickupLocation ? `<div>📌 <strong>الانطلاق:</strong> <a href="${escapeHtml(b.pickupLocation.startsWith('http') ? b.pickupLocation : 'https://maps.google.com/search?q='+encodeURIComponent(b.pickupLocation))}" target="_blank">${escapeHtml(b.pickupLocation)}</a></div>` : ''}
-                                ${b.dropoffLocation ? `<div>🏁 <strong>الوصول:</strong> <a href="${escapeHtml(b.dropoffLocation.startsWith('http') ? b.dropoffLocation : 'https://maps.google.com/search?q='+encodeURIComponent(b.dropoffLocation))}" target="_blank">${escapeHtml(b.dropoffLocation)}</a></div>` : ''}
+                                ${b.pickupLocation ? `<div>📌 <strong>الانطلاق:</strong> <a href="${escapeHtml(b.pickupLocation.startsWith('http') ? b.pickupLocation : 'https://maps.google.com/search?q='+encodeURIComponent(b.pickupLocation))}" target="_blank" rel="noopener noreferrer">${escapeHtml(b.pickupLocation)}</a></div>` : ''}
+                                ${b.dropoffLocation ? `<div>🏁 <strong>الوصول:</strong> <a href="${escapeHtml(b.dropoffLocation.startsWith('http') ? b.dropoffLocation : 'https://maps.google.com/search?q='+encodeURIComponent(b.dropoffLocation))}" target="_blank" rel="noopener noreferrer">${escapeHtml(b.dropoffLocation)}</a></div>` : ''}
                             </div>`;
                     }
 
@@ -2607,10 +2607,10 @@
                         <td>${escapeHtml(itemName)}</td>
                         <td><small>${escapeHtml(b.details)}</small>${locationInfoHtml}</td>
                         <td><strong style="color:var(--success);">${b.deposit.toFixed(2)} JOD</strong></td>
-                        <td><img src="${escapeHtml(b.receiptData)}" class="receipt-thumb" onclick="openImageModal('${b.receiptData}')"></td>
+                        <td><img src="${escapeHtml(b.receiptData)}" class="receipt-thumb" data-receipt="${escapeHtml(b.receiptData)}" onclick="openImageModal(this.dataset.receipt)"></td>
                         <td>
                             <div class="action-menu-inline">
-                                <a href="${waUrl}" target="_blank" class="icon-btn whatsapp" title="واتساب">💬</a>
+                                <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="icon-btn whatsapp" title="واتساب">💬</a>
                                 <button class="icon-btn danger" title="إلغاء وحذف" onclick="deleteBooking('confirmed', ${idx})">🗑️</button>
                             </div>
                         </td>`;
@@ -2700,7 +2700,7 @@
                             <td>${escapeHtml(currentLang === 'ar' ? b.itemNameAr : b.itemNameEn)}</td>
                             <td><small>${escapeHtml(b.details)}</small></td>
                             <td>الإجمالي: ${b.total.toFixed(2)} JOD<br><strong style="color:#C28222;">عربون ثابت: 5.00 JOD</strong></td>
-                            <td><img src="${escapeHtml(b.receiptData)}" class="receipt-thumb" onclick="openImageModal('${b.receiptData}')"></td>
+                            <td><img src="${escapeHtml(b.receiptData)}" class="receipt-thumb" data-receipt="${escapeHtml(b.receiptData)}" onclick="openImageModal(this.dataset.receipt)"></td>
                             <td>${isConfirmed ? '<span class="badge-status active">✅ مؤكد</span>' : '<span class="badge-status editing">⏳ انتظار</span>'}</td>`;
                         tbodyPitchesBookings.appendChild(tr);
                     });
@@ -2935,6 +2935,7 @@
                 const row = {
                     'اسم العميل': b.clientName || '',
                     'رقم الهاتف': String(b.phone || ''),
+                    'المنشأة / الخدمة': (currentLang === 'ar' ? b.itemNameAr : b.itemNameEn) || '',
                     'تفاصيل الحجز': b.details || '',
                     'مبلغ العربون (د.أ)': b.deposit ? parseFloat(b.deposit.toFixed(2)) : 0,
                     'المبلغ الإجمالي (د.أ)': b.total ? parseFloat(b.total.toFixed(2)) : 0,
@@ -2945,7 +2946,7 @@
                 return row;
             });
             const worksheet = XLSX.utils.json_to_sheet(data, { cellStyles: true });
-            worksheet['!cols'] = [{ wch: 28 }, { wch: 18 }, { wch: 32 }, { wch: 20 }, { wch: 22 }, { wch: 16 }, { wch: 40 }, { wch: 40 }];
+            worksheet['!cols'] = [{ wch: 28 }, { wch: 18 }, { wch: 26 }, { wch: 32 }, { wch: 20 }, { wch: 22 }, { wch: 16 }, { wch: 40 }, { wch: 40 }];
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, 'الحجوزات المؤكدة');
             XLSX.writeFile(workbook, 'تقرير_حجوزات_Weekend.xlsx', { bookType: 'xlsx', compression: true });
@@ -2966,12 +2967,13 @@
             const rows = confirmedBookings.map(function(b, i) {
                 const bg = i % 2 === 0 ? '#FFFFFF' : '#F8FAF9';
                 const locRow = (b.pickupLocation || b.dropoffLocation)
-                    ? `<tr style="background:${bg};"><td colspan="7" style="padding:4px 10px;font-size:10px;color:#555;border-bottom:1px solid #F0F2F1;">📌 ${escapeHtml(b.pickupLocation || '')} → 🏁 ${escapeHtml(b.dropoffLocation || '')}</td></tr>`
+                    ? `<tr style="background:${bg};"><td colspan="8" style="padding:4px 10px;font-size:10px;color:#555;border-bottom:1px solid #F0F2F1;">📌 ${escapeHtml(b.pickupLocation || '')} → 🏁 ${escapeHtml(b.dropoffLocation || '')}</td></tr>`
                     : '';
                 return `<tr style="background:${bg};">
                     <td style="padding:8px 10px;border-bottom:1px solid #F0F2F1;">${i + 1}</td>
                     <td style="padding:8px 10px;border-bottom:1px solid #F0F2F1;font-weight:600;">${escapeHtml(b.clientName || '')}</td>
                     <td style="padding:8px 10px;border-bottom:1px solid #F0F2F1;direction:ltr;text-align:right;">${escapeHtml(b.phone || '')}</td>
+                    <td style="padding:8px 10px;border-bottom:1px solid #F0F2F1;">${escapeHtml((currentLang === 'ar' ? b.itemNameAr : b.itemNameEn) || '')}</td>
                     <td style="padding:8px 10px;border-bottom:1px solid #F0F2F1;">${escapeHtml(b.details || '')}</td>
                     <td style="padding:8px 10px;border-bottom:1px solid #F0F2F1;color:#B27517;font-weight:700;">${b.deposit ? b.deposit.toFixed(2) + ' JOD' : '—'}</td>
                     <td style="padding:8px 10px;border-bottom:1px solid #F0F2F1;font-weight:600;">${b.total ? b.total.toFixed(2) + ' JOD' : '—'}</td>
@@ -2998,6 +3000,7 @@
                             <th style="padding:10px 8px;text-align:right;">#</th>
                             <th style="padding:10px 8px;text-align:right;">اسم العميل</th>
                             <th style="padding:10px 8px;text-align:right;">رقم الهاتف</th>
+                            <th style="padding:10px 8px;text-align:right;">المنشأة / الخدمة</th>
                             <th style="padding:10px 8px;text-align:right;">التفاصيل</th>
                             <th style="padding:10px 8px;text-align:right;">العربون</th>
                             <th style="padding:10px 8px;text-align:right;">الإجمالي</th>
