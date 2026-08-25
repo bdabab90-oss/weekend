@@ -65,6 +65,12 @@
         .filters { display: flex; gap: 0.7rem; margin-bottom: 1.8rem; flex-wrap: wrap; }
         .filter-chip { background: white; border: 1.5px solid #D0D9D4; color: var(--text-dark); padding: 0.45rem 1.1rem; border-radius: 30px; cursor: pointer; font-weight: 500; font-size: 0.88rem; transition: all 0.25s ease; }
         .filter-chip.active, .filter-chip:hover { background: var(--primary-dark); color: white; border-color: var(--primary-dark); }
+        .season-filters { display:flex; gap:0.7rem; margin:-0.8rem 0 1.8rem; flex-wrap:wrap; align-items:center; }
+        .season-filters-label { color:var(--text-muted); font-size:0.84rem; font-weight:600; }
+        .season-chip { background:white; border:1.5px solid #D0D9D4; color:var(--text-dark); padding:0.4rem 1rem; border-radius:30px; cursor:pointer; font-weight:500; font-size:0.84rem; transition:all 0.25s ease; }
+        .season-chip.active, .season-chip:hover { background:var(--accent-gold); color:var(--primary-dark); border-color:var(--accent-gold); }
+        [dir="ltr"] .season-filters-label { direction:ltr; }
+        @media (max-width: 768px) { .season-filters { overflow-x:auto; flex-wrap:nowrap; white-space:nowrap; padding-bottom:8px; } .season-chip { flex:0 0 auto; } }
 
         /* Cards Grid */
         .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.8rem; }
@@ -403,10 +409,15 @@
             </div>
         </div>
         <div class="filters">
-            <button class="filter-chip active" onclick="filterCategory('all')" data-key="filterAll">الكل</button>
-            <button class="filter-chip" onclick="filterCategory('farm')" data-key="filterFarms">مزارع وشاليهات 🌴</button>
-            <button class="filter-chip" onclick="filterCategory('field')" data-key="filterFields">ملاعب ⚽</button>
-            <button class="filter-chip" onclick="filterCategory('transport')" data-key="filterTransport">وسائل نقل وباصات 🚌</button>
+            <button class="filter-chip active" onclick="filterCategory('all', event)" data-key="filterAll">الكل</button>
+            <button class="filter-chip" onclick="filterCategory('farm', event)" data-key="filterFarms">مزارع وشاليهات 🌴</button>
+            <button class="filter-chip" onclick="filterCategory('field', event)" data-key="filterFields">ملاعب ⚽</button>
+            <button class="filter-chip" onclick="filterCategory('transport', event)" data-key="filterTransport">وسائل نقل وباصات 🚌</button>
+        </div>
+        <div class="season-filters" id="season-filters" style="display:flex;">
+            <span class="season-filters-label" data-key="seasonFilterLabel">الموسم:</span>
+            <button type="button" class="season-chip" data-season="winter" onclick="toggleSeasonFilter('winter', this)" data-key="seasonWinter">شتوية</button>
+            <button type="button" class="season-chip" data-season="summer" onclick="toggleSeasonFilter('summer', this)" data-key="seasonSummer">صيفية</button>
         </div>
         <div class="cards-grid" id="items-container"></div>
     </div>
@@ -543,6 +554,13 @@
                                 </div>
                             </div>
                             <div class="form-row"><div class="form-group" style="flex:1;"><label>الموقع</label><input type="text" class="form-control" id="adm-v-location" required placeholder="عمّان - طريق المطار"></div></div>
+                            <div class="form-group">
+                                <label>الموسم (يمكن اختيار الاثنين معاً)</label>
+                                <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:5px;">
+                                    <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="adm-v-season-winter" value="winter"> ❄️ شتوية</label>
+                                    <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="adm-v-season-summer" value="summer"> ☀️ صيفية</label>
+                                </div>
+                            </div>
 
                             <!-- Shift-based pricing for farms/chalets -->
                             <div id="adm-v-shifts-section">
@@ -1045,6 +1063,7 @@
                 lat: r.lat, lng: r.lng,
                 cancelPolicyAr: r.cancel_policy_ar, cancelPolicyEn: r.cancel_policy_en,
                 amenities: r.amenities || [],
+                seasons: Array.isArray(r.seasons) && r.seasons.length ? r.seasons : ['summer', 'winter'],
                 rating: r.rating, active: r.active,
                 reviews: []
             };
@@ -1061,7 +1080,9 @@
                 images: it.images || [], video_url: it.videoUrl || null,
                 lat: it.lat || null, lng: it.lng || null,
                 cancel_policy_ar: it.cancelPolicyAr || null, cancel_policy_en: it.cancelPolicyEn || null,
-                amenities: it.amenities || [], rating: it.rating || 5.0, active: it.active
+                amenities: it.amenities || [],
+                ...(it.category !== 'transport' ? { seasons: Array.isArray(it.seasons) && it.seasons.length ? it.seasons : ['summer', 'winter'] } : {}),
+                rating: it.rating || 5.0, active: it.active
             };
         }
         function rowToBooking(r) {
@@ -1442,9 +1463,99 @@
         //  TRANSLATIONS
         // =====================================================
         const translations = {
-            ar: { navHome:'الواجهة الرئيسية', navAdmin:'👑 لوحة الأدمن', btnDetails:'التفاصيل', btnBookNow:'ابدأ الحجز', badgeFarm:'مزرعة', badgeField:'ملعب', badgeTransport:'حافلة / باص' },
-            en: { navHome:'Home Page', navAdmin:'👑 Admin Panel', btnDetails:'Details', btnBookNow:'Book Now', badgeFarm:'Farm', badgeField:'Field', badgeTransport:'Bus' }
+            ar: {
+                navHome:'الواجهة الرئيسية', navFav:'المفضلة', navAdmin:'👑 لوحة الأدمن',
+                heroTitle:'احجز مكانك أو وسيلة النقل بسهولة وأمان', heroSubtitle:'حساب أوتوماتيكي للعربون - تأكيد فوري عبر CliQ - تجربة حجز سلسة',
+                favTitle:'قائمة المفضلة', sbTitle:'لوحة التحكم', sbOverview:'الرئيسية (الإحصائيات)', sbListings:'إدارة المنشآت', sbPitches:'إدارة الملاعب', sbBookings:'الحجوزات والطلبات',
+                dashTitle:'📊 نظرة عامة والإحصائيات', statPending:'طلبات بانتظار التأكيد', statConfirmed:'إجمالي الحجوزات المؤكدة', statRevenue:'مجموع أرباح العربون',
+                manageListingsTitle:'قائمة المنشآت الحالية (المزارع والشاليهات ووسائل النقل)', logoutBtn:'تسجيل الخروج',
+                filterAll:'الكل', filterFarms:'مزارع وشاليهات 🌴', filterFields:'ملاعب ⚽', filterTransport:'وسائل نقل وباصات 🚌', seasonFilterLabel:'الموسم:', seasonWinter:'شتوية', seasonSummer:'صيفية',
+                btnDetails:'التفاصيل', btnBookNow:'ابدأ الحجز', badgeFarm:'مزرعة', badgeField:'ملعب', badgeTransport:'حافلة / باص'
+            },
+            en: {
+                navHome:'Home', navFav:'Favorites', navAdmin:'👑 Admin Panel',
+                heroTitle:'Book your place or transportation easily and safely', heroSubtitle:'Automatic deposit calculation - Instant CliQ confirmation - A smooth booking experience',
+                favTitle:'Favorites', sbTitle:'Dashboard', sbOverview:'Overview & Statistics', sbListings:'Manage Listings', sbPitches:'Manage Fields', sbBookings:'Bookings & Requests',
+                dashTitle:'📊 Overview & Statistics', statPending:'Pending Confirmation', statConfirmed:'Total Confirmed Bookings', statRevenue:'Total Deposit Revenue',
+                manageListingsTitle:'Current Listings (Farms, Chalets & Transportation)', logoutBtn:'Log Out',
+                filterAll:'All', filterFarms:'Farms & Chalets 🌴', filterFields:'Sports Fields ⚽', filterTransport:'Transportation & Buses 🚌', seasonFilterLabel:'Season:', seasonWinter:'Winter', seasonSummer:'Summer',
+                btnDetails:'Details', btnBookNow:'Book Now', badgeFarm:'Farm', badgeField:'Field', badgeTransport:'Bus'
+            }
         };
+
+        const staticTextTranslations = {
+            'الشروط والأحكام وسياسة الاستخدام — منصة Weekend':'Terms & Conditions and Privacy Policy — Weekend',
+            'الشروط والأحكام وسياسة الاستخدام':'Terms & Conditions and Privacy Policy',
+            'آخر تحديث: أغسطس 2026':'Last updated: August 2026',
+            'إضافة منشأة أو وسيلة نقل جديدة':'Add a New Facility or Transportation Service',
+            '🏡 إضافة (مزرعة / شاليه / ملعب)':'🏡 Add (Farm / Chalet / Field)',
+            '🚌 إضافة (وسيلة نقل / باص)':'🚌 Add (Transportation / Bus)',
+            'الاسم':'Name','النوع':'Type','الموقع':'Location','الوصف والمواصفات':'Description & Specifications',
+            'الموسم (يمكن اختيار الاثنين معاً)':'Season (you can select both)', '❄️ شتوية':'❄️ Winter','☀️ صيفية':'☀️ Summer',
+            'أسعار الشفتات (د.أ):':'Shift Prices (JOD):','سعر الصباح (النهار)':'Morning Price (day)','سعر المساء (الليل)':'Evening Price (night)','سعر اليوم الكامل':'Full-day Price',
+            'سعر الساعة (د.أ):':'Hourly Price (JOD):','سعر الساعة (الحد الأدنى للحجز ساعتان)':'Hourly Price (minimum booking: 2 hours)',
+            'صورة المنشأة':'Facility Image','روابط صور إضافية (كل رابط في سطر)':'Additional Image URLs (one per line)',
+            'رابط فيديو ترويجي (YouTube embed)':'Promotional Video URL (YouTube embed)','سياسة الإلغاء والاسترداد':'Cancellation & Refund Policy',
+            'المرافق والمميزات (اختر ما ينطبق):':'Amenities (select all that apply):','مسبح خاص':'Private Pool','باربيكيو':'BBQ','واي فاي':'Wi-Fi','تدفئة':'Heating','جلسة خارجية':'Outdoor Seating',
+            'نشر المنشأة':'Publish Facility','إلغاء التعديل':'Cancel Editing','نشر وسيلة النقل':'Publish Transportation',
+            'الموسم / العطلات':'Season / Holidays','تسعير الموسم / العطلات':'Season / Holiday Pricing','أيام عادية (سعر عادي)':'Regular Days (standard price)','الخميس والجمعة والسبت (+15%)':'Thursday, Friday & Saturday (+15%)',
+            'اختر الشفت / التوقيت:':'Choose a shift / time:','صباحي (النهار)':'Morning (day)','مسائي (الليل)':'Evening (night)','يوم كامل':'Full day',
+            '📅 التقويم التفاعلي - اضغط على يوم متاح للحجز':'📅 Interactive calendar - click an available day to book', 'الانتقال للحجز الفوري':'Go to instant booking', '💬 مشاركة عبر واتساب':'💬 Share via WhatsApp',
+            '⭐ تقييمات وآراء العملاء':'⭐ Customer Reviews','أضف تقييمك للمكان':'Add your review','إرسال التقييم':'Submit Review',
+            'تأكيد الحجز':'Booking Confirmation','1. بيانات العميل:':'1. Customer Information:','2. تفاصيل التاريخ ونوع الرحلة:':'2. Date & Trip Details:',
+            'تاريخ الحجز':'Booking Date','عدد الساعات (الحد الأدنى 2)':'Number of Hours (minimum 2)','ساعة البدء':'Start Time',
+            '2. تفاصيل الرحلة:':'2. Trip Details:','عدد الركاب':'Number of Passengers','المسافة (كيلومتر)':'Distance (kilometers)','ذهاب وإياب (Round Trip)':'Round Trip','تاريخ الرحلة':'Trip Date',
+            '3. تحويل العربون عبر CliQ:':'3. Deposit Transfer via CliQ:','مواقع الانطلاق والوصول (إلزامي)':'Pickup and Drop-off Locations (required)',
+            'موقع الانطلاق / نقطة التجميع':'Pickup Location / Meeting Point','موقع الوصول / الوجهة':'Drop-off Location / Destination',
+            'أوافق على':'I agree to','تأكيد وإرسال طلب الحجز':'Confirm & Send Booking Request','صورة وصل تحويل CliQ':'CliQ Transfer Receipt',
+            '💬 الدعم والمحادثة الفورية':'💬 Live Support Chat','المساعد الذكي منصة Weekend':'Weekend Smart Assistant','مرحباً بك! كيف يمكنني مساعدتك اليوم؟':'Welcome! How can I help you today?',
+            'كيف أدفع العربون؟':'How do I pay the deposit?','رقم الشكاوى والدعم':'Support & Complaints Number','فتح محادثة واتساب مباشرة':'Open WhatsApp Chat',
+            '⚠️ سياسة الإلغاء والاسترداد:':'⚠️ Cancellation & Refund Policy:',
+            '✨ المرافق والمميزات:':'✨ Amenities & Features:',
+            '📍 الموقع على الخريطة':'📍 Location on Map',
+            '🗺️ فتح في خرائط Google':'🗺️ Open in Google Maps',
+            '🎬 فيديو ترويجي':'🎬 Promotional Video',
+            '⭐ تقييمات وآراء العملاء':'⭐ Customer Reviews',
+            'أضف تقييمك للمكان':'Add Your Review', 'اسمك الكريم':'Your Name', 'رأيك بالتجربة...':'Your experience...',
+            'العودة للرئيسية':'Back to Home','← العودة للتصفح':'← Back to Browse','جميع الحقوق محفوظة - Weekend Platform 2026 ©':'All rights reserved - Weekend Platform 2026 ©'
+        };
+
+        function applyLanguage() {
+            const lang = translations[currentLang];
+            document.querySelectorAll('[data-key]').forEach(el => {
+                if (lang[el.dataset.key] !== undefined) el.textContent = lang[el.dataset.key];
+            });
+            const reverseStaticTextTranslations = Object.fromEntries(Object.entries(staticTextTranslations).map(([ar, en]) => [en, ar]));
+            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+            const textNodes = [];
+            while (walker.nextNode()) textNodes.push(walker.currentNode);
+            textNodes.forEach(node => {
+                if (node.parentElement && ['SCRIPT','STYLE','OPTION'].includes(node.parentElement.tagName)) return;
+                const raw = node.nodeValue.trim();
+                if (!raw) return;
+                const translated = currentLang === 'en' ? staticTextTranslations[raw] : reverseStaticTextTranslations[raw];
+                if (translated) node.nodeValue = node.nodeValue.replace(raw, translated);
+            });
+            const search = document.getElementById('search-location');
+            if (search) search.placeholder = currentLang === 'ar' ? 'ابحث بالاسم أو الموقع أو الكلمة المفتاحية...' : 'Search by name, location or keyword...';
+            const placeholders = {
+                'adm-v-name': ['مثال: مزرعة الفخامة الهادئة','Example: Quiet Luxury Farm'],
+                'adm-v-location': ['عمّان - طريق المطار','Amman - Airport Road'],
+                'adm-v-specs': ['مسبح مفلتر، 3 غرف نوم...','Filtered pool, 3 bedrooms...'],
+                'adm-v-cancel': ['إلغاء مجاني قبل 48 ساعة...','Free cancellation before 48 hours...'],
+                'adm-t-name': ['باص تويوتا كوستر 23 راكب','Toyota Coaster Bus - 23 seats'],
+                'adm-t-location': ['عمّان - كافة المحافظات','Amman - All governorates'],
+                'adm-t-specs': ['تكييف ممتاز، شاشات عرض...','Excellent AC, display screens...'],
+                'adm-t-cancel': ['إلغاء مجاني قبل 48 ساعة...','Free cancellation before 48 hours...']
+            };
+            Object.entries(placeholders).forEach(([id, values]) => { const el = document.getElementById(id); if (el) el.placeholder = values[currentLang === 'ar' ? 0 : 1]; });
+            const categoryOptions = document.querySelectorAll('#search-category option');
+            const arOptions = ['جميع الأنواع','مزارع وشاليهات 🌴','ملاعب ⚽','حافلات 🚌'];
+            const enOptions = ['All Types','Farms & Chalets 🌴','Sports Fields ⚽','Buses 🚌'];
+            categoryOptions.forEach((option, i) => { option.textContent = (currentLang === 'ar' ? arOptions : enOptions)[i] || option.textContent; });
+            document.documentElement.lang = currentLang;
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+        }
 
         // =====================================================
         //  INIT
@@ -1513,8 +1624,10 @@
             document.documentElement.lang = currentLang;
             document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
             document.getElementById('lang-toggle-btn').innerText = currentLang === 'ar' ? 'English' : 'العربية';
-            renderItems('all');
-            if (isAdminLoggedIn) renderAdminPanel();
+            applyLanguage();
+            renderItems(document.getElementById('search-category')?.value || 'all');
+            applyLanguage();
+            if (isAdminLoggedIn) { renderAdminPanel(); applyLanguage(); }
         }
 
         function switchView(viewId) {
@@ -1610,20 +1723,64 @@
         // =====================================================
         //  RENDER ITEMS
         // =====================================================
+        const selectedSeasons = new Set();
+        const englishDataFallbacks = {
+            'مزرعة الفخامة الهادئة':'Quiet Luxury Farm',
+            'عمّان - طريق المطار':'Amman - Airport Road',
+            'مسبح مفلتر، 3 غرف نوم، منطقة باربيكيو، ألعاب أطفال، إضاءة هادئة ومساحات واسعة للاسترخاء.':'Filtered pool, 3 bedrooms, BBQ area, children’s play area, soft lighting, and spacious relaxation areas.'
+        };
+        function localizedItemText(item, field) {
+            if (currentLang === 'ar') return item[field + 'Ar'] || '';
+            const english = String(item[field + 'En'] || '').trim();
+            if (english && !/[\u0600-\u06FF]/.test(english)) return english;
+            return englishDataFallbacks[String(item[field + 'Ar'] || '').trim()] || 'English translation unavailable';
+        }
+        function localizedPolicyText(item) {
+            if (currentLang === 'ar') return item.cancelPolicyAr || '';
+            const english = String(item.cancelPolicyEn || '').trim();
+            if (english && !/[\u0600-\u06FF]/.test(english)) return english;
+            return 'Free cancellation before 48 hours. The deposit is non-refundable after booking confirmation.';
+        }
+
+        function syncSeasonFilterVisibility(category) {
+            const seasonFilters = document.getElementById('season-filters');
+            if (!seasonFilters) return;
+            const visible = category !== 'transport';
+            seasonFilters.style.display = visible ? 'flex' : 'none';
+            if (!visible && selectedSeasons.size) {
+                selectedSeasons.clear();
+                document.querySelectorAll('.season-chip').forEach(b => b.classList.remove('active'));
+            }
+        }
+
+        function toggleSeasonFilter(season, button) {
+            if (selectedSeasons.has(season)) {
+                selectedSeasons.delete(season);
+                button.classList.remove('active');
+            } else {
+                selectedSeasons.add(season);
+                button.classList.add('active');
+            }
+            liveSearch();
+        }
+
         function renderItems(category, locationQuery = '', maxPriceQuery = null) {
             const container = document.getElementById('items-container');
+            syncSeasonFilterVisibility(category);
             container.innerHTML = '';
             let filtered = items.filter(item => {
                 if (!item.active) return false;
                 const matchesCat = category === 'all' || item.category === category;
-                const locText = (currentLang === 'ar' ? item.locationAr : item.locationEn).toLowerCase();
+                const locText = localizedItemText(item, 'location').toLowerCase();
                 const matchesLoc = locationQuery === '' || locText.includes(locationQuery.toLowerCase());
+                const itemSeasons = Array.isArray(item.seasons) && item.seasons.length ? item.seasons : ['summer', 'winter'];
+                const matchesSeason = selectedSeasons.size === 0 || item.category === 'transport' || [...selectedSeasons].some(season => itemSeasons.includes(season));
                 let refPrice;
                 if (item.category === 'transport') refPrice = (item.pricePerKm || 0) * 50;
                 else if (item.category === 'field') refPrice = (item.hourlyRate || 0) * 2;
                 else refPrice = item.priceDay || 0;
                 const matchesPrice = !maxPriceQuery || refPrice <= maxPriceQuery;
-                return matchesCat && matchesLoc && matchesPrice;
+                return matchesCat && matchesLoc && matchesPrice && matchesSeason;
             });
 
             if (filtered.length === 0) {
@@ -1659,9 +1816,9 @@
             });
         }
 
-        function filterCategory(category) {
+        function filterCategory(category, ev) {
             document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
-            if (event) event.target.classList.add('active');
+            if (ev && ev.currentTarget) ev.currentTarget.classList.add('active');
             document.getElementById('search-category').value = category;
             liveSearch();
         }
@@ -1730,19 +1887,25 @@
             let badgeText = currentLang === 'ar' ? 'مزرعة' : 'Farm';
             if (item.category === 'field') badgeText = currentLang === 'ar' ? 'ملعب' : 'Field';
             if (item.category === 'transport') badgeText = currentLang === 'ar' ? 'حافلة' : 'Bus';
-            const name = currentLang === 'ar' ? item.nameAr : item.nameEn;
-            const location = currentLang === 'ar' ? item.locationAr : item.locationEn;
-            const specs = currentLang === 'ar' ? item.specsAr : item.specsEn;
+            const name = localizedItemText(item, 'name');
+            const location = localizedItemText(item, 'location');
+            const specs = localizedItemText(item, 'specs');
             const isFav = favorites.has(item.id);
 
             // Price tag line
             let priceTagHtml;
             if (item.category === 'transport') {
-                priceTagHtml = `🚗 ${item.pricePerKm || 0} JOD/كم &nbsp;|&nbsp; 👤 ${item.pricePerPerson || 0} JOD/شخص`;
+                priceTagHtml = currentLang === 'ar'
+                    ? `🚗 ${item.pricePerKm || 0} JOD/كم &nbsp;|&nbsp; 👤 ${item.pricePerPerson || 0} JOD/شخص`
+                    : `🚗 ${item.pricePerKm || 0} JOD/km &nbsp;|&nbsp; 👤 ${item.pricePerPerson || 0} JOD/person`;
             } else if (item.category === 'field') {
-                priceTagHtml = `⏰ ${item.hourlyRate || 0} JOD/ساعة &nbsp;|&nbsp; 🔒 عربون 5 JOD`;
+                priceTagHtml = currentLang === 'ar'
+                    ? `⏰ ${item.hourlyRate || 0} JOD/ساعة &nbsp;|&nbsp; 🔒 عربون 5 JOD`
+                    : `⏰ ${item.hourlyRate || 0} JOD/hour &nbsp;|&nbsp; 🔒 5 JOD deposit`;
             } else {
-                priceTagHtml = `☀️ ${item.priceDay} | 🌙 ${item.priceNight} JOD`;
+                priceTagHtml = currentLang === 'ar'
+                    ? `☀️ ${item.priceDay} | 🌙 ${item.priceNight} JOD`
+                    : `☀️ ${item.priceDay} | 🌙 ${item.priceNight} JOD`;
             }
 
             const card = document.createElement('div');
@@ -1778,10 +1941,10 @@
         let detailsMap = null;
         function openDetailsModal(id) {
             selectedItem = items.find(i => i.id === id);
-            const name = currentLang === 'ar' ? selectedItem.nameAr : selectedItem.nameEn;
+            const name = localizedItemText(selectedItem, 'name');
             document.getElementById('det-title').innerText = name;
-            document.getElementById('det-location').innerText = '📍 ' + (currentLang === 'ar' ? selectedItem.locationAr : selectedItem.locationEn);
-            document.getElementById('det-specs').innerText = currentLang === 'ar' ? selectedItem.specsAr : selectedItem.specsEn;
+            document.getElementById('det-location').innerText = '📍 ' + localizedItemText(selectedItem, 'location');
+            document.getElementById('det-specs').innerText = localizedItemText(selectedItem, 'specs');
             document.getElementById('det-book-btn').onclick = () => { closeModal('details-modal'); openBookingModal(id); };
 
             // Gallery
@@ -1814,7 +1977,7 @@
 
             // Cancel Policy
             const policyBox = document.getElementById('det-cancel-policy');
-            const policyText = currentLang === 'ar' ? selectedItem.cancelPolicyAr : selectedItem.cancelPolicyEn;
+            const policyText = localizedPolicyText(selectedItem);
             if (policyText) {
                 document.getElementById('det-cancel-text').innerText = policyText;
                 policyBox.style.display = 'block';
@@ -1863,12 +2026,12 @@
             container.innerHTML = '';
             const heading = document.getElementById('det-reviews-heading');
             if (!selectedItem.reviews || selectedItem.reviews.length === 0) {
-                if (heading) heading.innerHTML = '⭐ تقييمات وآراء العملاء';
-                container.innerHTML = `<p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1rem;">لا توجد تقييمات حالياً.</p>`;
+                if (heading) heading.innerHTML = currentLang === 'ar' ? '⭐ تقييمات وآراء العملاء' : '⭐ Customer Reviews';
+                container.innerHTML = `<p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1rem;">${currentLang === 'ar' ? 'لا توجد تقييمات حالياً.' : 'No reviews yet.'}</p>`;
                 return;
             }
             const avg = selectedItem.reviews.reduce((s, r) => s + r.rating, 0) / selectedItem.reviews.length;
-            if (heading) heading.innerHTML = `${renderStars(avg)} <span style="font-size:0.85rem;font-weight:600;color:#666;margin-right:6px;">${avg.toFixed(1)} / 5</span><span style="font-size:0.82rem;color:var(--text-muted);">(${selectedItem.reviews.length} تقييم)</span>`;
+            if (heading) heading.innerHTML = `${renderStars(avg)} <span style="font-size:0.85rem;font-weight:600;color:#666;margin-right:6px;">${avg.toFixed(1)} / 5</span><span style="font-size:0.82rem;color:var(--text-muted);">(${selectedItem.reviews.length} ${currentLang === 'ar' ? 'تقييم' : 'reviews'})</span>`;
             selectedItem.reviews.forEach(r => {
                 const div = document.createElement('div');
                 div.className = 'review-card';
@@ -1904,7 +2067,7 @@
         // =====================================================
         function openBookingModal(id) {
             selectedItem = items.find(i => i.id === id);
-            document.getElementById('modal-venue-name').innerText = currentLang === 'ar' ? selectedItem.nameAr : selectedItem.nameEn;
+            document.getElementById('modal-venue-name').innerText = localizedItemText(selectedItem, 'name');
             document.getElementById('accept-terms-checkbox').checked = false;
             currentUploadedReceiptBase64 = '';
 
@@ -2301,13 +2464,21 @@
         // =====================================================
         //  ADD / EDIT LISTING
         // =====================================================
-        function addListing(e, formType) {
+        async function addListing(e, formType) {
             e.preventDefault();
-            let category, name, location, specs, imgStore, imgUrl, extraImgs, videoUrl, lat, lng, cancelPolicy, amenities;
+            let category, name, location, specs, imgStore, imgUrl, extraImgs, videoUrl, lat, lng, cancelPolicy, amenities, seasons = ['summer', 'winter'];
             let priceDay = 0, priceNight = 0, priceFull = 0, pricePerKm = 0, pricePerPerson = 0, hourlyRate = 0;
 
             if (formType === 'venue') {
                 category    = document.getElementById('adm-v-type').value;
+                seasons     = [
+                    document.getElementById('adm-v-season-winter').checked ? 'winter' : null,
+                    document.getElementById('adm-v-season-summer').checked ? 'summer' : null
+                ].filter(Boolean);
+                if (!seasons.length) {
+                    showToast('⚠️ اختر موسماً واحداً على الأقل');
+                    return;
+                }
                 name        = document.getElementById('adm-v-name').value;
                 location    = document.getElementById('adm-v-location').value;
                 if (category === 'field') {
@@ -2365,6 +2536,7 @@
                         videoUrl, lat, lng,
                         cancelPolicyAr: cancelPolicy, cancelPolicyEn: cancelPolicy,
                         amenities: amenities || [],
+                        ...(category !== 'transport' ? { seasons } : {}),
                         active: true,
                         _editing: false
                     };
@@ -2384,9 +2556,16 @@
                         items[idx].priceNight = priceNight;
                         items[idx].priceFull  = priceFull;
                     }
+                    const { error } = await db.from('facilities').update(itemToRow(items[idx])).eq('id', editingId);
+                    if (error) {
+                        items[idx] = existing;
+                        showToast('❌ تعذر حفظ التعديلات في قاعدة البيانات');
+                        console.error('تعذر حفظ تعديل المنشأة بالقاعدة:', error);
+                        renderAdminPanel();
+                        renderItems('all');
+                        return;
+                    }
                     showToast('✅ تم حفظ التعديلات وإعادة نشر المنشأة');
-                    db.from('facilities').update(itemToRow(items[idx])).eq('id', editingId)
-                        .then(({ error }) => { if (error) console.error('تعذر حفظ تعديل المنشأة بالقاعدة:', error); });
                 }
                 cancelEditMode(formType);
             } else {
@@ -2400,6 +2579,7 @@
                     videoUrl, lat, lng,
                     cancelPolicyAr: cancelPolicy, cancelPolicyEn: cancelPolicy,
                     amenities: amenities || [],
+                    ...(category !== 'transport' ? { seasons } : {}),
                     rating: 5.0, active: true,
                     reviews: []
                 };
@@ -2413,10 +2593,14 @@
                     newItem.priceNight = priceNight;
                     newItem.priceFull  = priceFull;
                 }
+                const { error } = await db.from('facilities').insert(itemToRow(newItem));
+                if (error) {
+                    showToast('❌ تعذر حفظ المنشأة الجديدة في قاعدة البيانات');
+                    console.error('تعذر حفظ المنشأة الجديدة بالقاعدة:', error);
+                    return;
+                }
                 items.push(newItem);
                 showToast('✅ تم إضافة المنشأة بنجاح');
-                db.from('facilities').insert(itemToRow(newItem))
-                    .then(({ error }) => { if (error) console.error('تعذر حفظ المنشأة الجديدة بالقاعدة:', error); });
 
                 if (formType === 'venue') document.getElementById('add-venue-form').reset();
                 else document.getElementById('add-transport-form').reset();
@@ -2465,7 +2649,9 @@
                 document.getElementById('adm-v-editing-id').value  = id;
                 document.getElementById('adm-v-name').value        = item.nameAr;
                 document.getElementById('adm-v-type').value        = item.category;
-                document.getElementById('adm-v-location').value    = item.locationAr;
+                                document.getElementById('adm-v-location').value  = item.locationAr;
+                document.getElementById('adm-v-season-winter').checked = (item.seasons || ['summer', 'winter']).includes('winter');
+                document.getElementById('adm-v-season-summer').checked = (item.seasons || ['summer', 'winter']).includes('summer');
 
                 if (item.category === 'field') {
                     // Show hourly rate section for fields
@@ -2626,8 +2812,8 @@
                 tbodyListings.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:2rem;">لا توجد منشآت مضافة</td></tr>`;
             } else {
                 nonPitchItems.forEach(item => {
-                    const itemName = currentLang === 'ar' ? item.nameAr : item.nameEn;
-                    const itemLoc  = currentLang === 'ar' ? item.locationAr : item.locationEn;
+                    const itemName = localizedItemText(item, 'name');
+                    const itemLoc  = localizedItemText(item, 'location');
                     let statusHtml;
                     if (item._editing) statusHtml = `<span class="badge-status editing">⏸️ قيد التعديل</span>`;
                     else if (item.active) statusHtml = `<span class="badge-status active">نشط</span>`;
@@ -2834,14 +3020,14 @@
                     const partialBooked = morningBooked || eveningBooked;
 
                     if (fullyBooked) {
-                        cls += ' booked'; title = 'محجوز بالكامل';
+                        cls += ' booked'; title = currentLang === 'ar' ? 'محجوز بالكامل' : 'Fully booked';
                     } else if (partialBooked) {
-                        cls += ' partial'; title = 'محجوز جزئياً';
+                        cls += ' partial'; title = currentLang === 'ar' ? 'محجوز جزئياً' : 'Partially booked';
                     } else if (isWeekend) {
-                        cls += ' weekend-av'; title = 'متاح (+15% نهاية الأسبوع)';
+                        cls += ' weekend-av'; title = currentLang === 'ar' ? 'متاح (+15% نهاية الأسبوع)' : 'Available (+15% weekend)';
                         clickAttr = `onclick="calSelectDay('${dateStr}')"`;
                     } else {
-                        cls += ' available'; title = 'متاح - اضغط للحجز';
+                        cls += ' available'; title = currentLang === 'ar' ? 'متاح - اضغط للحجز' : 'Available - click to book';
                         clickAttr = `onclick="calSelectDay('${dateStr}')"`;
                     }
                 }
@@ -2850,10 +3036,10 @@
 
             html += `</div>
             <div class="avail-cal-legend">
-                <span><span class="legend-dot green"></span>متاح</span>
-                <span><span class="legend-dot blue"></span>متاح (نهاية أسبوع)</span>
-                <span><span class="legend-dot orange"></span>جزئي</span>
-                <span><span class="legend-dot red"></span>محجوز</span>
+                <span><span class="legend-dot green"></span>${currentLang === 'ar' ? 'متاح' : 'Available'}</span>
+                <span><span class="legend-dot blue"></span>${currentLang === 'ar' ? 'متاح (نهاية أسبوع)' : 'Available (weekend)'}</span>
+                <span><span class="legend-dot orange"></span>${currentLang === 'ar' ? 'جزئي' : 'Partial'}</span>
+                <span><span class="legend-dot red"></span>${currentLang === 'ar' ? 'محجوز' : 'Booked'}</span>
             </div>`;
 
             document.getElementById('avail-calendar').innerHTML = html;
@@ -2908,8 +3094,8 @@
         function sharePropertyWhatsApp(id) {
             const item = items.find(i => i.id === id);
             if (!item) return;
-            const name     = currentLang === 'ar' ? item.nameAr : item.nameEn;
-            const location = currentLang === 'ar' ? item.locationAr : item.locationEn;
+            const name     = localizedItemText(item, 'name');
+            const location = localizedItemText(item, 'location');
             let priceInfo;
             if (item.category === 'transport') {
                 priceInfo = `سعر الكيلو: ${item.pricePerKm} JOD | سعر الشخص: ${item.pricePerPerson} JOD`;
