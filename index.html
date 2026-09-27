@@ -1441,17 +1441,10 @@
         ];
 
         let pendingBookings = [];
-        let confirmedBookings = [
-            {
-                id: 101,
-                clientName: 'عبدالله العلي', phone: '0781929509',
-                itemId: 1,
-                itemNameAr: 'مزرعة الفخامة الهادئة', itemNameEn: 'Quiet Luxury Farm',
-                details: '2026-08-01 (fullday)',
-                total: 85.0, deposit: 12.75,
-                receiptData: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=300&q=80'
-            }
-        ];
+        // مهم أمنيًا: ما منحط هون أي حجز حقيقي (اسم/تلفون/إيصال) لأنه هاد الملف
+        // كود عام يقدر أي زائر يشوفه بـ "View Page Source" بدون أي تسجيل دخول.
+        // الحجوزات الحقيقية بتنجلب فقط من القاعدة عبر loadFromDatabase() بالأسفل.
+        let confirmedBookings = [];
 
         // Restore confirmed slots from pre-existing data
         confirmedBookings.forEach(b => {
