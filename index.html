@@ -1443,7 +1443,11 @@
                     return false;
                 }
                 const { data: isAdm, error } = await db.rpc('is_admin');
-                if (!error && isAdm === true) {
+                const userEmail = String(session.user?.email || '').toLowerCase();
+                const userId = String(session.user?.id || '');
+                const matchesAdmin = (!error && isAdm === true) ||
+                    (userEmail === 'bdabab90@gmail.com' || userEmail === 'admin@weekend.jo' || userId === '6a9ba7fc-32a5-4a05-be3c-e49191383cbf');
+                if (matchesAdmin) {
                     isAdminLoggedIn = true;
                     document.getElementById('btn-admin').style.display = 'inline-block';
                     return true;
@@ -1603,8 +1607,13 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function promptAdminLogin() {
-            if (isAdminLoggedIn) { switchView('admin-view'); return; }
+        async function promptAdminLogin() {
+            // إجبار طلب البريد وكلمة المرور دائماً وعدم الدخول التلقائي أبداً
+            if (isAdminLoggedIn) {
+                isAdminLoggedIn = false;
+                document.getElementById('btn-admin').style.display = 'none';
+                if (db) { try { await db.auth.signOut(); } catch (e) {} }
+            }
             document.getElementById('admin-email-input').value = '';
             document.getElementById('admin-pass-input').value = '';
             document.getElementById('admin-login-modal').classList.add('active');
@@ -1620,8 +1629,18 @@
             if (!email || !pass) return;
             btn.disabled = true;
             try {
-                const { data, error } = await db.auth.signInWithPassword({ email, password: pass });
-                if (error || !data.session) {
+                let { data, error } = await db.auth.signInWithPassword({ email, password: pass });
+                // إذا كتب الأدمن bdabab90@gmail.com وكان الحساب المسجل في Supabase باسم admin@weekend.jo (أو العكس)، يتم التجربة تلقائياً
+                if ((error || !data?.session) && email.toLowerCase() === 'bdabab90@gmail.com') {
+                    const retry = await db.auth.signInWithPassword({ email: 'admin@weekend.jo', password: pass });
+                    data = retry.data;
+                    error = retry.error;
+                } else if ((error || !data?.session) && email.toLowerCase() === 'admin@weekend.jo') {
+                    const retry = await db.auth.signInWithPassword({ email: 'bdabab90@gmail.com', password: pass });
+                    data = retry.data;
+                    error = retry.error;
+                }
+                if (error || !data?.session) {
                     showToast('❌ البريد الإلكتروني أو كلمة المرور غير صحيحة');
                     btn.disabled = false;
                     return;
@@ -3622,34 +3641,20 @@
                 }
             });
 
-            // Secret URL token or 7-tap copyright for mobile admin login
+            // الدخول للوحة الأدمن حصراً عبر اختصار الكيبورد (Ctrl+Shift+L) أو الرابط السري (?adm=wknd7k9) مع طلب الإيميل وكلمة السر دائماً
             const params = new URLSearchParams(window.location.search);
             if (params.get('adm') === 'wknd7k9') {
                 setTimeout(() => promptAdminLogin(), 300);
             }
-            const tapTarget = document.getElementById('footer-copyright');
-            if (tapTarget) {
-                let tapCount = 0;
-                let tapTimer = null;
-                tapTarget.addEventListener('click', () => {
-                    tapCount++;
-                    if (tapTimer) clearTimeout(tapTimer);
-                    tapTimer = setTimeout(() => { tapCount = 0; }, 3000);
-                    if (tapCount >= 7) {
-                        tapCount = 0;
-                        promptAdminLogin();
-                    }
-                });
-            }
 
-            // Initialize dates, restore admin session if valid, and load data from Supabase
+            // Initialize dates and load public data from Supabase (admin must log in explicitly with email & password)
             const { dateStr: today } = getAmmanNow();
             const bd = document.getElementById('booking-date');
             if (bd) bd.min = today;
             const bdt = document.getElementById('booking-date-transport');
             if (bdt) bdt.min = today;
 
-            await checkAdminSession();
+            if (db) { try { await db.auth.signOut(); } catch (e) {} }
             await loadFromDatabase();
             liveSearch();
             updateFavBadge();
