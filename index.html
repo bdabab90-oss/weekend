@@ -236,6 +236,32 @@
         .gallery-thumb:hover { transform:scale(1.05); }
         .gallery-thumb.active { border-color:var(--accent-gold); }
 
+        /* Admin Media Upload Box & Buttons (Separate Storage) */
+        .media-upload-box { background: #F5F9F6; border: 1.5px solid #C8E0D0; border-radius: 16px; padding: 1.2rem; margin-bottom: 1.2rem; }
+        .media-upload-box-title { color: var(--primary-dark); font-size: 0.96rem; font-weight: 700; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 6px; }
+        .media-upload-box-sub { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.9rem; }
+        .media-buttons-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 0.8rem; }
+        .media-upload-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--primary-dark); color: var(--accent-gold); border: 1.5px solid var(--accent-gold); padding: 0.7rem 1rem; border-radius: 12px; font-weight: 600; font-size: 0.86rem; cursor: pointer; transition: all 0.2s; text-align: center; min-height: 46px; position: relative; overflow: hidden; }
+        .media-upload-btn:hover { background: var(--primary-light); transform: translateY(-2px); }
+        .media-upload-btn.extra-btn { background: #FFFFFF; color: var(--primary-dark); border-color: var(--primary-dark); }
+        .media-upload-btn.extra-btn:hover { background: var(--primary-dark); color: #FFFFFF; }
+        .media-upload-btn.video-btn { background: #1B4332; color: #FFFFFF; border-color: #2D6A4F; }
+        .media-upload-btn.video-btn:hover { background: #2D6A4F; }
+        .media-upload-btn input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+        .media-preview-strip { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 0.6rem; }
+        .media-thumb-card { position: relative; width: 86px; height: 68px; border-radius: 10px; overflow: hidden; border: 2px solid #C8E0D0; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+        .media-thumb-card.main-thumb { border-color: var(--accent-gold); }
+        .media-thumb-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .media-thumb-badge { position: absolute; bottom: 0; right: 0; left: 0; background: rgba(13,40,24,0.85); color: var(--accent-gold); font-size: 0.63rem; text-align: center; padding: 2px 4px; font-weight: 700; }
+        .media-thumb-remove { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: rgba(211,47,47,0.92); color: white; border: none; font-size: 0.75rem; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; z-index: 2; }
+        .media-video-preview { margin-top: 0.7rem; background: #fff; border: 1px solid #C8E0D0; border-radius: 12px; padding: 0.7rem 0.9rem; display: none; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+        .media-status-note { font-size: 0.82rem; color: var(--success); font-weight: 600; margin-top: 4px; display: block; }
+        .video-section { margin-bottom: 1.2rem; }
+        .video-section h5 { font-size: 0.88rem; font-weight: 600; color: var(--primary-dark); margin-bottom: 0.5rem; }
+        .facility-video-player { width: 100%; max-height: 320px; border-radius: 14px; background: #000; display: block; }
+        .video-iframe-wrap { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; border-radius: 14px; overflow: hidden; background: #000; }
+        .video-iframe-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+
         /* Map */
         .map-section { margin-bottom:1.2rem; }
         .map-section h5 { font-size:0.88rem; font-weight:600; color:var(--primary-dark); margin-bottom:0.5rem; }
@@ -355,7 +381,7 @@
 <body>
 
     <nav class="navbar">
-        <button type="button" class="logo" id="site-logo" data-action="switch-view" data-view="customer-view"><img src="data:image/png;base64,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" alt="Weekend" style="height:40px;width:40px;border-radius:8px;object-fit:cover;">Weekend</button>
+        <button type="button" class="logo" id="site-logo" data-action="switch-view" data-view="customer-view"><img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBAUEBAYFBQUGBgYHCQ4JCQgICRINDQoOFRIWFhUSFBQXGiEcFxgfGRQUHScdHyIjJSUlFhwpLCgkKyEkJST/2wBDAQYGBgkICREJCREkGBQYJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCT/wAARCABAAEADASIAAhEBAxEB/8QAGwAAAwEBAQEBAAAAAAAAAAAAAwQFAQIGAAj/xAAvEAACAQMDAwMBCAMBAAAAAAABAgMABBEFEiETMUEiYXEGFDJCUWKBkaEjksHw/8QAGQEAAwEBAQAAAAAAAAAAAAAAAAEDAgQF/8QAHxEAAwEAAgIDAQAAAAAAAAAAAAECEQMhEjFBYfDR/9oADAMBAAIRAxEAPwD84LXYFcpRkAoMmBa+KgdyB807awRsrSzFhChwdv3nY9lGfPv4H58AnF1MPTbKluD2WFAWPyxyx/8AcCs6BJKA9iD8UNkr08emS3+nrd/bLS74fqwSemaJlBIGe/qA4PbPBFIfUWgy6HqElpv66xRxO8iDKqXUHGf696xPIm/H5HjzSEy0NhR3FAbiqgNIeaMtLoeaMjUmJlSFEeJA24rFCZio47tgnP8AqO3irOiQ6jqOoxDQLC5N5AVMJsYy00fGCWIyOcn7xHziollJvhaPGcr0yN4XK7gfP716v6R+p5tG1fToolNlYxvvmAvZGViQwyy5Cnx3Brk56qZeLWV4pVUk3grdaTqehTDQ9Zt76N5vVZwrFHNmUnlQwznPYhTnPcUKeC8vvpye1321tZrK2oXNxO5MhwAiR47k8EAfpPby/qOuzfUWjrZ3aRx3X215oYrLCMXK53Yyc5YnP/MV5nXisFisDRW8rMUxcGYmRmA9ZCg42lieSM4xjHmPE6tryWP92U5JmV16IJIZc9qA9GY4FBevSOZBUNUNOsX1BiqSxoQ6KQ2ezNt3fAJGfmpatR4J3hL7JGQOhjYqMkqe4pVudDWb2VbfTJJDL/lCPAqu67GLLl9vYD9z7UeG0uHewPVhf7ZtEe5HC8sy+orgE+k8flU+O/Z3neWYu9w69QvEGDAHOSPYgdq6S+kjW3lWQNLCuEIgHpYEsoyRyOSTUmqf76/ppeI/G1/It1BC1tbCJF68cUL7uWxtY8sccZGcfxUxtLcRR3XUiZJl3b1HZsgbTgcHBB9xRWvs7leZmUiOM9SAMXjXBBP548Z8ADml2u+nGyxXEnr2o6dMAFVOVJ9+B/JolUvQNyzi9s3tS56iSKkrQMy5GHXuOf5BpJjR7q7luW9b5Xc0mAgUFm7nA80sxqs7nYnm9Gg0WMru9e7H6cZoANaGpiHYnRZA0fWBBG0jbkGmReXELAiS5UAZ/B481KzW5+KTlME8K0rXluRCzXiYCnaxX7uOP67UlOyNIWk65ZjlixGSaVyPaszQpwHWnchTI2bsY/FQmNaTXBrQj//Z" alt="Weekend" style="height:40px;width:40px;border-radius:8px;object-fit:cover;">Weekend</button>
         <button type="button" class="hamburger-btn" id="hamburger-btn" aria-label="Toggle Menu">☰</button>
         <div class="nav-menu" id="nav-menu-container">
             <button type="button" class="lang-btn" id="lang-toggle-btn">English</button>
@@ -546,15 +572,39 @@
                                 <div class="form-group" style="flex:1;"><label>الوصف والمواصفات (عربي)</label><textarea class="form-control" id="adm-v-specs" rows="3" required maxlength="2500" placeholder="مسبح مفلتر، 3 غرف نوم..."></textarea></div>
                                 <div class="form-group" style="flex:1;"><label>Description (English - اختياري)</label><textarea class="form-control" id="adm-v-specs-en" rows="3" maxlength="2500" placeholder="Filtered pool, 3 bedrooms..."></textarea></div>
                             </div>
-                            <div class="form-group">
-                                <label>الصورة الرئيسية للمنشأة</label>
-                                <input type="file" class="form-control" id="adm-v-img-file" accept="image/jpeg,image/png,image/webp">
-                                <input type="url" class="form-control" id="adm-v-img-url" placeholder="أو رابط صورة مباشر https://..." style="margin-top:5px;">
+                            <div class="media-upload-box">
+                                <div class="media-upload-box-title">📸 صور وفيديو المنشأة (تُحفظ في ملف تخزين مستقل لتخفيف الموقع)</div>
+                                <div class="media-upload-box-sub">ارفع الصورة الرئيسية، وعدة صور إضافية للألبوم، وفيديو للمنشأة مباشرة من جهازك أو هاتفك:</div>
+                                <div class="media-buttons-grid">
+                                    <label class="media-upload-btn">
+                                        <span>📸 اختيار الصورة الرئيسية</span>
+                                        <input type="file" id="adm-v-img-file" accept="image/jpeg,image/png,image/webp">
+                                    </label>
+                                    <label class="media-upload-btn extra-btn">
+                                        <span>🖼️ إضافة صور إضافية (أكثر من صورة)</span>
+                                        <input type="file" id="adm-v-extra-files" accept="image/jpeg,image/png,image/webp" multiple>
+                                    </label>
+                                    <label class="media-upload-btn video-btn">
+                                        <span>🎥 إضافة فيديو للمنشأة</span>
+                                        <input type="file" id="adm-v-video-file" accept="video/mp4,video/webm,video/quicktime">
+                                    </label>
+                                </div>
+                                <small id="adm-v-media-status" class="media-status-note"></small>
+                                <div id="adm-v-media-previews" class="media-preview-strip"></div>
+                                <div id="adm-v-video-preview-box" class="media-video-preview">
+                                    <span id="adm-v-video-label" style="font-size:0.84rem;font-weight:600;color:var(--primary-dark);">🎬 تم إرفاق فيديو للمنشأة</span>
+                                    <button type="button" class="icon-btn danger" data-action="remove-admin-video" data-form="venue" title="حذف الفيديو">✕</button>
+                                </div>
                                 <input type="hidden" id="venue-img-store">
-                            </div>
-                            <div class="form-group">
-                                <label>روابط صور إضافية (كل رابط في سطر)</label>
-                                <textarea class="form-control" id="adm-v-extra-imgs" rows="2" placeholder="https://example.com/photo2.jpg"></textarea>
+                                <input type="hidden" id="venue-video-store">
+                                <details style="margin-top:0.7rem;font-size:0.82rem;color:var(--text-muted);">
+                                    <summary style="cursor:pointer;font-weight:600;">🔗 أو إضافة روابط خارجية يدوياً (اختياري)</summary>
+                                    <div style="margin-top:0.5rem;">
+                                        <input type="url" class="form-control" id="adm-v-img-url" placeholder="رابط صورة رئيسية مباشر https://..." style="margin-bottom:6px;">
+                                        <textarea class="form-control" id="adm-v-extra-imgs" rows="2" placeholder="روابط صور إضافية (كل رابط في سطر) https://..." style="margin-bottom:6px;"></textarea>
+                                        <input type="url" class="form-control" id="adm-v-video-url" placeholder="رابط فيديو مباشر أو يوتيوب https://...">
+                                    </div>
+                                </details>
                             </div>
                             <div class="form-row">
                                 <div class="form-group" style="flex:1;"><label>خط العرض Latitude</label><input type="number" step="any" min="-90" max="90" class="form-control" id="adm-v-lat" placeholder="31.9000"></div>
@@ -610,15 +660,39 @@
                                 <div class="form-group" style="flex:1;"><label>وصف الحافلة (عربي)</label><textarea class="form-control" id="adm-t-specs" rows="3" required maxlength="2500" placeholder="تكييف ممتاز، شاشات عرض..."></textarea></div>
                                 <div class="form-group" style="flex:1;"><label>Description (English - اختياري)</label><textarea class="form-control" id="adm-t-specs-en" rows="3" maxlength="2500" placeholder="Excellent AC, display screens..."></textarea></div>
                             </div>
-                            <div class="form-group">
-                                <label>الصورة الرئيسية للحافلة</label>
-                                <input type="file" class="form-control" id="adm-t-img-file" accept="image/jpeg,image/png,image/webp">
-                                <input type="url" class="form-control" id="adm-t-img-url" placeholder="أو رابط صورة مباشر https://..." style="margin-top:5px;">
+                            <div class="media-upload-box">
+                                <div class="media-upload-box-title">📸 صور وفيديو الحافلة (تُحفظ في ملف تخزين مستقل لتخفيف الموقع)</div>
+                                <div class="media-upload-box-sub">ارفع الصورة الرئيسية، وعدة صور إضافية للحافلة، وفيديو اختياري مباشرة من جهازك:</div>
+                                <div class="media-buttons-grid">
+                                    <label class="media-upload-btn">
+                                        <span>📸 اختيار الصورة الرئيسية</span>
+                                        <input type="file" id="adm-t-img-file" accept="image/jpeg,image/png,image/webp">
+                                    </label>
+                                    <label class="media-upload-btn extra-btn">
+                                        <span>🖼️ إضافة صور إضافية (أكثر من صورة)</span>
+                                        <input type="file" id="adm-t-extra-files" accept="image/jpeg,image/png,image/webp" multiple>
+                                    </label>
+                                    <label class="media-upload-btn video-btn">
+                                        <span>🎥 إضافة فيديو للحافلة</span>
+                                        <input type="file" id="adm-t-video-file" accept="video/mp4,video/webm,video/quicktime">
+                                    </label>
+                                </div>
+                                <small id="adm-t-media-status" class="media-status-note"></small>
+                                <div id="adm-t-media-previews" class="media-preview-strip"></div>
+                                <div id="adm-t-video-preview-box" class="media-video-preview">
+                                    <span id="adm-t-video-label" style="font-size:0.84rem;font-weight:600;color:var(--primary-dark);">🎬 تم إرفاق فيديو للحافلة</span>
+                                    <button type="button" class="icon-btn danger" data-action="remove-admin-video" data-form="transport" title="حذف الفيديو">✕</button>
+                                </div>
                                 <input type="hidden" id="transport-img-store">
-                            </div>
-                            <div class="form-group">
-                                <label>روابط صور إضافية (كل رابط في سطر)</label>
-                                <textarea class="form-control" id="adm-t-extra-imgs" rows="2" placeholder="https://example.com/bus2.jpg"></textarea>
+                                <input type="hidden" id="transport-video-store">
+                                <details style="margin-top:0.7rem;font-size:0.82rem;color:var(--text-muted);">
+                                    <summary style="cursor:pointer;font-weight:600;">🔗 أو إضافة روابط خارجية يدوياً (اختياري)</summary>
+                                    <div style="margin-top:0.5rem;">
+                                        <input type="url" class="form-control" id="adm-t-img-url" placeholder="رابط صورة رئيسية مباشر https://..." style="margin-bottom:6px;">
+                                        <textarea class="form-control" id="adm-t-extra-imgs" rows="2" placeholder="روابط صور إضافية (كل رابط في سطر) https://..." style="margin-bottom:6px;"></textarea>
+                                        <input type="url" class="form-control" id="adm-t-video-url" placeholder="رابط فيديو مباشر أو يوتيوب https://...">
+                                    </div>
+                                </details>
                             </div>
                             <div class="form-row">
                                 <div class="form-group" style="flex:1;"><label>خط العرض Latitude</label><input type="number" step="any" min="-90" max="90" class="form-control" id="adm-t-lat" placeholder="31.9510"></div>
@@ -730,6 +804,15 @@
             <!-- Gallery -->
             <img id="det-main-img" class="gallery-main" src="" alt="Property Image">
             <div id="det-gallery-thumbs" class="gallery-thumbs"></div>
+
+            <!-- Video Section -->
+            <div id="det-video-section" class="video-section" style="display:none;">
+                <h5>🎬 فيديو من داخل المنشأة</h5>
+                <video id="det-video-player" class="facility-video-player" controls playsinline preload="metadata" style="display:none;"></video>
+                <div id="det-video-iframe-wrap" class="video-iframe-wrap" style="display:none;">
+                    <iframe id="det-video-iframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                </div>
+            </div>
 
             <!-- Specs -->
             <p id="det-specs"></p>
@@ -1044,12 +1127,38 @@
             }[c]));
         }
 
-        // فحص روابط الصور لتسمح فقط بـ https:// أو data:image/ 안전한
+        const STORAGE_BUCKET = 'weekend-media';
+
+        // فحص روابط الصور لتسمح فقط بـ https:// أو data:image/ الآمنة
         function sanitizeImageUrl(url) {
             const s = String(url || '').trim();
             if (/^https:\/\/[^\s<>"']+$/i.test(s)) return s;
             if (/^data:image\/(jpeg|jpg|png|webp);base64,[A-Za-z0-9+/=]+$/i.test(s)) return s;
             return 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80';
+        }
+
+        // فحص وتطبيع رابط الفيديو (يدعم ملفات الفيديو المرفوعة في weekend-media وروابط يوتيوب)
+        function sanitizeVideoUrl(url) {
+            const s = String(url || '').trim();
+            if (!s) return '';
+            const ytWatch = s.match(/^https?:\/\/(?:www\.|m\.)?youtube\.com\/watch\?.*v=([A-Za-z0-9_-]{6,20})/i);
+            if (ytWatch) return 'https://www.youtube.com/embed/' + ytWatch[1];
+            const ytShort = s.match(/^https?:\/\/youtu\.be\/([A-Za-z0-9_-]{6,20})/i);
+            if (ytShort) return 'https://www.youtube.com/embed/' + ytShort[1];
+            const ytShorts = s.match(/^https?:\/\/(?:www\.|m\.)?youtube\.com\/shorts\/([A-Za-z0-9_-]{6,20})/i);
+            if (ytShorts) return 'https://www.youtube.com/embed/' + ytShorts[1];
+            if (/^https:\/\/[^\s<>"']+$/i.test(s)) return s;
+            return '';
+        }
+
+        function dataUrlToBlob(dataUrl) {
+            const parts = dataUrl.split(',');
+            const mime = (parts[0].match(/:(.*?);/) || [])[1] || 'image/jpeg';
+            const bstr = atob(parts[1]);
+            let n = bstr.length;
+            const u8arr = new Uint8Array(n);
+            while (n--) u8arr[n] = bstr.charCodeAt(n);
+            return new Blob([u8arr], { type: mime });
         }
 
         // تنظيف رقم الهاتف ليقبل المسافات والشرطات والأقواس من المستخدم ثم يوحّده
@@ -1142,6 +1251,62 @@
             });
         }
 
+        // ─── رفع الصور إلى مجلد التخزين المستقل (weekend-media) لتخفيف ملف الموقع وقاعدة البيانات ───
+        async function uploadImageToSeparateStorage(file, folder = 'facilities/images', maxDim = 1200, quality = 0.80) {
+            const compressedDataUrl = await compressImageFileToJpeg(file, maxDim, quality);
+            const sizeKb = Math.round((compressedDataUrl.length * 3) / 4 / 1024);
+            if (db && db.storage) {
+                try {
+                    const blob = dataUrlToBlob(compressedDataUrl);
+                    const filePath = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2, 9)}.jpg`;
+                    const { error: upErr } = await db.storage.from(STORAGE_BUCKET).upload(filePath, blob, {
+                        contentType: 'image/jpeg',
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+                    if (!upErr) {
+                        const { data: pub } = db.storage.from(STORAGE_BUCKET).getPublicUrl(filePath);
+                        if (pub && pub.publicUrl) {
+                            return { url: pub.publicUrl, sizeKb, storedSeparately: true };
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Fallback to compressed image data:', e);
+                }
+            }
+            return { url: compressedDataUrl, sizeKb, storedSeparately: false };
+        }
+
+        // ─── رفع فيديو المنشأة إلى مجلد الفيديوهات المستقل (weekend-media/facilities/videos) ───
+        async function uploadVideoToSeparateStorage(file, folder = 'facilities/videos') {
+            if (!file || !file.type || !/^video\/(mp4|webm|quicktime)$/i.test(file.type)) {
+                throw new Error('يرجى اختيار ملف فيديو صالح بصيغة MP4 أو WebM أو MOV.');
+            }
+            if (file.size > 50 * 1024 * 1024) {
+                throw new Error('حجم الفيديو يتجاوز الحد المسموح (50 ميجابايت).');
+            }
+            if (!db || !db.storage) {
+                throw new Error('الاتصال بخدمة التخزين غير متاح حالياً.');
+            }
+            const extMap = { 'video/mp4': 'mp4', 'video/webm': 'webm', 'video/quicktime': 'mov' };
+            const ext = extMap[file.type.toLowerCase()] || 'mp4';
+            const filePath = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2, 9)}.${ext}`;
+            const { error: upErr } = await db.storage.from(STORAGE_BUCKET).upload(filePath, file, {
+                contentType: file.type,
+                cacheControl: '3600',
+                upsert: false
+            });
+            if (upErr) {
+                throw new Error('تعذر رفع الفيديو: تأكد من تشغيل ملف SQL في Supabase لتفعيل مجلد weekend-media.');
+            }
+            const { data: pub } = db.storage.from(STORAGE_BUCKET).getPublicUrl(filePath);
+            if (!pub || !pub.publicUrl) {
+                throw new Error('تعذر استخراج رابط الفيديو بعد الرفع.');
+            }
+            const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+            return { url: pub.publicUrl, sizeMb };
+        }
+
         // الحصول على التاريخ والساعة الحالية بتوقيت الأردن (Asia/Amman)
         function getAmmanNow() {
             try {
@@ -1181,6 +1346,7 @@
                 specsAr: r.specs_ar || '',
                 specsEn: r.specs_en || '',
                 images: safeImgs.length ? safeImgs : ['https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80'],
+                videoUrl: sanitizeVideoUrl(r.video_url),
                 lat: r.lat !== null && r.lat !== undefined ? Number(r.lat) : null,
                 lng: r.lng !== null && r.lng !== undefined ? Number(r.lng) : null,
                 cancelPolicyAr: r.cancel_policy_ar || '',
@@ -1210,6 +1376,7 @@
                 specs_ar: String(it.specsAr || '').trim(),
                 specs_en: String(it.specsEn || '').trim() || null,
                 images: Array.isArray(it.images) ? it.images.map(sanitizeImageUrl) : [],
+                video_url: sanitizeVideoUrl(it.videoUrl) || null,
                 lat: (it.lat !== null && it.lat !== '' && Number.isFinite(Number(it.lat))) ? Number(it.lat) : null,
                 lng: (it.lng !== null && it.lng !== '' && Number.isFinite(Number(it.lng))) ? Number(it.lng) : null,
                 cancel_policy_ar: String(it.cancelPolicyAr || '').trim() || null,
@@ -1948,6 +2115,29 @@
                 });
             }
 
+            // Video Player Section (Supports uploaded video files from weekend-media or YouTube embed)
+            const videoSec = document.getElementById('det-video-section');
+            const videoPlayer = document.getElementById('det-video-player');
+            const iframeWrap = document.getElementById('det-video-iframe-wrap');
+            const videoIframe = document.getElementById('det-video-iframe');
+            const safeVid = sanitizeVideoUrl(selectedItem.videoUrl);
+            if (videoPlayer) { videoPlayer.pause(); videoPlayer.removeAttribute('src'); videoPlayer.load(); videoPlayer.style.display = 'none'; }
+            if (videoIframe) { videoIframe.src = ''; }
+            if (iframeWrap) { iframeWrap.style.display = 'none'; }
+
+            if (safeVid) {
+                videoSec.style.display = 'block';
+                if (safeVid.includes('youtube.com/embed/')) {
+                    iframeWrap.style.display = 'block';
+                    videoIframe.src = safeVid;
+                } else {
+                    videoPlayer.style.display = 'block';
+                    videoPlayer.src = safeVid;
+                }
+            } else {
+                videoSec.style.display = 'none';
+            }
+
             // Cancel Policy
             const policyBox = document.getElementById('det-cancel-policy');
             const policyText = localizedPolicyText(selectedItem);
@@ -2217,6 +2407,11 @@
             if (modalId === 'booking-modal') {
                 clearInterval(lockTimerInterval);
                 releaseTempHold();
+            } else if (modalId === 'details-modal') {
+                const vp = document.getElementById('det-video-player');
+                if (vp) { try { vp.pause(); } catch (e) {} }
+                const vf = document.getElementById('det-video-iframe');
+                if (vf) vf.src = '';
             }
         }
 
@@ -2354,15 +2549,16 @@
             isReceiptProcessing = true;
             if (msgEl) {
                 msgEl.style.color = 'var(--text-muted)';
-                msgEl.textContent = '⏳ جاري فحص وضغط صورة الوصل...';
+                msgEl.textContent = '⏳ جاري ضغط وحفظ صورة الوصل في ملف الوصولات المستقل...';
             }
             try {
-                const compressed = await compressImageFileToJpeg(input.files[0], 1200, 0.78);
-                currentUploadedReceiptBase64 = compressed;
-                const sizeKb = Math.round((compressed.length * 3) / 4 / 1024);
+                const uploaded = await uploadImageToSeparateStorage(input.files[0], 'cliq-receipts', 1200, 0.78);
+                currentUploadedReceiptBase64 = uploaded.url;
                 if (msgEl) {
                     msgEl.style.color = 'var(--success)';
-                    msgEl.textContent = `✅ تم تجهيز صورة الوصل بنجاح (${sizeKb} KB)`;
+                    msgEl.textContent = uploaded.storedSeparately
+                        ? `✅ تم حفظ صورة الوصل في ملف الوصولات المستقل بنجاح (${uploaded.sizeKb} KB)`
+                        : `✅ تم تجهيز وضغط صورة الوصل بنجاح (${uploaded.sizeKb} KB)`;
                 }
             } catch (err) {
                 input.value = '';
@@ -2564,23 +2760,176 @@
             document.getElementById('add-transport-form').style.display = type === 'transport' ? 'block' : 'none';
         }
 
-        async function handleAdminImageUpload(input, targetStoreId) {
+        let venueExtraUploadedImages = [];
+        let transportExtraUploadedImages = [];
+
+        function renderAdminMediaPreviews(formType) {
+            const isVenue = formType === 'venue';
+            const mainStoreId = isVenue ? 'venue-img-store' : 'transport-img-store';
+            const videoStoreId = isVenue ? 'venue-video-store' : 'transport-video-store';
+            const previewStripId = isVenue ? 'adm-v-media-previews' : 'adm-t-media-previews';
+            const videoBoxId = isVenue ? 'adm-v-video-preview-box' : 'adm-t-video-preview-box';
+            const videoLabelId = isVenue ? 'adm-v-video-label' : 'adm-t-video-label';
+            const extraArr = isVenue ? venueExtraUploadedImages : transportExtraUploadedImages;
+
+            const mainImg = document.getElementById(mainStoreId)?.value?.trim() || '';
+            const strip = document.getElementById(previewStripId);
+            if (strip) {
+                let html = '';
+                if (mainImg) {
+                    html += `
+                        <div class="media-thumb-card main-thumb">
+                            <img src="${escapeHtml(sanitizeImageUrl(mainImg))}" alt="الصورة الرئيسية">
+                            <span class="media-thumb-badge">الرئيسية ⭐</span>
+                            <button type="button" class="media-thumb-remove" data-action="remove-main-img" data-form="${formType}" title="حذف الصورة الرئيسية">&times;</button>
+                        </div>`;
+                }
+                extraArr.forEach((src, idx) => {
+                    html += `
+                        <div class="media-thumb-card">
+                            <img src="${escapeHtml(sanitizeImageUrl(src))}" alt="صورة إضافية ${idx + 1}">
+                            <span class="media-thumb-badge">إضافية ${idx + 1}</span>
+                            <button type="button" class="media-thumb-remove" data-action="remove-extra-img" data-form="${formType}" data-idx="${idx}" title="حذف الصورة">&times;</button>
+                        </div>`;
+                });
+                strip.innerHTML = html;
+            }
+
+            const videoUrl = document.getElementById(videoStoreId)?.value?.trim() || '';
+            const videoBox = document.getElementById(videoBoxId);
+            const videoLabel = document.getElementById(videoLabelId);
+            if (videoBox) {
+                if (videoUrl) {
+                    videoBox.style.display = 'flex';
+                    if (videoLabel) {
+                        videoLabel.innerHTML = `🎬 تم إرفاق الفيديو بنجاح <a href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer" style="color:var(--accent-hover);margin-right:6px;text-decoration:underline;">(معاينة الفيديو)</a>`;
+                    }
+                } else {
+                    videoBox.style.display = 'none';
+                }
+            }
+        }
+
+        async function handleAdminImageUpload(input, formType) {
             if (!input.files || !input.files[0]) return;
+            const isVenue = formType === 'venue';
+            const targetStoreId = isVenue ? 'venue-img-store' : 'transport-img-store';
+            const statusEl = document.getElementById(isVenue ? 'adm-v-media-status' : 'adm-t-media-status');
+            if (statusEl) {
+                statusEl.style.color = 'var(--text-muted)';
+                statusEl.textContent = '⏳ جاري ضغط وحفظ الصورة الرئيسية في ملف الصور المستقل...';
+            }
             try {
-                const compressed = await compressImageFileToJpeg(input.files[0], 1200, 0.80);
-                document.getElementById(targetStoreId).value = compressed;
-                showToast('✅ تم تجهيز وضغط صورة المنشأة');
+                const uploaded = await uploadImageToSeparateStorage(input.files[0], 'facilities/images', 1200, 0.80);
+                document.getElementById(targetStoreId).value = uploaded.url;
+                renderAdminMediaPreviews(formType);
+                if (statusEl) {
+                    statusEl.style.color = 'var(--success)';
+                    statusEl.textContent = uploaded.storedSeparately
+                        ? `✅ تم حفظ الصورة الرئيسية في ملف الصور المستقل (${uploaded.sizeKb} KB)`
+                        : `✅ تم تجهيز وضغط الصورة الرئيسية (${uploaded.sizeKb} KB)`;
+                }
+                showToast('✅ تم رفع الصورة الرئيسية بنجاح');
             } catch (err) {
                 input.value = '';
-                document.getElementById(targetStoreId).value = '';
+                if (statusEl) {
+                    statusEl.style.color = 'var(--danger)';
+                    statusEl.textContent = '❌ ' + (err.message || 'ملف الصورة غير صالح');
+                }
                 showToast('⚠️ ' + (err.message || 'ملف الصورة غير صالح'));
             }
+        }
+
+        async function handleAdminExtraImagesUpload(input, formType) {
+            const files = Array.from(input.files || []);
+            if (!files.length) return;
+            const isVenue = formType === 'venue';
+            const statusEl = document.getElementById(isVenue ? 'adm-v-media-status' : 'adm-t-media-status');
+            const targetArr = isVenue ? venueExtraUploadedImages : transportExtraUploadedImages;
+
+            if (statusEl) {
+                statusEl.style.color = 'var(--text-muted)';
+                statusEl.textContent = `⏳ جاري ضغط وحفظ ${files.length} صورة إضافية في ملف الصور المستقل...`;
+            }
+            let addedCount = 0;
+            for (const file of files) {
+                try {
+                    const uploaded = await uploadImageToSeparateStorage(file, 'facilities/images', 1200, 0.80);
+                    targetArr.push(uploaded.url);
+                    addedCount++;
+                    renderAdminMediaPreviews(formType);
+                } catch (err) {
+                    showToast('⚠️ تعذر رفع إحدى الصور: ' + (err.message || ''));
+                }
+            }
+            input.value = '';
+            if (addedCount > 0) {
+                if (statusEl) {
+                    statusEl.style.color = 'var(--success)';
+                    statusEl.textContent = `✅ تم حفظ ${addedCount} صورة إضافية في ألبوم المنشأة (الإجمالي: ${targetArr.length} صور إضافية)`;
+                }
+                showToast(`✅ تم إضافة ${addedCount} صورة إضافية للألبوم`);
+            }
+        }
+
+        async function handleAdminVideoUpload(input, formType) {
+            if (!input.files || !input.files[0]) return;
+            const isVenue = formType === 'venue';
+            const videoStoreId = isVenue ? 'venue-video-store' : 'transport-video-store';
+            const statusEl = document.getElementById(isVenue ? 'adm-v-media-status' : 'adm-t-media-status');
+            if (statusEl) {
+                statusEl.style.color = 'var(--text-muted)';
+                statusEl.textContent = '⏳ جاري رفع الفيديو إلى ملف الفيديوهات المستقل... يرجى الانتظار';
+            }
+            try {
+                const uploaded = await uploadVideoToSeparateStorage(input.files[0], 'facilities/videos');
+                document.getElementById(videoStoreId).value = uploaded.url;
+                renderAdminMediaPreviews(formType);
+                if (statusEl) {
+                    statusEl.style.color = 'var(--success)';
+                    statusEl.textContent = `✅ تم حفظ الفيديو في ملف الفيديوهات المستقل بنجاح (${uploaded.sizeMb} MB)`;
+                }
+                showToast('✅ تم رفع فيديو المنشأة بنجاح');
+            } catch (err) {
+                input.value = '';
+                if (statusEl) {
+                    statusEl.style.color = 'var(--danger)';
+                    statusEl.textContent = '❌ ' + (err.message || 'تعذر رفع الفيديو');
+                }
+                showToast('⚠️ ' + (err.message || 'تعذر رفع الفيديو'));
+            }
+        }
+
+        function removeAdminMainImage(formType) {
+            const isVenue = formType === 'venue';
+            document.getElementById(isVenue ? 'venue-img-store' : 'transport-img-store').value = '';
+            const fileInput = document.getElementById(isVenue ? 'adm-v-img-file' : 'adm-t-img-file');
+            if (fileInput) fileInput.value = '';
+            renderAdminMediaPreviews(formType);
+        }
+
+        function removeAdminExtraImage(formType, idx) {
+            const arr = formType === 'venue' ? venueExtraUploadedImages : transportExtraUploadedImages;
+            if (idx >= 0 && idx < arr.length) {
+                arr.splice(idx, 1);
+                renderAdminMediaPreviews(formType);
+            }
+        }
+
+        function removeAdminVideo(formType) {
+            const isVenue = formType === 'venue';
+            document.getElementById(isVenue ? 'venue-video-store' : 'transport-video-store').value = '';
+            const vidInput = document.getElementById(isVenue ? 'adm-v-video-file' : 'adm-t-video-file');
+            if (vidInput) vidInput.value = '';
+            const urlInput = document.getElementById(isVenue ? 'adm-v-video-url' : 'adm-t-video-url');
+            if (urlInput) urlInput.value = '';
+            renderAdminMediaPreviews(formType);
         }
 
         async function addListing(e, formType) {
             e.preventDefault();
             if (!db || !isAdminLoggedIn) return;
-            let category, nameAr, nameEn, locationAr, locationEn, specsAr, specsEn, imgStore, imgUrl, extraImgs, lat, lng, cancelAr, cancelEn, amenities, seasons = ['summer', 'winter'];
+            let category, nameAr, nameEn, locationAr, locationEn, specsAr, specsEn, imgStore, imgUrl, extraImgs, videoStore, videoUrlInput, lat, lng, cancelAr, cancelEn, amenities, seasons = ['summer', 'winter'];
             let priceDay = null, priceNight = null, priceFull = null, pricePerKm = null, pricePerPerson = null, hourlyRate = null, capacity = null;
 
             if (formType === 'venue') {
@@ -2609,16 +2958,18 @@
                         return;
                     }
                 }
-                specsAr     = document.getElementById('adm-v-specs').value.trim();
-                specsEn     = document.getElementById('adm-v-specs-en').value.trim();
-                imgStore    = document.getElementById('venue-img-store').value.trim();
-                imgUrl      = document.getElementById('adm-v-img-url').value.trim();
-                extraImgs   = document.getElementById('adm-v-extra-imgs').value;
-                lat         = document.getElementById('adm-v-lat').value.trim();
-                lng         = document.getElementById('adm-v-lng').value.trim();
-                cancelAr    = document.getElementById('adm-v-cancel').value.trim();
-                cancelEn    = document.getElementById('adm-v-cancel-en').value.trim();
-                amenities   = ['pool','bbq','wifi','heating','outdoor'].filter(a => document.getElementById(`adm-v-am-${a}`).checked);
+                specsAr       = document.getElementById('adm-v-specs').value.trim();
+                specsEn       = document.getElementById('adm-v-specs-en').value.trim();
+                imgStore      = document.getElementById('venue-img-store').value.trim();
+                imgUrl        = document.getElementById('adm-v-img-url').value.trim();
+                extraImgs     = document.getElementById('adm-v-extra-imgs').value;
+                videoStore    = document.getElementById('venue-video-store').value.trim();
+                videoUrlInput = document.getElementById('adm-v-video-url').value.trim();
+                lat           = document.getElementById('adm-v-lat').value.trim();
+                lng           = document.getElementById('adm-v-lng').value.trim();
+                cancelAr      = document.getElementById('adm-v-cancel').value.trim();
+                cancelEn      = document.getElementById('adm-v-cancel-en').value.trim();
+                amenities     = ['pool','bbq','wifi','heating','outdoor'].filter(a => document.getElementById(`adm-v-am-${a}`).checked);
             } else {
                 category       = 'transport';
                 nameAr         = document.getElementById('adm-t-name').value.trim();
@@ -2632,21 +2983,27 @@
                     showToast('⚠️ سعة الحافلة يجب أن تكون بين 1 و200 راكب');
                     return;
                 }
-                specsAr     = document.getElementById('adm-t-specs').value.trim();
-                specsEn     = document.getElementById('adm-t-specs-en').value.trim();
-                imgStore    = document.getElementById('transport-img-store').value.trim();
-                imgUrl      = document.getElementById('adm-t-img-url').value.trim();
-                extraImgs   = document.getElementById('adm-t-extra-imgs').value;
-                lat         = document.getElementById('adm-t-lat').value.trim();
-                lng         = document.getElementById('adm-t-lng').value.trim();
-                cancelAr    = document.getElementById('adm-t-cancel').value.trim();
-                cancelEn    = document.getElementById('adm-t-cancel-en').value.trim();
-                amenities   = ['wifi','heating','outdoor'].filter(a => document.getElementById(`adm-t-am-${a}`).checked);
+                specsAr       = document.getElementById('adm-t-specs').value.trim();
+                specsEn       = document.getElementById('adm-t-specs-en').value.trim();
+                imgStore      = document.getElementById('transport-img-store').value.trim();
+                imgUrl        = document.getElementById('adm-t-img-url').value.trim();
+                extraImgs     = document.getElementById('adm-t-extra-imgs').value;
+                videoStore    = document.getElementById('transport-video-store').value.trim();
+                videoUrlInput = document.getElementById('adm-t-video-url').value.trim();
+                lat           = document.getElementById('adm-t-lat').value.trim();
+                lng           = document.getElementById('adm-t-lng').value.trim();
+                cancelAr      = document.getElementById('adm-t-cancel').value.trim();
+                cancelEn      = document.getElementById('adm-t-cancel-en').value.trim();
+                amenities     = ['wifi','heating','outdoor'].filter(a => document.getElementById(`adm-t-am-${a}`).checked);
             }
 
-            const mainImg = sanitizeImageUrl(imgStore || imgUrl || 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80');
-            const extraList = (extraImgs || '').split('\n').map(s => s.trim()).filter(Boolean).map(sanitizeImageUrl);
-            const allImages = [mainImg, ...extraList];
+            const uploadedExtras = formType === 'venue' ? venueExtraUploadedImages : transportExtraUploadedImages;
+            const manualExtraList = (extraImgs || '').split('\n').map(s => s.trim()).filter(Boolean).map(sanitizeImageUrl);
+            const primaryCandidate = imgStore || imgUrl || uploadedExtras[0] || manualExtraList[0] || 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80';
+            const mainImg = sanitizeImageUrl(primaryCandidate);
+            const remainingExtras = (!imgStore && !imgUrl && uploadedExtras.length > 0) ? uploadedExtras.slice(1) : uploadedExtras;
+            const allImages = [mainImg, ...remainingExtras.map(sanitizeImageUrl), ...manualExtraList];
+            const finalVideoUrl = sanitizeVideoUrl(videoStore || videoUrlInput) || null;
 
             const editingId = formType === 'venue'
                 ? parseInt(document.getElementById('adm-v-editing-id').value, 10)
@@ -2661,6 +3018,7 @@
                 pricePerKm, pricePerPerson, capacity,
                 specsAr, specsEn,
                 images: allImages,
+                videoUrl: finalVideoUrl,
                 lat: lat !== '' ? parseFloat(lat) : null,
                 lng: lng !== '' ? parseFloat(lng) : null,
                 cancelPolicyAr: cancelAr,
@@ -2702,9 +3060,17 @@
                 if (formType === 'venue') {
                     document.getElementById('add-venue-form').reset();
                     document.getElementById('venue-img-store').value = '';
+                    document.getElementById('venue-video-store').value = '';
+                    document.getElementById('adm-v-media-status').textContent = '';
+                    venueExtraUploadedImages = [];
+                    renderAdminMediaPreviews('venue');
                 } else {
                     document.getElementById('add-transport-form').reset();
                     document.getElementById('transport-img-store').value = '';
+                    document.getElementById('transport-video-store').value = '';
+                    document.getElementById('adm-t-media-status').textContent = '';
+                    transportExtraUploadedImages = [];
+                    renderAdminMediaPreviews('transport');
                 }
                 toggleVenueTypePricing();
             }
@@ -2720,7 +3086,6 @@
             editingItemId = item.id;
             editingPreviousActive = Boolean(item.active);
 
-            // إيقاف المنشأة مؤقتاً في قاعدة البيانات أثناء التعديل فعلياً
             const { error } = await db.from('facilities').update({ active: false }).eq('id', item.id);
             if (!error) {
                 item.active = false;
@@ -2730,8 +3095,7 @@
             switchAdminTab('dash-listings', document.querySelectorAll('.sidebar-item')[1]);
 
             const firstImg = (item.images && item.images[0]) || '';
-            const isBase64Img = firstImg.startsWith('data:image/');
-            const extraImgsText = (item.images && item.images.length > 1) ? item.images.slice(1).join('\n') : '';
+            const extraImgsArr = (item.images && item.images.length > 1) ? [...item.images.slice(1)] : [];
 
             if (item.category === 'transport') {
                 switchAdminForm('transport');
@@ -2745,9 +3109,13 @@
                 document.getElementById('adm-t-capacity').value     = item.capacity || 23;
                 document.getElementById('adm-t-specs').value        = item.specsAr || '';
                 document.getElementById('adm-t-specs-en').value     = item.specsEn || '';
-                document.getElementById('transport-img-store').value = isBase64Img ? firstImg : '';
-                document.getElementById('adm-t-img-url').value      = isBase64Img ? '' : firstImg;
-                document.getElementById('adm-t-extra-imgs').value   = extraImgsText;
+                document.getElementById('transport-img-store').value   = firstImg;
+                document.getElementById('adm-t-img-url').value         = '';
+                document.getElementById('adm-t-extra-imgs').value      = '';
+                document.getElementById('transport-video-store').value = item.videoUrl || '';
+                document.getElementById('adm-t-video-url').value       = '';
+                transportExtraUploadedImages = extraImgsArr;
+                renderAdminMediaPreviews('transport');
                 document.getElementById('adm-t-lat').value          = item.lat ?? '';
                 document.getElementById('adm-t-lng').value          = item.lng ?? '';
                 document.getElementById('adm-t-cancel').value       = item.cancelPolicyAr || '';
@@ -2780,9 +3148,13 @@
 
                 document.getElementById('adm-v-specs').value        = item.specsAr || '';
                 document.getElementById('adm-v-specs-en').value     = item.specsEn || '';
-                document.getElementById('venue-img-store').value    = isBase64Img ? firstImg : '';
-                document.getElementById('adm-v-img-url').value      = isBase64Img ? '' : firstImg;
-                document.getElementById('adm-v-extra-imgs').value   = extraImgsText;
+                document.getElementById('venue-img-store').value    = firstImg;
+                document.getElementById('adm-v-img-url').value      = '';
+                document.getElementById('adm-v-extra-imgs').value   = '';
+                document.getElementById('venue-video-store').value  = item.videoUrl || '';
+                document.getElementById('adm-v-video-url').value    = '';
+                venueExtraUploadedImages = extraImgsArr;
+                renderAdminMediaPreviews('venue');
                 document.getElementById('adm-v-lat').value          = item.lat ?? '';
                 document.getElementById('adm-v-lng').value          = item.lng ?? '';
                 document.getElementById('adm-v-cancel').value       = item.cancelPolicyAr || '';
@@ -2822,6 +3194,10 @@
             if (formType === 'venue') {
                 document.getElementById('adm-v-editing-id').value          = '';
                 document.getElementById('venue-img-store').value           = '';
+                document.getElementById('venue-video-store').value         = '';
+                document.getElementById('adm-v-media-status').textContent  = '';
+                venueExtraUploadedImages = [];
+                renderAdminMediaPreviews('venue');
                 document.getElementById('adm-v-submit-btn').textContent    = 'نشر المنشأة';
                 document.getElementById('adm-v-cancel-edit-btn').style.display = 'none';
                 document.getElementById('add-venue-form').reset();
@@ -2829,6 +3205,10 @@
             } else {
                 document.getElementById('adm-t-editing-id').value          = '';
                 document.getElementById('transport-img-store').value       = '';
+                document.getElementById('transport-video-store').value     = '';
+                document.getElementById('adm-t-media-status').textContent  = '';
+                transportExtraUploadedImages = [];
+                renderAdminMediaPreviews('transport');
                 document.getElementById('adm-t-submit-btn').textContent    = 'نشر وسيلة النقل';
                 document.getElementById('adm-t-cancel-edit-btn').style.display = 'none';
                 document.getElementById('add-transport-form').reset();
@@ -3530,8 +3910,12 @@
             document.getElementById('search-location').addEventListener('input', liveSearch);
             document.getElementById('search-category').addEventListener('change', liveSearch);
             document.getElementById('adm-v-type').addEventListener('change', toggleVenueTypePricing);
-            document.getElementById('adm-v-img-file').addEventListener('change', function() { handleAdminImageUpload(this, 'venue-img-store'); });
-            document.getElementById('adm-t-img-file').addEventListener('change', function() { handleAdminImageUpload(this, 'transport-img-store'); });
+            document.getElementById('adm-v-img-file').addEventListener('change', function() { handleAdminImageUpload(this, 'venue'); });
+            document.getElementById('adm-v-extra-files').addEventListener('change', function() { handleAdminExtraImagesUpload(this, 'venue'); });
+            document.getElementById('adm-v-video-file').addEventListener('change', function() { handleAdminVideoUpload(this, 'venue'); });
+            document.getElementById('adm-t-img-file').addEventListener('change', function() { handleAdminImageUpload(this, 'transport'); });
+            document.getElementById('adm-t-extra-files').addEventListener('change', function() { handleAdminExtraImagesUpload(this, 'transport'); });
+            document.getElementById('adm-t-video-file').addEventListener('change', function() { handleAdminVideoUpload(this, 'transport'); });
             document.getElementById('add-venue-form').addEventListener('submit', e => addListing(e, 'venue'));
             document.getElementById('add-transport-form').addEventListener('submit', e => addListing(e, 'transport'));
             document.getElementById('review-form').addEventListener('submit', submitReview);
@@ -3623,6 +4007,12 @@
                     calNavMonth(Number(el.dataset.dir));
                 } else if (action === 'cal-select-day') {
                     calSelectDay(el.dataset.date);
+                } else if (action === 'remove-main-img') {
+                    removeAdminMainImage(el.dataset.form);
+                } else if (action === 'remove-extra-img') {
+                    removeAdminExtraImage(el.dataset.form, Number(el.dataset.idx));
+                } else if (action === 'remove-admin-video') {
+                    removeAdminVideo(el.dataset.form);
                 } else if (action === 'dismiss-parent') {
                     if (el.parentElement) el.parentElement.remove();
                 }
