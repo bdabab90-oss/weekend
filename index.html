@@ -1053,7 +1053,7 @@
     <div id="image-modal" class="modal" role="dialog" aria-modal="true">
         <div class="modal-content" style="max-width:450px;text-align:center;">
             <button type="button" class="close-modal" data-action="close-modal" data-modal="image-modal" aria-label="إغلاق">&times;</button>
-            <h3 style="margin-bottom:1rem;">صورة وصل تحويل CliQ</h3>
+            <h3 id="image-modal-title" style="margin-bottom:1rem;">صورة وصل تحويل CliQ</h3>
             <img id="enlarged-receipt-img" src="" alt="Receipt" style="width:100%;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.2);">
         </div>
     </div>
@@ -2748,6 +2748,7 @@
 
         let venueExtraUploadedImages = [];
         let transportExtraUploadedImages = [];
+        let adminMediaUploadingCount = 0;
 
         function renderAdminMediaPreviews(formType) {
             const isVenue = formType === 'venue';
@@ -2805,6 +2806,7 @@
                 statusEl.style.color = 'var(--text-muted)';
                 statusEl.textContent = '⏳ جاري ضغط وحفظ الصورة الرئيسية في ملف الصور المستقل...';
             }
+            adminMediaUploadingCount++;
             try {
                 const uploaded = await uploadImageToSeparateStorage(input.files[0], 'facilities/images', 1200, 0.80);
                 document.getElementById(targetStoreId).value = uploaded.url;
@@ -2823,6 +2825,8 @@
                     statusEl.textContent = '❌ ' + (err.message || 'ملف الصورة غير صالح');
                 }
                 showToast('⚠️ ' + (err.message || 'ملف الصورة غير صالح'));
+            } finally {
+                adminMediaUploadingCount = Math.max(0, adminMediaUploadingCount - 1);
             }
         }
 
@@ -2837,7 +2841,9 @@
                 statusEl.style.color = 'var(--text-muted)';
                 statusEl.textContent = `⏳ جاري ضغط وحفظ ${files.length} صورة إضافية في ملف الصور المستقل...`;
             }
+            adminMediaUploadingCount++;
             let addedCount = 0;
+            try {
             for (const file of files) {
                 try {
                     const uploaded = await uploadImageToSeparateStorage(file, 'facilities/images', 1200, 0.80);
@@ -2856,6 +2862,9 @@
                 }
                 showToast(`✅ تم إضافة ${addedCount} صورة إضافية للألبوم`);
             }
+            } finally {
+                adminMediaUploadingCount = Math.max(0, adminMediaUploadingCount - 1);
+            }
         }
 
         async function handleAdminVideoUpload(input, formType) {
@@ -2867,6 +2876,7 @@
                 statusEl.style.color = 'var(--text-muted)';
                 statusEl.textContent = '⏳ جاري رفع الفيديو إلى ملف الفيديوهات المستقل... يرجى الانتظار';
             }
+            adminMediaUploadingCount++;
             try {
                 const uploaded = await uploadVideoToSeparateStorage(input.files[0], 'facilities/videos');
                 document.getElementById(videoStoreId).value = uploaded.url;
@@ -2883,6 +2893,8 @@
                     statusEl.textContent = '❌ ' + (err.message || 'تعذر رفع الفيديو');
                 }
                 showToast('⚠️ ' + (err.message || 'تعذر رفع الفيديو'));
+            } finally {
+                adminMediaUploadingCount = Math.max(0, adminMediaUploadingCount - 1);
             }
         }
 
@@ -2915,6 +2927,10 @@
         async function addListing(e, formType) {
             e.preventDefault();
             if (!db || !isAdminLoggedIn) return;
+            if (adminMediaUploadingCount > 0) {
+                showToast('⏳ يرجى الانتظار ثواني حتى يكتمل رفع الصور أو الفيديو أولاً');
+                return;
+            }
             let category, nameAr, nameEn, locationAr, locationEn, specsAr, specsEn, imgStore, imgUrl, extraImgs, videoStore, videoUrlInput, lat, lng, cancelAr, cancelEn, amenities, seasons = ['summer', 'winter'];
             let priceDay = null, priceNight = null, priceFull = null, pricePerKm = null, pricePerPerson = null, hourlyRate = null, capacity = null;
 
@@ -3587,7 +3603,9 @@
             showToast('تم حذف المنشأة نهائياً');
         }
 
-        function openImageModal(imgSrc) {
+        function openImageModal(imgSrc, titleText = 'صورة وصل تحويل CliQ') {
+            const titleEl = document.getElementById('image-modal-title');
+            if (titleEl) titleEl.textContent = titleText;
             document.getElementById('enlarged-receipt-img').src = sanitizeImageUrl(imgSrc);
             document.getElementById('image-modal').classList.add('active');
         }
@@ -3785,6 +3803,11 @@
             window.open(`https://wa.me/?text=${text}`, '_blank', 'noopener,noreferrer');
         }
 
+        function sanitizeExcelCell(val) {
+            const s = String(val ?? '');
+            return /^[=+\-@\t\r]/.test(s) ? "'" + s : s;
+        }
+
         function exportBookingsToExcel() {
             if (!confirmedBookings || !confirmedBookings.length) {
                 showToast('⚠️ لا توجد حجوزات مؤكدة لتصديرها');
@@ -3792,16 +3815,16 @@
             }
             const data = confirmedBookings.map(function(b) {
                 const row = {
-                    'اسم العميل': b.clientName || '',
-                    'رقم الهاتف': String(b.phone || ''),
-                    'المنشأة / الخدمة': (currentLang === 'ar' ? b.itemNameAr : b.itemNameEn) || '',
-                    'تفاصيل الحجز': b.details || '',
+                    'اسم العميل': sanitizeExcelCell(b.clientName || ''),
+                    'رقم الهاتف': sanitizeExcelCell(String(b.phone || '')),
+                    'المنشأة / الخدمة': sanitizeExcelCell((currentLang === 'ar' ? b.itemNameAr : b.itemNameEn) || ''),
+                    'تفاصيل الحجز': sanitizeExcelCell(b.details || ''),
                     'مبلغ العربون (د.أ)': Number(b.deposit || 0),
                     'المبلغ الإجمالي (د.أ)': Number(b.total || 0),
                     'حالة الحجز': 'مؤكد ✓'
                 };
-                if (b.pickupLocation) row['موقع الانطلاق'] = b.pickupLocation;
-                if (b.dropoffLocation) row['موقع الوصول'] = b.dropoffLocation;
+                if (b.pickupLocation) row['موقع الانطلاق'] = sanitizeExcelCell(b.pickupLocation);
+                if (b.dropoffLocation) row['موقع الوصول'] = sanitizeExcelCell(b.dropoffLocation);
                 return row;
             });
             const worksheet = XLSX.utils.json_to_sheet(data, { cellStyles: true });
@@ -3932,6 +3955,9 @@
             document.getElementById('det-wa-share-btn').addEventListener('click', function() {
                 const id = this.dataset.id;
                 if (id) sharePropertyWhatsApp(Number(id));
+            });
+            document.getElementById('det-main-img').addEventListener('click', function() {
+                if (this.src) openImageModal(this.src, selectedItem ? localizedItemText(selectedItem, 'name') : 'معاينة الصورة');
             });
 
             // Global click delegation for dynamic elements
