@@ -1610,11 +1610,7 @@
                     return false;
                 }
                 const { data: isAdm, error } = await db.rpc('is_admin');
-                const userEmail = String(session.user?.email || '').toLowerCase();
-                const userId = String(session.user?.id || '');
-                const matchesAdmin = (!error && isAdm === true) ||
-                    (userEmail === 'bdabab90@gmail.com' || userEmail === 'admin@weekend.jo' || userId === '6a9ba7fc-32a5-4a05-be3c-e49191383cbf');
-                if (matchesAdmin) {
+                if (!error && isAdm === true) {
                     isAdminLoggedIn = true;
                     document.getElementById('btn-admin').style.display = 'inline-block';
                     return true;
@@ -1796,17 +1792,7 @@
             if (!email || !pass) return;
             btn.disabled = true;
             try {
-                let { data, error } = await db.auth.signInWithPassword({ email, password: pass });
-                // إذا كتب الأدمن bdabab90@gmail.com وكان الحساب المسجل في Supabase باسم admin@weekend.jo (أو العكس)، يتم التجربة تلقائياً
-                if ((error || !data?.session) && email.toLowerCase() === 'bdabab90@gmail.com') {
-                    const retry = await db.auth.signInWithPassword({ email: 'admin@weekend.jo', password: pass });
-                    data = retry.data;
-                    error = retry.error;
-                } else if ((error || !data?.session) && email.toLowerCase() === 'admin@weekend.jo') {
-                    const retry = await db.auth.signInWithPassword({ email: 'bdabab90@gmail.com', password: pass });
-                    data = retry.data;
-                    error = retry.error;
-                }
+                const { data, error } = await db.auth.signInWithPassword({ email, password: pass });
                 if (error || !data?.session) {
                     showToast('❌ البريد الإلكتروني أو كلمة المرور غير صحيحة');
                     btn.disabled = false;
