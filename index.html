@@ -3959,6 +3959,20 @@
         }
 
         // ─── إجراءات الأدمن تنتظر استجابة قاعدة البيانات أولاً قبل تعديل الواجهة ───
+        function updateLocalMyBookingStatus(bookingId, newStatus) {
+            try {
+                const list = JSON.parse(safeGetStorage('wknd_my_bookings', '[]'));
+                let changed = false;
+                list.forEach(item => {
+                    if (Number(item.id) === Number(bookingId)) {
+                        item.status = newStatus;
+                        changed = true;
+                    }
+                });
+                if (changed) safeSetStorage('wknd_my_bookings', JSON.stringify(list));
+            } catch (e) {}
+        }
+
         async function approveBooking(bookingId) {
             if (!db || !isAdminLoggedIn) return;
             const numId = Number(bookingId);
@@ -3971,9 +3985,10 @@
                 }
                 return;
             }
+            updateLocalMyBookingStatus(numId, 'confirmed');
             await loadFromDatabase();
             renderAdminPanel();
-            showToast('✅ تم تأكيد الحجز وقفل الموعد رسمياً');
+            showToast('✅ تم تأكيد الحجز وتحديث حالة تذكرة العميل رسمياً');
         }
 
         async function rejectBooking(bookingId) {
@@ -3984,6 +3999,7 @@
                 showToast('❌ تعذر رفض/إلغاء الحجز: ' + (error.message || ''));
                 return;
             }
+            updateLocalMyBookingStatus(numId, 'rejected');
             await loadFromDatabase();
             renderAdminPanel();
             showToast('تم رفض/إلغاء الحجز وتحرير الموعد مع حفظه في السجل');
@@ -4340,7 +4356,8 @@
             const deposit = Number(b.deposit || 0);
             const discount = Number(b.discountAmount || 0);
             const remaining = Math.max(0, Number((total - deposit).toFixed(2)));
-            const status = b.status || 'pending';
+            const status = resolveLiveBookingStatus(b);
+            b.status = status;
             let statusBadgeHtml = '<span style="background:#FFF3CD;color:#8A5E00;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:700;">⏳ بانتظار تأكيد الإدارة</span>';
             if (status === 'confirmed') {
                 statusBadgeHtml = '<span style="background:#E8F5E9;color:#2E7D32;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:700;">✅ حجز مؤكد رسمياً</span>';
@@ -4431,14 +4448,111 @@
         }
 
         // =====================================================
-        //  FEATURE 4: TRACK MY BOOKING (CUSTOMER SELF-SERVICE)
+        //  FEATURE 4: TRACK MY BOOKING (CUSTOMER SELF-SERVICE + LIVE DB SYNC)
         // =====================================================
-        function openTrackBookingModal() {
+        function resolveLiveBookingStatus(b) {
+            if (!b) return 'pending';
+            const numId = Number(b.id);
+            const facId = Number(b.facilityId || b.itemId || b.facility_id);
+            const bDate = String(b.bookingDate || b.booking_date || '').trim() ||
+                          ((String(b.details || '').match(/(\d{4}-\d{2}-\d{2})/) || [])[1] || '');
+            const bDetails = String(b.details || '').trim();
+
+            // 1) إذا كانت بيانات الأدمن محمّلة في المتصفح، نتحقق منها مباشرةً
+            if (confirmedBookings.some(x => Number(x.id) === numId || (facId && Number(x.itemId) === facId && x.bookingDate === bDate && x.details === bDetails))) {
+                return 'confirmed';
+            }
+            const archMatch = archivedBookings.find(x => Number(x.id) === numId || (facId && Number(x.itemId) === facId && x.bookingDate === bDate && x.details === bDetails));
+            if (archMatch) return archMatch.status || 'rejected';
+            if (pendingBookings.some(x => Number(x.id) === numId)) return 'pending';
+
+            // 2) التحقق من جدول المواعيد العام المباشر من السيرفر (public_confirmed_slots / busyIntervals)
+            if (facId && bDate && Array.isArray(busyIntervals)) {
+                const slotMatches = busyIntervals.filter(s => Number(s.facilityId) === facId && String(s.date) === bDate);
+                if (slotMatches.some(s => s.status === 'confirmed')) {
+                    return 'confirmed';
+                }
+                if (slotMatches.some(s => s.status === 'pending')) {
+                    return 'pending';
+                }
+                // إذا لم يعد الموعد موجوداً في المواعيد المحجوزة أو المعلقة بعد مرور 15 ثانية على إنشائه، فهذا يعني أنه رُفض أو أُلغي
+                const createdMs = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                if (busyIntervals.length > 0 && slotMatches.length === 0 && (!createdMs || (Date.now() - createdMs > 15000))) {
+                    return 'rejected';
+                }
+            }
+
+            return b.status || 'pending';
+        }
+
+        async function syncLocalBookingsWithDatabase(phoneFilter = '', idFilter = null) {
+            await loadPublicConfirmedSlots();
+            const savedList = JSON.parse(safeGetStorage('wknd_my_bookings', '[]'));
+            const targetPhone = normalizePhone(phoneFilter || (savedList[0] ? savedList[0].phone : ''));
+
+            let serverResults = [];
+            if (db && targetPhone && isValidPhone(targetPhone)) {
+                try {
+                    const { data, error } = await db.rpc('track_my_bookings', {
+                        p_phone: targetPhone,
+                        p_booking_id: idFilter
+                    });
+                    if (!error && Array.isArray(data) && data.length > 0) {
+                        serverResults = data.map(r => ({
+                            id: Number(r.id),
+                            facilityId: Number(r.facility_id),
+                            itemNameAr: r.item_name_ar,
+                            itemNameEn: r.item_name_en || r.item_name_ar,
+                            locationAr: r.location_ar,
+                            lat: r.lat,
+                            lng: r.lng,
+                            clientName: r.client_name,
+                            phone: r.phone,
+                            bookingDate: r.booking_date,
+                            details: r.details,
+                            promoCode: r.promo_code,
+                            discountAmount: Number(r.discount_amount || 0),
+                            total: Number(r.total || 0),
+                            deposit: Number(r.deposit || 0),
+                            status: r.status || 'pending'
+                        }));
+                    }
+                } catch (e) {}
+            }
+
+            // تحديث الحجوزات المحفوظة محلياً بأحدث حالة حقيقية من السيرفر
+            if (savedList.length > 0) {
+                savedList.forEach(localItem => {
+                    const srv = serverResults.find(s => Number(s.id) === Number(localItem.id));
+                    if (srv) {
+                        localItem.status = srv.status;
+                    } else {
+                        localItem.status = resolveLiveBookingStatus(localItem);
+                    }
+                });
+                safeSetStorage('wknd_my_bookings', JSON.stringify(savedList));
+            }
+
+            if (serverResults.length > 0) return serverResults;
+
+            return savedList.filter(b => {
+                const pMatch = !targetPhone || normalizePhone(b.phone).slice(-9) === targetPhone.slice(-9);
+                const idMatch = !idFilter || Number(b.id) === Number(idFilter);
+                return pMatch && idMatch;
+            });
+        }
+
+        async function openTrackBookingModal() {
             document.getElementById('track-booking-modal').classList.add('active');
             const savedList = JSON.parse(safeGetStorage('wknd_my_bookings', '[]'));
-            if (savedList.length > 0 && !document.getElementById('track-phone-input').value) {
-                document.getElementById('track-phone-input').value = savedList[0].phone || '';
-                renderTrackBookingResults(savedList);
+            const phoneInp = document.getElementById('track-phone-input');
+            if (savedList.length > 0 && phoneInp && !phoneInp.value) {
+                phoneInp.value = savedList[0].phone || '';
+            }
+            const currentPhone = phoneInp ? phoneInp.value.trim() : '';
+            if (currentPhone || savedList.length > 0) {
+                const synced = await syncLocalBookingsWithDatabase(currentPhone, null);
+                renderTrackBookingResults(synced);
             }
         }
 
@@ -4450,7 +4564,8 @@
                 return;
             }
             container.innerHTML = list.map((b, idx) => {
-                const status = b.status || 'pending';
+                const status = resolveLiveBookingStatus(b);
+                b.status = status;
                 let badge = '<span class="badge-status editing">⏳ قيد المراجعة</span>';
                 if (status === 'confirmed') badge = '<span class="badge-status active">✅ مؤكد رسمياً</span>';
                 else if (status === 'rejected' || status === 'expired') badge = '<span class="badge-status inactive">❌ مرفوض / منتهي</span>';
@@ -4485,41 +4600,7 @@
             if (btn) btn.disabled = true;
 
             try {
-                let results = [];
-                if (db) {
-                    const { data, error } = await db.rpc('track_my_bookings', {
-                        p_phone: cleanPhone,
-                        p_booking_id: parsedId
-                    });
-                    if (!error && Array.isArray(data)) {
-                        results = data.map(r => ({
-                            id: Number(r.id),
-                            facilityId: Number(r.facility_id),
-                            itemNameAr: r.item_name_ar,
-                            itemNameEn: r.item_name_en || r.item_name_ar,
-                            locationAr: r.location_ar,
-                            lat: r.lat,
-                            lng: r.lng,
-                            clientName: r.client_name,
-                            phone: r.phone,
-                            bookingDate: r.booking_date,
-                            details: r.details,
-                            promoCode: r.promo_code,
-                            discountAmount: Number(r.discount_amount || 0),
-                            total: Number(r.total || 0),
-                            deposit: Number(r.deposit || 0),
-                            status: r.status || 'pending'
-                        }));
-                    }
-                }
-                if (results.length === 0) {
-                    const localList = JSON.parse(safeGetStorage('wknd_my_bookings', '[]'));
-                    results = localList.filter(b => {
-                        const pMatch = normalizePhone(b.phone).slice(-9) === cleanPhone.slice(-9);
-                        const idMatch = !parsedId || Number(b.id) === parsedId;
-                        return pMatch && idMatch;
-                    });
-                }
+                const results = await syncLocalBookingsWithDatabase(cleanPhone, parsedId);
                 renderTrackBookingResults(results);
             } finally {
                 if (btn) btn.disabled = false;
