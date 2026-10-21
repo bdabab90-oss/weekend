@@ -374,6 +374,32 @@
         .pricing-mode-badge { padding: 0.65rem 0.9rem; border-radius: 10px; font-size: 0.88rem; font-weight: 600; background: #F5F9F6; border: 1.5px solid #D0E8D8; color: var(--primary-dark); }
         .pricing-mode-badge.weekend { background: #FFF3CD; border-color: #F0D5A8; color: #8A5E00; }
 
+
+        /* Feature 1: Privacy & Audience Ribbon + Promo Badge on Cards */
+        .card-privacy-ribbon { position: absolute; top: 56px; right: 14px; background: rgba(13, 40, 24, 0.92); color: #A5D6A7; border: 1px solid #4CAF50; padding: 3px 10px; border-radius: 14px; font-size: 0.72rem; font-weight: 700; z-index: 2; backdrop-filter: blur(4px); }
+        [dir="ltr"] .card-privacy-ribbon { right: auto; left: 14px; }
+        .card-promo-ribbon { position: absolute; bottom: 10px; left: 14px; background: linear-gradient(135deg, #D32F2F, #FF6F00); color: white; padding: 3px 10px; border-radius: 14px; font-size: 0.74rem; font-weight: 700; z-index: 2; box-shadow: 0 2px 8px rgba(211,47,47,0.35); }
+        [dir="ltr"] .card-promo-ribbon { left: auto; right: 14px; }
+        .privacy-highlight-badge { background: #E8F5E9 !important; border-color: #2E7D32 !important; color: #1B5E20 !important; font-weight: 700 !important; }
+
+        /* Feature 3 & 4: Electronic Booking Ticket & Track My Booking */
+        .ticket-card { background: #FFFFFF; border: 2px solid var(--accent-gold); border-radius: 18px; overflow: hidden; box-shadow: 0 8px 28px rgba(13,40,24,0.1); margin-bottom: 1rem; }
+        .ticket-header { background: linear-gradient(135deg, var(--primary-dark), var(--primary-light)); color: white; padding: 1.2rem 1.4rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 2px dashed var(--accent-gold); }
+        .ticket-body { padding: 1.2rem 1.4rem; display: flex; gap: 1.2rem; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+        .ticket-info-grid { flex: 1; min-width: 220px; display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem 1rem; font-size: 0.86rem; }
+        .ticket-info-item strong { display: block; color: var(--text-muted); font-size: 0.76rem; margin-bottom: 2px; }
+        .ticket-info-item span { color: var(--primary-dark); font-weight: 700; }
+        .ticket-qr-box { width: 112px; text-align: center; background: #FAFBFB; border: 1px solid #E0EAE4; border-radius: 12px; padding: 8px; flex-shrink: 0; margin: 0 auto; }
+        .ticket-footer { background: #FFF9EF; padding: 0.85rem 1.4rem; border-top: 1px dashed #E5C384; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 0.84rem; }
+        .track-result-card { background: #FAFBFB; border: 1.5px solid #D0E8D8; border-radius: 14px; padding: 1rem 1.2rem; margin-bottom: 0.8rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+
+        /* Feature 5: Promo Code Input & Admin Day Pills */
+        .promo-input-box { background: linear-gradient(135deg, #F0F8F4, #FAFDFB); border: 1.5px dashed #2E7D32; border-radius: 14px; padding: 0.95rem 1.1rem; margin: 1rem 0; }
+        .days-pills-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+        .day-check-pill { display: inline-flex; align-items: center; gap: 5px; background: #F5F9F6; border: 1.5px solid #C8E0D0; padding: 5px 12px; border-radius: 20px; font-size: 0.84rem; font-weight: 600; cursor: pointer; user-select: none; }
+        .day-check-pill input { accent-color: var(--primary-dark); width: 16px; height: 16px; cursor: pointer; }
+        .excluded-facs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; max-height: 150px; overflow-y: auto; background: #FAFBFB; border: 1px solid #E0E0E0; border-radius: 10px; padding: 0.7rem; margin-top: 5px; }
+
         /* Mobile */
         @media (max-width: 768px) {
             .navbar { padding: 0.8rem 1rem; }
@@ -413,6 +439,7 @@
             <button type="button" class="lang-btn" id="lang-toggle-btn">English</button>
             <button type="button" class="nav-btn active" id="btn-customer" data-action="switch-view" data-view="customer-view" data-key="navHome">الواجهة الرئيسية</button>
             <button type="button" class="nav-btn" id="btn-favorites" data-action="switch-view" data-view="favorites-view">❤️ <span data-key="navFav">المفضلة</span> <span class="fav-count-badge" id="fav-nav-badge" style="display:none;">0</span></button>
+            <button type="button" class="nav-btn" id="btn-track-booking" data-action="open-track-modal">🔍 <span data-key="navTrack">تتبّع حجزي</span></button>
             <button type="button" class="nav-btn admin-login-btn" id="btn-admin" data-action="switch-view" data-view="admin-view" data-key="navAdmin">👑 لوحة الأدمن</button>
         </div>
     </nav>
@@ -444,9 +471,11 @@
             <button type="button" class="filter-chip" data-action="filter-category" data-category="transport" data-key="filterTransport">وسائل نقل وباصات 🚌</button>
         </div>
         <div class="season-filters" id="season-filters" style="display:flex;">
-            <span class="season-filters-label" data-key="seasonFilterLabel">الموسم:</span>
-            <button type="button" class="season-chip" data-action="toggle-season" data-season="winter" data-key="seasonWinter">شتوية</button>
-            <button type="button" class="season-chip" data-action="toggle-season" data-season="summer" data-key="seasonSummer">صيفية</button>
+            <span class="season-filters-label" data-key="seasonFilterLabel">الموسم والخصوصية:</span>
+            <button type="button" class="season-chip" data-action="toggle-season" data-season="winter" data-key="seasonWinter">❄️ شتوية</button>
+            <button type="button" class="season-chip" data-action="toggle-season" data-season="summer" data-key="seasonSummer">☀️ صيفية</button>
+            <button type="button" class="season-chip" data-action="toggle-season" data-season="private_screened" data-key="filterPrivatePool">🔒 مسبح مستور (خصوصية تامة)</button>
+            <button type="button" class="season-chip" data-action="toggle-season" data-season="families_only" data-key="filterFamiliesOnly">👨‍👩‍👧‍👦 عائلات فقط</button>
         </div>
         <div class="cards-grid" id="items-container"></div>
     </div>
@@ -516,6 +545,7 @@
                         <li class="sidebar-item" data-action="admin-tab" data-tab="dash-listings"><span>🏡</span> <span data-key="sbListings">إدارة المنشآت</span></li>
                         <li class="sidebar-item" data-action="admin-tab" data-tab="dash-pitches"><span>⚽</span> <span data-key="sbPitches">إدارة الملاعب</span></li>
                         <li class="sidebar-item" data-action="admin-tab" data-tab="dash-bookings"><span>📅</span> <span data-key="sbBookings">الحجوزات والطلبات</span></li>
+                        <li class="sidebar-item" data-action="admin-tab" data-tab="dash-promos"><span>🎁</span> <span data-key="sbPromos">الخصومات والكوبونات</span></li>
                         <li class="sidebar-item" data-action="admin-tab" data-tab="dash-reviews"><span>⭐</span> <span data-key="sbReviews">مراجعة التقييمات</span></li>
                     </ul>
                 </div>
@@ -648,8 +678,12 @@
                                 <div class="form-group" style="flex:1;"><label>Cancellation Policy (English - اختياري)</label><textarea class="form-control" id="adm-v-cancel-en" rows="2" maxlength="1200" placeholder="Free cancellation 48h before..."></textarea></div>
                             </div>
                             <div class="form-group">
-                                <label>المرافق والمميزات (اختر ما ينطبق):</label>
-                                <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:5px;">
+                                <label>المرافق، الخصوصية، وتصنيف الجمهور (اختر ما ينطبق):</label>
+                                <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:5px;padding:0.75rem;background:#F5F9F6;border-radius:12px;border:1px solid #C8E0D0;">
+                                    <label style="display:flex;align-items:center;gap:6px;font-weight:700;color:#1B5E20;"><input type="checkbox" id="adm-v-am-private_screened"> 🔒 مسبح مستور (خصوصية تامة للعائلات)</label>
+                                    <label style="display:flex;align-items:center;gap:6px;font-weight:700;color:#0D47A1;"><input type="checkbox" id="adm-v-am-families_only"> 👨‍👩‍👧‍👦 عائلات فقط</label>
+                                    <label style="display:flex;align-items:center;gap:6px;font-weight:600;"><input type="checkbox" id="adm-v-am-youth_allowed"> 👥 عائلات وشباب</label>
+                                    <label style="display:flex;align-items:center;gap:6px;font-weight:600;"><input type="checkbox" id="adm-v-am-events_allowed"> 🎉 مناسبات وحفلات</label>
                                     <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="adm-v-am-pool"> 🏊 مسبح خاص</label>
                                     <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="adm-v-am-bbq"> 🔥 باربيكيو</label>
                                     <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="adm-v-am-wifi"> 📶 واي فاي</label>
@@ -815,6 +849,108 @@
                     </div>
                 </div>
 
+                <!-- Promos & Discounts Tab -->
+                <div id="dash-promos" class="admin-tab-page">
+                    <div class="admin-box">
+                        <h3 class="admin-section-title">🎁 إدارة كوبونات الخصم وعروض الأيام والأعياد</h3>
+                        <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:1rem;">تحكم كامل بالخصومات: حدد أي يوم من الأسبوع وكم قيمة الخصم، أنشئ أكواد خصم للأعياد والمناسبات، أوقف أو فعّل أي عرض بضغطة زر، واعمل استثناء لأي تاريخ أو أي منشأة.</p>
+                        <div class="table-card" style="margin-bottom:0;">
+                            <table class="admin-table">
+                                <thead><tr><th>الكود / النوع</th><th>المناسبة / الوصف</th><th>قيمة الخصم</th><th>الأيام والفترة</th><th>الاستثناءات</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
+                                <tbody id="admin-promos-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="admin-box">
+                        <h3 class="admin-section-title" id="promo-form-title">➕ إضافة كود خصم أو عرض يومي جديد</h3>
+                        <form id="add-promo-form">
+                            <input type="hidden" id="adm-p-editing-id" value="">
+                            <div class="form-row">
+                                <div class="form-group" style="flex:1;">
+                                    <label>كود الخصم (مثال: EID20 أو SUNDAY15)</label>
+                                    <input type="text" class="form-control" id="adm-p-code" required maxlength="40" placeholder="EID20" style="text-transform:uppercase;font-weight:700;">
+                                </div>
+                                <div class="form-group" style="flex:1.5;">
+                                    <label>اسم العرض / المناسبة (يظهر للزبون في الفاتورة)</label>
+                                    <input type="text" class="form-control" id="adm-p-title" required maxlength="120" placeholder="مثال: خصم عيد الفطر السعيد / خصم أيام وسط الأسبوع">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group" style="flex:1;">
+                                    <label>نوع الخصم</label>
+                                    <select class="form-control" id="adm-p-type">
+                                        <option value="percent">نسبة مئوية (%)</option>
+                                        <option value="fixed">مبلغ ثابت بالدينار (JOD)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="flex:1;">
+                                    <label>قيمة الخصم (كم القيمة؟)</label>
+                                    <input type="number" step="0.5" min="1" max="5000" class="form-control" id="adm-p-value" required placeholder="15">
+                                </div>
+                                <div class="form-group" style="flex:1.2;">
+                                    <label>طريقة تطبيق الخصم</label>
+                                    <select class="form-control" id="adm-p-auto">
+                                        <option value="false">🔑 كود خصم يدخله الزبون (مثل كود الأعياد)</option>
+                                        <option value="true">✨ خصم تلقائي مباشر في الأيام المحددة بدون كود</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                                    <label style="margin:0;">📅 حدد الأيام المسموحة التي يعمل فيها الخصم:</label>
+                                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                                        <button type="button" class="copy-chip-btn" data-action="promo-days-preset" data-preset="all">كل الأيام</button>
+                                        <button type="button" class="copy-chip-btn" data-action="promo-days-preset" data-preset="weekdays">وسط الأسبوع (أحد–أربعاء)</button>
+                                        <button type="button" class="copy-chip-btn" data-action="promo-days-preset" data-preset="weekend">نهاية الأسبوع (خميس–سبت)</button>
+                                    </div>
+                                </div>
+                                <div class="days-pills-wrap">
+                                    <label class="day-check-pill"><input type="checkbox" class="adm-p-day-cb" value="0" checked> الأحد</label>
+                                    <label class="day-check-pill"><input type="checkbox" class="adm-p-day-cb" value="1" checked> الاثنين</label>
+                                    <label class="day-check-pill"><input type="checkbox" class="adm-p-day-cb" value="2" checked> الثلاثاء</label>
+                                    <label class="day-check-pill"><input type="checkbox" class="adm-p-day-cb" value="3" checked> الأربعاء</label>
+                                    <label class="day-check-pill"><input type="checkbox" class="adm-p-day-cb" value="4" checked> الخميس</label>
+                                    <label class="day-check-pill"><input type="checkbox" class="adm-p-day-cb" value="5" checked> الجمعة</label>
+                                    <label class="day-check-pill"><input type="checkbox" class="adm-p-day-cb" value="6" checked> السبت</label>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group" style="flex:1;">
+                                    <label>تاريخ بداية العرض (اختياري — للأعياد والمواسم)</label>
+                                    <input type="date" class="form-control" id="adm-p-from">
+                                </div>
+                                <div class="form-group" style="flex:1;">
+                                    <label>تاريخ انتهاء العرض (اختياري)</label>
+                                    <input type="date" class="form-control" id="adm-p-until">
+                                </div>
+                            </div>
+
+                            <div style="background:#FFF9EF;border:1.5px dashed #E5C384;border-radius:14px;padding:1rem;margin-bottom:1rem;">
+                                <strong style="display:block;color:var(--primary-dark);margin-bottom:0.6rem;font-size:0.92rem;">🚫 قسم الاستثناءات (حدد أي تاريخ أو منشأة تريد استثناءها من الخصم):</strong>
+                                <div class="form-group">
+                                    <label>1. تواريخ مستثناة لا يعمل فيها الخصم (مثلاً أيام عطل أو ذروة محددة):</label>
+                                    <div style="display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+                                        <input type="date" class="form-control" id="adm-p-ex-date-picker" style="max-width:220px;">
+                                        <button type="button" class="btn-details" id="btn-add-ex-date" style="margin:0;">➕ استثناء هذا التاريخ</button>
+                                    </div>
+                                    <input type="text" class="form-control" id="adm-p-excluded-dates" placeholder="التواريخ المستثناة مفصولة بفاصلة مثال: 2026-12-31, 2026-11-15">
+                                </div>
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label>2. منشآت مستثناة من هذا الخصم (ضع علامة ✓ على أي منشأة تريد استثناءها):</label>
+                                    <div id="adm-p-excluded-facilities-list" class="excluded-facs-grid"></div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-action" style="width:100%;padding:0.85rem;" id="adm-p-submit-btn">💾 حفظ وتفعيل العرض / الكود</button>
+                            <button type="button" class="btn-details" style="width:100%;padding:0.8rem;margin-top:0.5rem;display:none;" id="adm-p-cancel-btn" data-action="cancel-promo-edit">إلغاء التعديل</button>
+                        </form>
+                    </div>
+                </div>
+
                 <!-- Reviews Moderation Tab -->
                 <div id="dash-reviews" class="admin-tab-page">
                     <div class="admin-box">
@@ -881,8 +1017,9 @@
             </div>
 
             <div style="display:flex;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap;">
-                <button type="button" class="btn-action" style="flex:1;padding:0.85rem;" id="det-book-btn">الانتقال للحجز الفوري</button>
-                <button type="button" class="btn-wa-share" id="det-wa-share-btn">💬 مشاركة عبر واتساب</button>
+                <button type="button" class="btn-action" style="flex:1;padding:0.85rem;min-width:170px;" id="det-book-btn">الانتقال للحجز الفوري</button>
+                <button type="button" class="btn-wa-share" id="det-wa-share-btn">💬 مشاركة واتساب</button>
+                <button type="button" class="btn-details" id="det-copy-link-btn" style="margin:0;">🔗 نسخ رابط المنشأة</button>
             </div>
 
             <!-- Reviews -->
@@ -1054,6 +1191,16 @@
                     <small id="receipt-status-msg" style="display:block;margin-top:4px;font-size:0.8rem;color:var(--text-muted);"></small>
                 </div>
 
+                <div class="promo-input-box">
+                    <label for="booking-promo-input" style="font-weight:700;font-size:0.88rem;color:var(--primary-dark);display:block;margin-bottom:0.4rem;">🎁 هل لديك كود خصم (كود أعياد / عرض خاص)؟</label>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <input type="text" class="form-control" id="booking-promo-input" placeholder="أدخل الكود هنا (مثال: EID20)" maxlength="40" style="flex:1;min-width:150px;text-transform:uppercase;font-weight:700;">
+                        <button type="button" class="btn-action" id="btn-apply-promo" style="white-space:nowrap;padding:0 1.2rem;">تطبيق الكود</button>
+                        <button type="button" class="btn-details" id="btn-clear-promo" style="display:none;white-space:nowrap;padding:0 0.9rem;margin:0;">إلغاء الكود</button>
+                    </div>
+                    <small id="promo-status-msg" style="display:block;margin-top:5px;font-size:0.82rem;font-weight:600;"></small>
+                </div>
+
                 <div class="bill-box" id="bill-details"></div>
 
                 <div class="form-group" style="display:flex;align-items:flex-start;gap:10px;margin-top:1rem;background:#FAFBFB;padding:0.8rem;border-radius:10px;border:1px solid #EAEAEA;">
@@ -1093,6 +1240,43 @@
             <button type="button" class="close-modal" data-action="close-modal" data-modal="image-modal" aria-label="إغلاق">&times;</button>
             <h3 id="image-modal-title" style="margin-bottom:1rem;">صورة وصل تحويل CliQ</h3>
             <img id="enlarged-receipt-img" src="" alt="Receipt" style="width:100%;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+        </div>
+    </div>
+
+    <!-- Feature 4: Track My Booking Modal -->
+    <div id="track-booking-modal" class="modal" role="dialog" aria-modal="true">
+        <div class="modal-content" style="max-width:560px;">
+            <button type="button" class="close-modal" data-action="close-modal" data-modal="track-booking-modal" aria-label="إغلاق">&times;</button>
+            <h3 style="color:var(--primary-dark);margin-bottom:0.4rem;">🔍 تتبّع حالة حجزي وتذكرتي</h3>
+            <p style="color:var(--text-muted);font-size:0.86rem;margin-bottom:1rem;">أدخل رقم الهاتف الذي استخدمته أثناء الحجز لمعرفة حالة طلبك فوراً وتحميل تذكرة الحجز الإلكترونية:</p>
+            <form id="track-booking-form">
+                <div class="form-row">
+                    <div class="form-group" style="flex:1.5;">
+                        <label for="track-phone-input">رقم الهاتف</label>
+                        <input type="tel" class="form-control" id="track-phone-input" required placeholder="مثال: 0791234567" maxlength="20">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label for="track-id-input">رقم التذكرة (اختياري)</label>
+                        <input type="text" class="form-control" id="track-id-input" placeholder="مثال: 15 أو WKND-15" maxlength="20">
+                    </div>
+                </div>
+                <button type="submit" class="btn-action" id="track-submit-btn" style="width:100%;padding:0.8rem;">🔍 بحث عن حجوزاتي</button>
+            </form>
+            <div id="track-results-container" style="margin-top:1.2rem;"></div>
+        </div>
+    </div>
+
+    <!-- Feature 3: Electronic Booking Ticket Modal -->
+    <div id="ticket-modal" class="modal" role="dialog" aria-modal="true">
+        <div class="modal-content" style="max-width:600px;">
+            <button type="button" class="close-modal" data-action="close-modal" data-modal="ticket-modal" aria-label="إغلاق">&times;</button>
+            <h3 style="color:var(--primary-dark);margin-bottom:0.8rem;">🎫 تذكرة الحجز الإلكترونية — Weekend</h3>
+            <div id="ticket-printable-area"></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:1rem;">
+                <button type="button" class="btn-action" id="btn-download-ticket-pdf" style="flex:1;background:#0D2818;color:#D4A359;">📄 تحميل التذكرة PDF</button>
+                <a id="btn-share-ticket-wa" href="#" target="_blank" rel="noopener noreferrer" class="btn-wa-share" style="flex:1;justify-content:center;text-decoration:none;">💬 إرسال عبر واتساب</a>
+                <button type="button" class="btn-details" id="btn-copy-ticket-id" style="margin:0;">📋 نسخ رقم التذكرة</button>
+            </div>
         </div>
     </div>
 
@@ -1449,20 +1633,61 @@
                 receiptData: sanitizeImageUrl(r.receipt_data),
                 pickupLocation: r.pickup_location || null,
                 dropoffLocation: r.dropoff_location || null,
+                promoCode: r.promo_code || null,
+                discountAmount: Number.isFinite(Number(r.discount_amount)) ? Number(r.discount_amount) : 0,
                 status: r.status || 'pending',
                 createdAt: r.created_at || null
             };
+        }
+
+        function rowToPromo(r) {
+            return {
+                id: Number(r.id),
+                code: String(r.code || '').toUpperCase().trim(),
+                titleAr: String(r.title_ar || 'عرض خصم'),
+                discountType: r.discount_type === 'fixed' ? 'fixed' : 'percent',
+                discountValue: Number(r.discount_value) || 0,
+                allowedDays: Array.isArray(r.allowed_days) ? r.allowed_days.map(Number) : [0,1,2,3,4,5,6],
+                validFrom: r.valid_from || null,
+                validUntil: r.valid_until || null,
+                excludedDates: Array.isArray(r.excluded_dates) ? r.excluded_dates.map(String) : [],
+                excludedFacilityIds: Array.isArray(r.excluded_facility_ids) ? r.excluded_facility_ids.map(Number) : [],
+                autoApply: Boolean(r.auto_apply),
+                active: r.active !== false
+            };
+        }
+
+        function promoToRow(p) {
+            const row = {
+                code: String(p.code || '').toUpperCase().trim(),
+                title_ar: String(p.titleAr || '').trim(),
+                discount_type: p.discountType === 'fixed' ? 'fixed' : 'percent',
+                discount_value: Number(p.discountValue) || 10,
+                allowed_days: Array.isArray(p.allowedDays) ? p.allowedDays.map(Number) : [0,1,2,3,4,5,6],
+                valid_from: p.validFrom || null,
+                valid_until: p.validUntil || null,
+                excluded_dates: Array.isArray(p.excludedDates) ? p.excludedDates.filter(Boolean) : [],
+                excluded_facility_ids: Array.isArray(p.excludedFacilityIds) ? p.excludedFacilityIds.map(Number) : [],
+                auto_apply: Boolean(p.autoApply),
+                active: Boolean(p.active)
+            };
+            if (p.id) row.id = Number(p.id);
+            return row;
         }
 
         // =====================================================
         //  STATE & STRUCTURED SLOT AVAILABILITY (Farms, Pitches, Transport)
         // =====================================================
         const AMENITIES_MAP = {
-            pool:    { icon: '🏊', labelAr: 'مسبح خاص',    labelEn: 'Private Pool' },
-            bbq:     { icon: '🔥', labelAr: 'باربيكيو',     labelEn: 'BBQ' },
-            wifi:    { icon: '📶', labelAr: 'واي فاي',      labelEn: 'Wi-Fi' },
-            heating: { icon: '🌡️', labelAr: 'تدفئة',        labelEn: 'Heating' },
-            outdoor: { icon: '🌿', labelAr: 'جلسة خارجية',  labelEn: 'Outdoor Seating' }
+            private_screened: { icon: '🔒', labelAr: 'مسبح مستور (خصوصية تامة)', labelEn: '100% Private Screened Pool', highlight: true },
+            families_only:    { icon: '👨‍👩‍👧‍👦', labelAr: 'عائلات فقط',               labelEn: 'Families Only',              highlight: true },
+            youth_allowed:    { icon: '👥', labelAr: 'عائلات وشباب',              labelEn: 'Families & Youth' },
+            events_allowed:   { icon: '🎉', labelAr: 'مناسبات وحفلات',            labelEn: 'Events & Parties' },
+            pool:             { icon: '🏊', labelAr: 'مسبح خاص',                  labelEn: 'Private Pool' },
+            bbq:              { icon: '🔥', labelAr: 'باربيكيو',                   labelEn: 'BBQ' },
+            wifi:             { icon: '📶', labelAr: 'واي فاي',                    labelEn: 'Wi-Fi' },
+            heating:          { icon: '🌡️', labelAr: 'تدفئة',                      labelEn: 'Heating' },
+            outdoor:          { icon: '🌿', labelAr: 'جلسة خارجية',                labelEn: 'Outdoor Seating' }
         };
 
         let currentLang = 'ar';
@@ -1480,6 +1705,9 @@
         let confirmedBookings = [];
         let archivedBookings = [];
         let allReviews = [];
+        let promoCodes = JSON.parse(safeGetStorage('wknd_promos_fallback', '[]'));
+        let appliedPromoCode = '';
+        let currentTicketBooking = null;
 
         // جميع الفترات المحجوزة أو قيد المراجعة من الـ View العام:
         // [{ facilityId, date, hourFrom, hourTo, shiftType, status }]
@@ -1666,13 +1894,19 @@
             if (!db) return;
             try {
                 // جلب جميع البيانات الأساسية بالتوازي (Parallel Fetch) لتقليص زمن التحميل بنسبة 70%
-                const [facRes, revRes, , favRes, admBookRes] = await Promise.all([
+                const [facRes, revRes, , favRes, admBookRes, promoRes] = await Promise.all([
                     db.from('facilities').select('*').order('id'),
                     db.from('reviews').select('id,facility_id,user_name,rating,comment,status,created_at').order('id', { ascending: false }),
                     loadPublicConfirmedSlots(),
                     db.from('favorites').select('facility_id').eq('device_id', DEVICE_ID),
-                    isAdminLoggedIn ? db.from('bookings').select('*').order('id', { ascending: false }) : Promise.resolve({ data: null, error: null })
+                    isAdminLoggedIn ? db.from('bookings').select('*').order('id', { ascending: false }) : Promise.resolve({ data: null, error: null }),
+                    db.from('promo_codes').select('*').order('id', { ascending: false })
                 ]);
+
+                if (!promoRes.error && Array.isArray(promoRes.data)) {
+                    promoCodes = promoRes.data.map(rowToPromo);
+                    safeSetStorage('wknd_promos_fallback', JSON.stringify(promoCodes));
+                }
 
                 if (facRes.error) throw facRes.error;
                 const facilityRows = facRes.data;
@@ -1712,21 +1946,23 @@
         // =====================================================
         const translations = {
             ar: {
-                navHome:'الواجهة الرئيسية', navFav:'المفضلة', navAdmin:'👑 لوحة الأدمن',
+                navHome:'الواجهة الرئيسية', navFav:'المفضلة', navTrack:'تتبّع حجزي', navAdmin:'👑 لوحة الأدمن',
                 heroTitle:'احجز مكانك أو وسيلة النقل بسهولة وأمان', heroSubtitle:'حساب أوتوماتيكي للعربون - تأكيد فوري عبر CliQ - تجربة حجز سلسة',
-                favTitle:'قائمة المفضلة', sbTitle:'لوحة التحكم', sbOverview:'الرئيسية (الإحصائيات)', sbListings:'إدارة المنشآت', sbPitches:'إدارة الملاعب', sbBookings:'الحجوزات والطلبات', sbReviews:'مراجعة التقييمات',
+                favTitle:'قائمة المفضلة', sbTitle:'لوحة التحكم', sbOverview:'الرئيسية (الإحصائيات)', sbListings:'إدارة المنشآت', sbPitches:'إدارة الملاعب', sbBookings:'الحجوزات والطلبات', sbPromos:'الخصومات والكوبونات', sbReviews:'مراجعة التقييمات',
                 dashTitle:'📊 نظرة عامة والإحصائيات', statPending:'طلبات بانتظار التأكيد', statConfirmed:'إجمالي الحجوزات المؤكدة', statRevenue:'مجموع أرباح العربون',
                 manageListingsTitle:'قائمة المنشآت الحالية (المزارع والشاليهات ووسائل النقل)', logoutBtn:'تسجيل الخروج',
-                filterAll:'الكل', filterFarms:'مزارع وشاليهات 🌴', filterFields:'ملاعب ⚽', filterTransport:'وسائل نقل وباصات 🚌', seasonFilterLabel:'الموسم:', seasonWinter:'شتوية', seasonSummer:'صيفية',
+                filterAll:'الكل', filterFarms:'مزارع وشاليهات 🌴', filterFields:'ملاعب ⚽', filterTransport:'وسائل نقل وباصات 🚌', seasonFilterLabel:'الموسم والخصوصية:', seasonWinter:'❄️ شتوية', seasonSummer:'☀️ صيفية',
+                filterPrivatePool:'🔒 مسبح مستور (خصوصية تامة)', filterFamiliesOnly:'👨‍👩‍👧‍👦 عائلات فقط',
                 btnDetails:'التفاصيل', btnBookNow:'ابدأ الحجز', badgeFarm:'مزرعة', badgeField:'ملعب', badgeTransport:'حافلة / باص'
             },
             en: {
-                navHome:'Home', navFav:'Favorites', navAdmin:'👑 Admin Panel',
+                navHome:'Home', navFav:'Favorites', navTrack:'Track Booking', navAdmin:'👑 Admin Panel',
                 heroTitle:'Book your place or transportation easily and safely', heroSubtitle:'Automatic deposit calculation - Instant CliQ confirmation - A smooth booking experience',
-                favTitle:'Favorites', sbTitle:'Dashboard', sbOverview:'Overview & Statistics', sbListings:'Manage Listings', sbPitches:'Manage Fields', sbBookings:'Bookings & Requests', sbReviews:'Reviews Moderation',
+                favTitle:'Favorites', sbTitle:'Dashboard', sbOverview:'Overview & Statistics', sbListings:'Manage Listings', sbPitches:'Manage Fields', sbBookings:'Bookings & Requests', sbPromos:'Promos & Discounts', sbReviews:'Reviews Moderation',
                 dashTitle:'📊 Overview & Statistics', statPending:'Pending Confirmation', statConfirmed:'Total Confirmed Bookings', statRevenue:'Total Deposit Revenue',
                 manageListingsTitle:'Current Listings (Farms, Chalets & Transportation)', logoutBtn:'Log Out',
-                filterAll:'All', filterFarms:'Farms & Chalets 🌴', filterFields:'Sports Fields ⚽', filterTransport:'Transportation & Buses 🚌', seasonFilterLabel:'Season:', seasonWinter:'Winter', seasonSummer:'Summer',
+                filterAll:'All', filterFarms:'Farms & Chalets 🌴', filterFields:'Sports Fields ⚽', filterTransport:'Transportation & Buses 🚌', seasonFilterLabel:'Season & Privacy:', seasonWinter:'❄️ Winter', seasonSummer:'☀️ Summer',
+                filterPrivatePool:'🔒 Private Screened Pool', filterFamiliesOnly:'👨‍👩‍👧‍👦 Families Only',
                 btnDetails:'Details', btnBookNow:'Book Now', badgeFarm:'Farm', badgeField:'Field', badgeTransport:'Bus'
             }
         };
@@ -1948,8 +2184,12 @@
                 ].filter(Boolean).join(' ').toLowerCase();
                 const matchesQuery = q === '' || searchableText.includes(q);
                 const itemSeasons = Array.isArray(item.seasons) && item.seasons.length ? item.seasons : ['summer', 'winter'];
-                const matchesSeason = selectedSeasons.size === 0 || item.category === 'transport' || [...selectedSeasons].some(s => itemSeasons.includes(s));
-                return matchesCat && matchesQuery && matchesSeason;
+                const itemAmenities = Array.isArray(item.amenities) ? item.amenities : [];
+                const activeSeasonFilters = [...selectedSeasons].filter(s => s === 'winter' || s === 'summer');
+                const activePrivacyFilters = [...selectedSeasons].filter(s => s === 'private_screened' || s === 'families_only');
+                const matchesSeason = activeSeasonFilters.length === 0 || item.category === 'transport' || activeSeasonFilters.some(s => itemSeasons.includes(s));
+                const matchesPrivacy = activePrivacyFilters.length === 0 || activePrivacyFilters.every(p => itemAmenities.includes(p));
+                return matchesCat && matchesQuery && matchesSeason && matchesPrivacy;
             });
 
             if (filtered.length === 0) {
@@ -2082,6 +2322,19 @@
                 priceTagHtml = `☀️ ${Number(item.priceDay || 0)} | 🌙 ${Number(item.priceNight || 0)} JOD`;
             }
 
+            const amList = Array.isArray(item.amenities) ? item.amenities : [];
+            let privacyRibbonHtml = '';
+            if (amList.includes('private_screened')) {
+                privacyRibbonHtml = `<span class="card-privacy-ribbon">${currentLang==='ar'?'🔒 مسبح مستور (خصوصية تامة)':'🔒 100% Private Pool'}</span>`;
+            } else if (amList.includes('families_only')) {
+                privacyRibbonHtml = `<span class="card-privacy-ribbon">${currentLang==='ar'?'👨‍👩‍👧‍👦 عائلات فقط':'👨‍👩‍👧‍👦 Families Only'}</span>`;
+            }
+
+            const activeAutoPromo = (promoCodes || []).find(p => p.active && p.autoApply && !(p.excludedFacilityIds || []).includes(item.id));
+            const promoRibbonHtml = activeAutoPromo
+                ? `<span class="card-promo-ribbon">🔥 ${escapeHtml(activeAutoPromo.discountType === 'percent' ? `خصم ${activeAutoPromo.discountValue}%` : `خصم ${activeAutoPromo.discountValue} د.أ`)}</span>`
+                : '';
+
             const card = document.createElement('div');
             card.className = 'venue-card';
             card.innerHTML = `
@@ -2089,6 +2342,8 @@
                     <div class="card-img-holder" tabindex="0" role="button" data-action="open-details" data-id="${item.id}">
                         <img src="${imgSrc}" alt="${name}" loading="lazy">
                         <span class="card-badge">${escapeHtml(badgeText)}</span>
+                        ${privacyRibbonHtml}
+                        ${promoRibbonHtml}
                         <span class="card-rating-badge">${renderStars(item.rating)} ${ratingVal}</span>
                         <button type="button" class="fav-btn ${isFav?'active':''}" data-action="toggle-fav" data-id="${item.id}" title="إضافة للمفضلة">${isFav?'❤️':'🤍'}</button>
                     </div>
@@ -2098,7 +2353,7 @@
                         <div class="card-specs">${specs}</div>
                     </div>
                 </div>
-                ${(item.amenities||[]).length ? `<div class="card-amenities">${(item.amenities).map(a=>{ const m=AMENITIES_MAP[a]; return m?`<span class="card-amenity">${m.icon} ${escapeHtml(currentLang==='ar'?m.labelAr:m.labelEn)}</span>`:''; }).join('')}</div>` : ''}
+                ${amList.length ? `<div class="card-amenities">${amList.map(a=>{ const m=AMENITIES_MAP[a]; return m?`<span class="card-amenity ${m.highlight?'privacy-highlight-badge':''}">${m.icon} ${escapeHtml(currentLang==='ar'?m.labelAr:m.labelEn)}</span>`:''; }).join('')}</div>` : ''}
                 <div class="card-footer">
                     <div class="price-tag">${priceTagHtml}</div>
                     <div>
@@ -2124,6 +2379,8 @@
             document.getElementById('det-specs').textContent = localizedItemText(selectedItem, 'specs');
             document.getElementById('det-book-btn').dataset.id = selectedItem.id;
             document.getElementById('det-wa-share-btn').dataset.id = selectedItem.id;
+            const copyLinkBtn = document.getElementById('det-copy-link-btn');
+            if (copyLinkBtn) copyLinkBtn.dataset.id = selectedItem.id;
 
             // Gallery
             const mainImg = document.getElementById('det-main-img');
@@ -2202,7 +2459,7 @@
             if ((selectedItem.amenities || []).length > 0) {
                 amenitiesStrip.innerHTML = selectedItem.amenities.map(a => {
                     const m = AMENITIES_MAP[a];
-                    return m ? `<span class="amenity-badge"><span class="am-icon">${m.icon}</span>${escapeHtml(currentLang === 'ar' ? m.labelAr : m.labelEn)}</span>` : '';
+                    return m ? `<span class="amenity-badge ${m.highlight?'privacy-highlight-badge':''}"><span class="am-icon">${m.icon}</span>${escapeHtml(currentLang === 'ar' ? m.labelAr : m.labelEn)}</span>` : '';
                 }).join('');
                 amenitiesSection.style.display = 'block';
             } else {
@@ -2273,6 +2530,111 @@
         // =====================================================
         //  BOOKING MODAL & SERVER-VERIFIED RPC SUBMISSION
         // =====================================================
+        const DAY_NAMES_AR = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+
+        function evaluatePromoForBooking(itemId, dateVal, subtotal, manualCode) {
+            const cleanCode = String(manualCode || '').toUpperCase().trim();
+            if (!subtotal || subtotal <= 0) {
+                return { valid: false, discount: 0, code: null, titleAr: '', msg: '' };
+            }
+            const dow = dateVal ? new Date(dateVal + 'T00:00:00').getDay() : null;
+
+            if (cleanCode) {
+                const promo = (promoCodes || []).find(p => String(p.code || '').toUpperCase() === cleanCode);
+                if (!promo) {
+                    return { valid: false, discount: 0, code: null, titleAr: '', msg: '❌ كود الخصم غير موجود، تأكد من كتابته بشكل صحيح' };
+                }
+                if (!promo.active) {
+                    return { valid: false, discount: 0, code: null, titleAr: '', msg: '⏸️ كود الخصم هذا متوقف حالياً من الإدارة' };
+                }
+                if ((promo.excludedFacilityIds || []).map(Number).includes(Number(itemId))) {
+                    return { valid: false, discount: 0, code: null, titleAr: '', msg: '🚫 هذه المنشأة مستثناة من هذا العرض' };
+                }
+                if (!dateVal) {
+                    return { valid: false, discount: 0, code: null, titleAr: '', msg: '📅 يرجى اختيار تاريخ الحجز أولاً لتطبيق كود الخصم' };
+                }
+                if (promo.validFrom && dateVal < promo.validFrom) {
+                    return { valid: false, discount: 0, code: null, titleAr: '', msg: `📅 هذا الكود يبدأ تفعيله بتاريخ ${promo.validFrom}` };
+                }
+                if (promo.validUntil && dateVal > promo.validUntil) {
+                    return { valid: false, discount: 0, code: null, titleAr: '', msg: `⌛ انتهت صلاحية هذا الكود بتاريخ ${promo.validUntil}` };
+                }
+                if ((promo.excludedDates || []).includes(dateVal)) {
+                    return { valid: false, discount: 0, code: null, titleAr: '', msg: `🚫 التاريخ المختار (${dateVal}) مستثنى من هذا العرض` };
+                }
+                const allowed = Array.isArray(promo.allowedDays) ? promo.allowedDays.map(Number) : [0,1,2,3,4,5,6];
+                if (dow !== null && !allowed.includes(dow)) {
+                    const allowedNames = allowed.map(d => DAY_NAMES_AR[d]).join('، ');
+                    return { valid: false, discount: 0, code: null, titleAr: '', msg: `📅 هذا الكود مخصص لأيام: (${allowedNames}) فقط` };
+                }
+                const rawDisc = promo.discountType === 'percent'
+                    ? Number((subtotal * (Number(promo.discountValue) / 100)).toFixed(2))
+                    : Number(promo.discountValue);
+                const discount = Math.min(rawDisc, Math.max(0, Number((subtotal - 1).toFixed(2))));
+                return {
+                    valid: true,
+                    discount,
+                    code: promo.code,
+                    titleAr: promo.titleAr,
+                    isAuto: false,
+                    msg: `✅ تم تطبيق "${promo.titleAr}" (خصم ${discount.toFixed(2)} JOD)`
+                };
+            }
+
+            // فحص العروض التلقائية لليوم المختار (autoApply)
+            if (dateVal && dow !== null) {
+                const autoCandidates = (promoCodes || []).filter(p => {
+                    if (!p.active || !p.autoApply) return false;
+                    if ((p.excludedFacilityIds || []).map(Number).includes(Number(itemId))) return false;
+                    if (p.validFrom && dateVal < p.validFrom) return false;
+                    if (p.validUntil && dateVal > p.validUntil) return false;
+                    if ((p.excludedDates || []).includes(dateVal)) return false;
+                    const allowed = Array.isArray(p.allowedDays) ? p.allowedDays.map(Number) : [0,1,2,3,4,5,6];
+                    return allowed.includes(dow);
+                });
+                if (autoCandidates.length > 0) {
+                    const best = autoCandidates[0];
+                    const rawDisc = best.discountType === 'percent'
+                        ? Number((subtotal * (Number(best.discountValue) / 100)).toFixed(2))
+                        : Number(best.discountValue);
+                    const discount = Math.min(rawDisc, Math.max(0, Number((subtotal - 1).toFixed(2))));
+                    return {
+                        valid: true,
+                        discount,
+                        code: best.code,
+                        titleAr: best.titleAr,
+                        isAuto: true,
+                        msg: `✨ تم تطبيق عرض اليوم تلقائياً: "${best.titleAr}" (-${discount.toFixed(2)} JOD)`
+                    };
+                }
+            }
+            return { valid: false, discount: 0, code: null, titleAr: '', msg: '' };
+        }
+
+        function applyBookingPromoCode() {
+            const inp = document.getElementById('booking-promo-input');
+            const code = inp ? inp.value.toUpperCase().trim() : '';
+            if (!code) {
+                showToast('⚠️ يرجى كتابة كود الخصم أولاً');
+                return;
+            }
+            appliedPromoCode = code;
+            const clearBtn = document.getElementById('btn-clear-promo');
+            if (clearBtn) clearBtn.style.display = 'inline-block';
+            updateBookingCalculation();
+        }
+
+        function clearBookingPromoCode() {
+            appliedPromoCode = '';
+            const inp = document.getElementById('booking-promo-input');
+            if (inp) inp.value = '';
+            const clearBtn = document.getElementById('btn-clear-promo');
+            if (clearBtn) clearBtn.style.display = 'none';
+            const msgEl = document.getElementById('promo-status-msg');
+            if (msgEl) msgEl.textContent = '';
+            updateBookingCalculation();
+        }
+
         function isWeekendDate(dateVal) {
             if (!dateVal) return false;
             const dow = new Date(dateVal + 'T00:00:00').getDay();
@@ -2360,6 +2722,13 @@
             document.getElementById('receipt-status-msg').textContent = '';
             currentUploadedReceiptBase64 = '';
             isReceiptProcessing = false;
+            appliedPromoCode = '';
+            const promoInp = document.getElementById('booking-promo-input');
+            if (promoInp) promoInp.value = '';
+            const promoClearBtn = document.getElementById('btn-clear-promo');
+            if (promoClearBtn) promoClearBtn.style.display = 'none';
+            const promoMsg = document.getElementById('promo-status-msg');
+            if (promoMsg) promoMsg.textContent = '';
 
             const isTransport = selectedItem.category === 'transport';
             const isPitch     = selectedItem.category === 'field';
@@ -2464,6 +2833,24 @@
             updateBookingCalculation();
         }
 
+        function renderPromoFeedbackAndRows(itemId, dateVal, subtotal) {
+            const promoMsgEl = document.getElementById('promo-status-msg');
+            const evalRes = evaluatePromoForBooking(itemId, dateVal, subtotal, appliedPromoCode);
+            if (promoMsgEl) {
+                promoMsgEl.textContent = evalRes.msg || '';
+                promoMsgEl.style.color = evalRes.valid ? 'var(--success)' : 'var(--danger)';
+            }
+            const discount = evalRes.valid ? evalRes.discount : 0;
+            const netTotal = Math.max(1, Number((subtotal - discount).toFixed(2)));
+            const discountHtml = discount > 0
+                ? `<div class="bill-row" style="color:var(--success);font-weight:700;"><span>🎁 الخصم (${escapeHtml(evalRes.titleAr || evalRes.code)}):</span><span>-${discount.toFixed(2)} JOD</span></div>`
+                : '';
+            const totalLabelHtml = discount > 0
+                ? `<span style="text-decoration:line-through;color:#999;font-size:0.82rem;margin-left:6px;">${subtotal.toFixed(2)} JOD</span><strong>${netTotal.toFixed(2)} JOD</strong>`
+                : `<strong>${netTotal.toFixed(2)} JOD</strong>`;
+            return { netTotal, discount, code: evalRes.valid ? evalRes.code : null, discountHtml, totalLabelHtml };
+        }
+
         function updateBookingCalculation() {
             if (!selectedItem) return;
             const billEl = document.getElementById('bill-details');
@@ -2474,6 +2861,7 @@
                 const passengers = parseInt(document.getElementById('trans-passengers').value, 10) || 0;
                 const distance   = parseFloat(document.getElementById('trans-distance').value) || 0;
                 const isRoundTrip = document.getElementById('trans-round-trip').checked;
+                const tripDate   = document.getElementById('booking-date-transport').value;
                 const tripMult   = isRoundTrip ? 2 : 1;
 
                 if (passengers <= 0 || distance <= 0) {
@@ -2489,7 +2877,9 @@
                     return;
                 }
 
-                const total   = Number(((distance * Number(selectedItem.pricePerKm || 0) + passengers * Number(selectedItem.pricePerPerson || 0)) * tripMult).toFixed(2));
+                const subtotal = Number(((distance * Number(selectedItem.pricePerKm || 0) + passengers * Number(selectedItem.pricePerPerson || 0)) * tripMult).toFixed(2));
+                const promoInfo = renderPromoFeedbackAndRows(selectedItem.id, tripDate, subtotal);
+                const total = promoInfo.netTotal;
                 const deposit = Number((total * 0.15).toFixed(2));
                 const remaining = Number((total - deposit).toFixed(2));
                 const tripTypeLabel = isRoundTrip ? 'ذهاب وإياب' : 'ذهاب فقط';
@@ -2500,7 +2890,8 @@
                     <div class="bill-row"><span>سعر الكيلو:</span><span>${Number(selectedItem.pricePerKm || 0).toFixed(2)} JOD</span></div>
                     <div class="bill-row"><span>سعر الشخص:</span><span>${Number(selectedItem.pricePerPerson || 0).toFixed(2)} JOD</span></div>
                     <div class="bill-row"><span>نوع الرحلة:</span><span>${tripTypeLabel}</span></div>
-                    <div class="bill-row"><span>المبلغ الإجمالي:</span><span><strong>${total.toFixed(2)} JOD</strong></span></div>
+                    ${promoInfo.discountHtml}
+                    <div class="bill-row"><span>المبلغ الإجمالي:</span><span>${promoInfo.totalLabelHtml}</span></div>
                     <div class="bill-row highlight"><span>العربون المطلوب (15%):</span><span><strong>${deposit.toFixed(2)} JOD</strong></span></div>
                     <div class="bill-row total"><span>المتبقي عند الرحلة:</span><span>${remaining.toFixed(2)} JOD</span></div>`;
                 return;
@@ -2523,15 +2914,17 @@
                     return;
                 }
 
+                const dateVal    = document.getElementById('booking-date').value;
                 const endHour    = startHour + hours;
                 const hourlyRate = Number(selectedItem.hourlyRate) || 0;
-                const total      = Number((hours * hourlyRate).toFixed(2));
+                const subtotal   = Number((hours * hourlyRate).toFixed(2));
+                const promoInfo  = renderPromoFeedbackAndRows(selectedItem.id, dateVal, subtotal);
+                const total      = promoInfo.netTotal;
                 const deposit    = Math.min(5.0, total);
                 const remaining  = Math.max(0, Number((total - deposit).toFixed(2)));
                 const startLabel = startHour < 12 ? `${startHour}:00 ص` : (startHour === 12 ? '12:00 ظ' : `${startHour-12}:00 م`);
                 const endLabel   = endHour < 12 ? `${endHour}:00 ص` : (endHour === 12 ? '12:00 ظ' : endHour === 24 ? '12:00 ص (منتصف الليل)' : `${endHour-12}:00 م`);
 
-                const dateVal = document.getElementById('booking-date').value;
                 const busyState = dateVal ? getIntervalBusyStatus(selectedItem.id, dateVal, startHour, endHour) : null;
                 const conflictWarning = busyState
                     ? `<div style="margin-top:6px;color:var(--danger);font-weight:700;font-size:0.84rem;">⛔ هذه الساعات متعارضة مع حجز ${busyState === 'confirmed' ? 'مؤكد' : 'قيد المراجعة'} في هذا اليوم.</div>`
@@ -2541,7 +2934,8 @@
                     <div class="bill-row"><span>سعر الساعة:</span><span>${hourlyRate.toFixed(1)} JOD/ساعة</span></div>
                     <div class="bill-row"><span>عدد الساعات:</span><span>${hours} ساعة</span></div>
                     <div class="bill-row"><span>وقت الحجز:</span><span>${startLabel} → ${endLabel}</span></div>
-                    <div class="bill-row"><span>المبلغ الإجمالي (${hours} × ${hourlyRate}):</span><span><strong>${total.toFixed(2)} JOD</strong></span></div>
+                    ${promoInfo.discountHtml}
+                    <div class="bill-row"><span>المبلغ الإجمالي (${hours} × ${hourlyRate}):</span><span>${promoInfo.totalLabelHtml}</span></div>
                     <div class="bill-row highlight"><span>العربون المطلوب:</span><span><strong>${deposit.toFixed(2)} JOD</strong></span></div>
                     <div class="bill-row total"><span>المتبقي عند الملعب:</span><span>${remaining.toFixed(2)} JOD</span></div>
                     ${conflictWarning}`;
@@ -2554,8 +2948,10 @@
             let basePrice = Number(selectedItem.priceDay) || 0;
             if (selectedShiftType === 'evening') basePrice = Number(selectedItem.priceNight) || 0;
             if (selectedShiftType === 'fullday') basePrice = Number(selectedItem.priceFull) || 0;
-            const total   = Number((basePrice * multiplier).toFixed(2));
-            const deposit = Number((total * 0.15).toFixed(2));
+            const subtotal  = Number((basePrice * multiplier).toFixed(2));
+            const promoInfo = renderPromoFeedbackAndRows(selectedItem.id, dateVal, subtotal);
+            const total     = promoInfo.netTotal;
+            const deposit   = Number((total * 0.15).toFixed(2));
             const remaining = Number((total - deposit).toFixed(2));
 
             document.getElementById('price-day-label').textContent   = `${(Number(selectedItem.priceDay || 0) * multiplier).toFixed(1)} JOD`;
@@ -2564,7 +2960,8 @@
 
             billEl.innerHTML = `
                 <div class="bill-row"><span>التسعير المطبق:</span><span>${multiplier > 1 ? 'نهاية الأسبوع (+15%)' : 'أيام عادية'}</span></div>
-                <div class="bill-row"><span>المبلغ الإجمالي:</span><span><strong>${total.toFixed(2)} JOD</strong></span></div>
+                ${promoInfo.discountHtml}
+                <div class="bill-row"><span>المبلغ الإجمالي:</span><span>${promoInfo.totalLabelHtml}</span></div>
                 <div class="bill-row highlight"><span>العربون المطلوب (15%):</span><span><strong>${deposit.toFixed(2)} JOD</strong></span></div>
                 <div class="bill-row total"><span>المتبقي عند الوصول:</span><span>${remaining.toFixed(2)} JOD</span></div>`;
         }
@@ -2742,7 +3139,15 @@
                     return;
                 }
 
-                const { data: result, error } = await db.rpc('create_booking', rpcParams);
+                // التحقق من الخصم قبل الإرسال
+                const rpcWithPromo = { ...rpcParams, p_promo_code: appliedPromoCode || null };
+                let { data: result, error } = await db.rpc('create_booking', rpcWithPromo);
+                if (error && String(error.message || '').includes('create_booking')) {
+                    // توافق تلقائي في حال لم يتم تحديث دالة SQL بعد
+                    const fallbackRes = await db.rpc('create_booking', rpcParams);
+                    result = fallbackRes.data;
+                    error = fallbackRes.error;
+                }
                 if (error) {
                     if (error.code === '23P01') {
                         showToast('⛔ سبقك شخص آخر لحجز هذا الموعد للتو، جرب موعداً آخر');
@@ -2755,21 +3160,37 @@
 
                 await refreshBookingsForItem(selectedItem.id);
                 playAdminBeep();
+                const bookedItem = selectedItem;
                 closeModal('booking-modal');
-                showToast('✅ تم إرسال طلب الحجز بنجاح وبانتظار تأكيد الإدارة!');
+                showToast('✅ تم إرسال طلب الحجز بنجاح! تذكرتك الإلكترونية جاهزة.');
 
-                const savedTotal = Number(result?.total || 0).toFixed(2);
-                const savedDeposit = Number(result?.deposit || 0).toFixed(2);
-                const savedDetails = String(result?.details || '');
-                const waText = encodeURIComponent(`🌴 *تأكيد طلب الحجز - منصة Weekend*\n\nالاسم: ${clientName}\nالخدمة: ${selectedItem.nameAr}\nالتفاصيل: ${savedDetails}\nالإجمالي: ${savedTotal} JOD\nالعربون: ${savedDeposit} JOD\n\nشكراً لاختيارك منصة Weekend 🙏`);
+                const ticketObj = {
+                    id: Number(result?.id || Date.now().toString().slice(-5)),
+                    facilityId: bookedItem.id,
+                    itemNameAr: bookedItem.nameAr,
+                    itemNameEn: bookedItem.nameEn || bookedItem.nameAr,
+                    locationAr: bookedItem.locationAr,
+                    lat: bookedItem.lat,
+                    lng: bookedItem.lng,
+                    clientName,
+                    phone,
+                    bookingDate,
+                    details: String(result?.details || ''),
+                    promoCode: result?.promo_code || appliedPromoCode || null,
+                    discountAmount: Number(result?.discount_amount || 0),
+                    total: Number(result?.total || 0),
+                    deposit: Number(result?.deposit || 0),
+                    status: 'pending',
+                    createdAt: new Date().toISOString()
+                };
 
-                setTimeout(() => {
-                    const shareToast = document.createElement('div');
-                    shareToast.style.cssText = 'position:fixed;bottom:80px;right:20px;background:#0D2818;color:white;padding:1rem 1.5rem;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.25);z-index:3100;display:flex;align-items:center;gap:12px;max-width:360px;font-size:0.88rem;';
-                    shareToast.innerHTML = `<span style="flex:1;">شارك ملخص الحجز عبر واتساب:</span><a href="https://wa.me/?text=${waText}" target="_blank" rel="noopener noreferrer" style="background:#25D366;color:white;padding:6px 14px;border-radius:8px;text-decoration:none;font-weight:700;white-space:nowrap;font-size:0.85rem;">💬 واتساب</a><button type="button" data-action="dismiss-parent" style="background:none;border:none;color:#aaa;font-size:1.3rem;cursor:pointer;padding:0 4px;">&times;</button>`;
-                    document.body.appendChild(shareToast);
-                    setTimeout(() => { if (shareToast.parentElement) shareToast.remove(); }, 8000);
-                }, 500);
+                // حفظ التذكرة محلياً على جهاز الزبون لسهولة الرجوع إليها من نافذة تتبّع حجزي
+                const myLocalBookings = JSON.parse(safeGetStorage('wknd_my_bookings', '[]'));
+                myLocalBookings.unshift(ticketObj);
+                safeSetStorage('wknd_my_bookings', JSON.stringify(myLocalBookings.slice(0, 20)));
+
+                // فتح تذكرة الحجز الإلكترونية فوراً (Feature 3)
+                setTimeout(() => openBookingTicketModal(ticketObj), 250);
 
                 if (isAdminLoggedIn) {
                     await loadFromDatabase();
@@ -3015,7 +3436,7 @@
                 lng           = document.getElementById('adm-v-lng').value.trim();
                 cancelAr      = document.getElementById('adm-v-cancel').value.trim();
                 cancelEn      = document.getElementById('adm-v-cancel-en').value.trim();
-                amenities     = ['pool','bbq','wifi','heating','outdoor'].filter(a => document.getElementById(`adm-v-am-${a}`).checked);
+                amenities     = ['private_screened','families_only','youth_allowed','events_allowed','pool','bbq','wifi','heating','outdoor'].filter(a => document.getElementById(`adm-v-am-${a}`)?.checked);
             } else {
                 category       = 'transport';
                 nameAr         = document.getElementById('adm-t-name').value.trim();
@@ -3205,7 +3626,7 @@
                 document.getElementById('adm-v-lng').value          = item.lng ?? '';
                 document.getElementById('adm-v-cancel').value       = item.cancelPolicyAr || '';
                 document.getElementById('adm-v-cancel-en').value    = item.cancelPolicyEn || '';
-                ['pool','bbq','wifi','heating','outdoor'].forEach(a => {
+                ['private_screened','families_only','youth_allowed','events_allowed','pool','bbq','wifi','heating','outdoor'].forEach(a => {
                     const el = document.getElementById(`adm-v-am-${a}`);
                     if (el) el.checked = (item.amenities || []).includes(a);
                 });
@@ -3325,6 +3746,7 @@
                         <td>
                             <div class="action-menu-inline">
                                 <button type="button" class="icon-btn approve" title="تأكيد الحجز" data-action="approve-booking" data-id="${b.id}">✓</button>
+                                <button type="button" class="icon-btn edit-btn" title="عرض تذكرة الحجز" data-action="open-admin-ticket" data-id="${b.id}">🎫</button>
                                 <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="icon-btn whatsapp" title="واتساب">💬</a>
                                 <button type="button" class="icon-btn danger" title="رفض الطلب (حفظ بالسجل)" data-action="reject-booking" data-id="${b.id}">✕</button>
                             </div>
@@ -3358,6 +3780,7 @@
                         <td><img src="${escapeHtml(b.receiptData)}" class="receipt-thumb" alt="وصل" data-action="preview-receipt" data-receipt="${escapeHtml(b.receiptData)}"></td>
                         <td>
                             <div class="action-menu-inline">
+                                <button type="button" class="icon-btn edit-btn" title="عرض تذكرة الحجز" data-action="open-admin-ticket" data-id="${b.id}">🎫</button>
                                 <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="icon-btn whatsapp" title="واتساب">💬</a>
                                 <button type="button" class="icon-btn danger" title="إلغاء الحجز وتحرير الموعد" data-action="reject-booking" data-id="${b.id}">✕</button>
                             </div>
@@ -3532,6 +3955,7 @@
             document.getElementById('stat-approved-count').textContent = confirmedBookings.length;
             const totalRev = confirmedBookings.reduce((s, b) => s + (Number(b.deposit) || 0), 0);
             document.getElementById('stat-total-revenue').textContent  = `${totalRev.toFixed(2)} JOD`;
+            renderAdminPromosSection();
         }
 
         // ─── إجراءات الأدمن تنتظر استجابة قاعدة البيانات أولاً قبل تعديل الواجهة ───
@@ -3828,6 +4252,23 @@
             } catch(e) {}
         }
 
+        function getPropertyDeepLink(id) {
+            return `${window.location.origin}${window.location.pathname}?venue=${Number(id)}`;
+        }
+
+        function copyPropertyDeepLink(id) {
+            const item = items.find(i => i.id === Number(id));
+            if (!item) return;
+            const link = getPropertyDeepLink(item.id);
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(link).then(() => {
+                    showToast('🔗 تم نسخ الرابط المباشر للمنشأة بنجاح!');
+                }).catch(() => {});
+            } else {
+                showToast('🔗 رابط المنشأة: ' + link);
+            }
+        }
+
         function sharePropertyWhatsApp(id) {
             const item = items.find(i => i.id === Number(id));
             if (!item) return;
@@ -3841,10 +4282,468 @@
             } else {
                 priceInfo = `☀️ ${item.priceDay} | 🌙 ${item.priceNight} | 🗓️ ${item.priceFull} JOD`;
             }
+            const deepLink = getPropertyDeepLink(item.id);
             const text = encodeURIComponent(
-                `🌴 *${name}*\n📍 ${location}\n\n💰 الأسعار: ${priceInfo}\n\n⭐ التقييم: ${Number(item.rating || 5).toFixed(1)}/5\n\n📅 للحجز عبر منصة Weekend:\n${window.location.origin}${window.location.pathname}`
+                `🌴 *${name}*\n📍 ${location}\n\n💰 الأسعار: ${priceInfo}\n\n⭐ التقييم: ${Number(item.rating || 5).toFixed(1)}/5\n\n📅 لمشاهدة الصور والتفاصيل والحجز المباشر عبر منصة Weekend:\n${deepLink}`
             );
             window.open(`https://wa.me/?text=${text}`, '_blank', 'noopener,noreferrer');
+        }
+
+        // =====================================================
+        //  FEATURE 3: ELECTRONIC BOOKING TICKET (VOUCHER + QR + PDF)
+        // =====================================================
+        function buildQrSvg(seedText) {
+            const str = String(seedText || 'WKND');
+            let hash = 2166136261;
+            for (let i = 0; i < str.length; i++) {
+                hash ^= str.charCodeAt(i);
+                hash = Math.imul(hash, 16777619);
+            }
+            const size = 13;
+            const cell = 6;
+            let rects = '';
+            const isFinder = (r, c) =>
+                (r < 3 && c < 3) || (r < 3 && c >= size - 3) || (r >= size - 3 && c < 3);
+            for (let r = 0; r < size; r++) {
+                for (let c = 0; c < size; c++) {
+                    let on = false;
+                    if (isFinder(r, c)) {
+                        on = true;
+                    } else {
+                        const bitIdx = (r * size + c) % 31;
+                        const mixed = (hash ^ Math.imul(r + 1, 374761393) ^ Math.imul(c + 1, 668265263)) >>> 0;
+                        on = ((mixed >> (bitIdx % 16)) & 1) === 1;
+                    }
+                    if (on) {
+                        rects += `<rect x="${c * cell + 4}" y="${r * cell + 4}" width="${cell - 0.6}" height="${cell - 0.6}" rx="1" fill="#0D2818"/>`;
+                    }
+                }
+            }
+            const totalDim = size * cell + 8;
+            return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalDim} ${totalDim}" width="92" height="92" aria-label="QR Code">${rects}</svg>`;
+        }
+
+        function openBookingTicketModal(b) {
+            if (!b) return;
+            currentTicketBooking = b;
+            const fac = items.find(i => i.id === Number(b.facilityId || b.itemId));
+            const ticketCode = `WKND-${b.id}`;
+            const venueName = (currentLang === 'ar' ? b.itemNameAr : b.itemNameEn) || (fac ? localizedItemText(fac, 'name') : 'منشأة Weekend');
+            const venueLoc  = b.locationAr || (fac ? localizedItemText(fac, 'location') : 'الأردن');
+            const lat = b.lat ?? (fac ? fac.lat : null);
+            const lng = b.lng ?? (fac ? fac.lng : null);
+            const mapsHref = (lat !== null && lng !== null && Number.isFinite(Number(lat)) && Number.isFinite(Number(lng)))
+                ? `https://www.google.com/maps?q=${encodeURIComponent(lat)},${encodeURIComponent(lng)}`
+                : buildSafeMapsHref(venueLoc);
+
+            const total = Number(b.total || 0);
+            const deposit = Number(b.deposit || 0);
+            const discount = Number(b.discountAmount || 0);
+            const remaining = Math.max(0, Number((total - deposit).toFixed(2)));
+            const status = b.status || 'pending';
+            let statusBadgeHtml = '<span style="background:#FFF3CD;color:#8A5E00;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:700;">⏳ بانتظار تأكيد الإدارة</span>';
+            if (status === 'confirmed') {
+                statusBadgeHtml = '<span style="background:#E8F5E9;color:#2E7D32;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:700;">✅ حجز مؤكد رسمياً</span>';
+            } else if (status === 'rejected' || status === 'expired') {
+                statusBadgeHtml = '<span style="background:#FFEBEE;color:#D32F2F;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:700;">❌ ملغى / منتهي</span>';
+            }
+
+            const qrSvg = buildQrSvg(`${ticketCode}|${b.phone}|${total}`);
+            const area = document.getElementById('ticket-printable-area');
+            area.innerHTML = `
+                <div class="ticket-card" id="ticket-card-node">
+                    <div class="ticket-header">
+                        <div>
+                            <div style="font-size:1.25rem;font-weight:700;color:var(--accent-gold);">🌴 منصة Weekend الأردن</div>
+                            <div style="font-size:0.82rem;color:#D1DDD5;margin-top:2px;">تذكرة حجز إلكترونية رسمية</div>
+                        </div>
+                        <div style="text-align:left;">
+                            <div style="font-size:0.95rem;font-weight:700;color:#fff;margin-bottom:4px;direction:ltr;">#${escapeHtml(ticketCode)}</div>
+                            ${statusBadgeHtml}
+                        </div>
+                    </div>
+                    <div class="ticket-body">
+                        <div class="ticket-info-grid">
+                            <div class="ticket-info-item"><strong>👤 اسم العميل</strong><span>${escapeHtml(b.clientName || '')}</span></div>
+                            <div class="ticket-info-item"><strong>📞 رقم الهاتف</strong><span style="direction:ltr;display:inline-block;">${escapeHtml(b.phone || '')}</span></div>
+                            <div class="ticket-info-item"><strong>🏡 المنشأة / الخدمة</strong><span>${escapeHtml(venueName)}</span></div>
+                            <div class="ticket-info-item"><strong>📍 الموقع</strong><span>${escapeHtml(venueLoc)}</span></div>
+                            <div class="ticket-info-item" style="grid-column:1/-1;"><strong>📅 تفاصيل الموعد والحجز</strong><span>${escapeHtml(b.details || b.bookingDate || '')}</span></div>
+                            ${discount > 0 ? `<div class="ticket-info-item" style="grid-column:1/-1;"><strong>🎁 الخصم المطبق (${escapeHtml(b.promoCode || 'عرض')})</strong><span style="color:var(--success);">-${discount.toFixed(2)} JOD</span></div>` : ''}
+                            <div class="ticket-info-item"><strong>💰 المبلغ الإجمالي</strong><span>${total.toFixed(2)} JOD</span></div>
+                            <div class="ticket-info-item"><strong>💳 العربون (CliQ)</strong><span style="color:#B27517;">${deposit.toFixed(2)} JOD</span></div>
+                            <div class="ticket-info-item" style="grid-column:1/-1;background:#E8F5E9;padding:8px 10px;border-radius:10px;">
+                                <strong style="color:#1B5E20;">💵 المبلغ المتبقي للدفع عند الوصول</strong>
+                                <span style="color:#1B5E20;font-size:1rem;">${remaining.toFixed(2)} JOD</span>
+                            </div>
+                        </div>
+                        <div class="ticket-qr-box">
+                            ${qrSvg}
+                            <div style="font-size:0.68rem;font-weight:700;color:var(--primary-dark);margin-top:4px;direction:ltr;">#${escapeHtml(ticketCode)}</div>
+                        </div>
+                    </div>
+                    <div class="ticket-footer">
+                        <span>📌 أبرِز هذه التذكرة عند الوصول للمنشأة</span>
+                        <a href="${escapeHtml(mapsHref)}" target="_blank" rel="noopener noreferrer" style="color:var(--primary-dark);font-weight:700;text-decoration:underline;">🗺️ فتح الموقع على Google Maps</a>
+                    </div>
+                </div>`;
+
+            const waText = encodeURIComponent(
+                `🎫 *تذكرة حجز إلكترونية - منصة Weekend*
+` +
+                `رقم التذكرة: #${ticketCode}
+` +
+                `الحالة: ${status === 'confirmed' ? 'مؤكد رسمياً ✅' : 'قيد المراجعة ⏳'}
+` +
+                `العميل: ${b.clientName || ''}
+` +
+                `المنشأة: ${venueName}
+` +
+                `التفاصيل: ${b.details || ''}
+` +
+                `الإجمالي: ${total.toFixed(2)} JOD | العربون: ${deposit.toFixed(2)} JOD
+` +
+                `المتبقي عند الوصول: ${remaining.toFixed(2)} JOD`
+            );
+            const waBtn = document.getElementById('btn-share-ticket-wa');
+            if (waBtn) waBtn.href = `https://wa.me/?text=${waText}`;
+
+            document.getElementById('ticket-modal').classList.add('active');
+        }
+
+        function downloadTicketPDF() {
+            const node = document.getElementById('ticket-card-node');
+            if (!node || !window.html2pdf) {
+                window.print();
+                return;
+            }
+            const code = currentTicketBooking ? `WKND-${currentTicketBooking.id}` : 'WKND-Ticket';
+            const opt = {
+                margin: [8, 8, 8, 8],
+                filename: `تذكرة_حجز_${code}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, logging: false },
+                jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(node).save().then(() => {
+                showToast('📄 تم تحميل تذكرة الحجز PDF بنجاح');
+            });
+        }
+
+        // =====================================================
+        //  FEATURE 4: TRACK MY BOOKING (CUSTOMER SELF-SERVICE)
+        // =====================================================
+        function openTrackBookingModal() {
+            document.getElementById('track-booking-modal').classList.add('active');
+            const savedList = JSON.parse(safeGetStorage('wknd_my_bookings', '[]'));
+            if (savedList.length > 0 && !document.getElementById('track-phone-input').value) {
+                document.getElementById('track-phone-input').value = savedList[0].phone || '';
+                renderTrackBookingResults(savedList);
+            }
+        }
+
+        function renderTrackBookingResults(list) {
+            const container = document.getElementById('track-results-container');
+            if (!container) return;
+            if (!Array.isArray(list) || list.length === 0) {
+                container.innerHTML = `<div style="text-align:center;padding:1.5rem;color:var(--text-muted);background:#FAFBFB;border-radius:12px;">لا توجد حجوزات مطابقة لرقم الهاتف المدخل.</div>`;
+                return;
+            }
+            container.innerHTML = list.map((b, idx) => {
+                const status = b.status || 'pending';
+                let badge = '<span class="badge-status editing">⏳ قيد المراجعة</span>';
+                if (status === 'confirmed') badge = '<span class="badge-status active">✅ مؤكد رسمياً</span>';
+                else if (status === 'rejected' || status === 'expired') badge = '<span class="badge-status inactive">❌ مرفوض / منتهي</span>';
+                const vName = (currentLang === 'ar' ? b.itemNameAr : b.itemNameEn) || b.item_name_ar || 'منشأة';
+                return `
+                    <div class="track-result-card">
+                        <div style="flex:1;min-width:200px;">
+                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                                <strong style="color:var(--primary-dark);font-size:0.95rem;">#${escapeHtml('WKND-' + b.id)} — ${escapeHtml(vName)}</strong>
+                                ${badge}
+                            </div>
+                            <div style="font-size:0.83rem;color:#555;margin-bottom:3px;">📅 ${escapeHtml(b.details || b.bookingDate || b.booking_date || '')}</div>
+                            <div style="font-size:0.82rem;color:var(--primary-dark);font-weight:700;">الإجمالي: ${Number(b.total || 0).toFixed(2)} JOD | العربون: ${Number(b.deposit || 0).toFixed(2)} JOD</div>
+                        </div>
+                        <button type="button" class="btn-action" data-action="open-tracked-ticket" data-idx="${idx}" style="font-size:0.82rem;padding:0.45rem 0.9rem;">🎫 عرض التذكرة</button>
+                    </div>`;
+            }).join('');
+            container._lastResults = list;
+        }
+
+        async function handleTrackBookingSubmit(e) {
+            e.preventDefault();
+            const rawPhone = document.getElementById('track-phone-input').value;
+            const rawId = document.getElementById('track-id-input').value.trim().replace(/^#?WKND-/i, '');
+            const cleanPhone = normalizePhone(rawPhone);
+            if (!isValidPhone(cleanPhone)) {
+                showToast('⚠️ يرجى إدخال رقم هاتف صحيح');
+                return;
+            }
+            const parsedId = rawId && !isNaN(Number(rawId)) ? Number(rawId) : null;
+            const btn = document.getElementById('track-submit-btn');
+            if (btn) btn.disabled = true;
+
+            try {
+                let results = [];
+                if (db) {
+                    const { data, error } = await db.rpc('track_my_bookings', {
+                        p_phone: cleanPhone,
+                        p_booking_id: parsedId
+                    });
+                    if (!error && Array.isArray(data)) {
+                        results = data.map(r => ({
+                            id: Number(r.id),
+                            facilityId: Number(r.facility_id),
+                            itemNameAr: r.item_name_ar,
+                            itemNameEn: r.item_name_en || r.item_name_ar,
+                            locationAr: r.location_ar,
+                            lat: r.lat,
+                            lng: r.lng,
+                            clientName: r.client_name,
+                            phone: r.phone,
+                            bookingDate: r.booking_date,
+                            details: r.details,
+                            promoCode: r.promo_code,
+                            discountAmount: Number(r.discount_amount || 0),
+                            total: Number(r.total || 0),
+                            deposit: Number(r.deposit || 0),
+                            status: r.status || 'pending'
+                        }));
+                    }
+                }
+                if (results.length === 0) {
+                    const localList = JSON.parse(safeGetStorage('wknd_my_bookings', '[]'));
+                    results = localList.filter(b => {
+                        const pMatch = normalizePhone(b.phone).slice(-9) === cleanPhone.slice(-9);
+                        const idMatch = !parsedId || Number(b.id) === parsedId;
+                        return pMatch && idMatch;
+                    });
+                }
+                renderTrackBookingResults(results);
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        // =====================================================
+        //  FEATURE 5: ADMIN PROMO CODES & DAY DISCOUNTS MANAGEMENT
+        // =====================================================
+        function renderAdminPromosSection() {
+            const facListEl = document.getElementById('adm-p-excluded-facilities-list');
+            if (facListEl) {
+                const currentChecked = new Set(
+                    Array.from(facListEl.querySelectorAll('input[type="checkbox"]:checked')).map(cb => Number(cb.value))
+                );
+                facListEl.innerHTML = items.map(it => `
+                    <label style="display:flex;align-items:center;gap:6px;font-size:0.82rem;cursor:pointer;">
+                        <input type="checkbox" class="adm-p-ex-fac-cb" value="${it.id}" ${currentChecked.has(it.id) ? 'checked' : ''}>
+                        <span>${escapeHtml(it.nameAr)}</span>
+                    </label>
+                `).join('') || '<span style="font-size:0.8rem;color:#888;">لا توجد منشآت مضافة</span>';
+            }
+
+            const tbody = document.getElementById('admin-promos-table');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            if (!promoCodes || promoCodes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:2rem;">لا توجد كوبونات أو عروض خصم مضافة حالياً</td></tr>`;
+                return;
+            }
+
+            promoCodes.forEach(p => {
+                const valText = p.discountType === 'percent' ? `${p.discountValue}%` : `${Number(p.discountValue).toFixed(2)} JOD`;
+                const daysArr = Array.isArray(p.allowedDays) ? p.allowedDays.map(Number) : [0,1,2,3,4,5,6];
+                const daysText = daysArr.length === 7 ? 'كل الأيام' : daysArr.map(d => DAY_NAMES_AR[d]).join('، ');
+                const rangeText = (p.validFrom || p.validUntil)
+                    ? `<br><small style="color:var(--text-muted);">${escapeHtml(p.validFrom || '...')} → ${escapeHtml(p.validUntil || '...')}</small>`
+                    : '';
+                const exDatesCount = (p.excludedDates || []).length;
+                const exFacsCount = (p.excludedFacilityIds || []).length;
+                const exSummary = (exDatesCount || exFacsCount)
+                    ? `<small>${exDatesCount ? `🚫 ${exDatesCount} تاريخ مستثنى<br>` : ''}${exFacsCount ? `🏡 ${exFacsCount} منشأة مستثناة` : ''}</small>`
+                    : '<small style="color:#888;">لا يوجد</small>';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <strong style="color:var(--primary-dark);font-size:0.95rem;">${escapeHtml(p.code)}</strong><br>
+                        <small style="color:${p.autoApply ? '#1B5E20' : '#B27517'};font-weight:600;">${p.autoApply ? '✨ تلقائي باليوم' : '🔑 كود يدخله الزبون'}</small>
+                    </td>
+                    <td>${escapeHtml(p.titleAr)}</td>
+                    <td><strong style="color:var(--success);font-size:0.95rem;">${escapeHtml(valText)}</strong></td>
+                    <td><small style="font-weight:600;">${escapeHtml(daysText)}</small>${rangeText}</td>
+                    <td>${exSummary}</td>
+                    <td>${p.active ? '<span class="badge-status active">نشط ✅</span>' : '<span class="badge-status inactive">موقوف ⏸️</span>'}</td>
+                    <td>
+                        <div class="action-menu-inline">
+                            <button type="button" class="icon-btn edit-btn" title="تعديل العرض" data-action="edit-promo" data-id="${p.id}">✏️</button>
+                            <button type="button" class="icon-btn" title="إيقاف / تفعيل العرض" data-action="toggle-promo" data-id="${p.id}">${p.active ? '⏸️' : '▶️'}</button>
+                            <button type="button" class="icon-btn danger" title="حذف العرض" data-action="delete-promo" data-id="${p.id}">🗑️</button>
+                        </div>
+                    </td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function setPromoDaysPreset(preset) {
+            document.querySelectorAll('.adm-p-day-cb').forEach(cb => {
+                const d = Number(cb.value);
+                if (preset === 'all') cb.checked = true;
+                else if (preset === 'weekdays') cb.checked = (d >= 0 && d <= 3);
+                else if (preset === 'weekend') cb.checked = (d >= 4 && d <= 6);
+            });
+        }
+
+        function addExcludedDateToInput() {
+            const picker = document.getElementById('adm-p-ex-date-picker');
+            const inp = document.getElementById('adm-p-excluded-dates');
+            if (!picker || !picker.value || !inp) return;
+            const existing = inp.value.split(',').map(s => s.trim()).filter(Boolean);
+            if (!existing.includes(picker.value)) {
+                existing.push(picker.value);
+                inp.value = existing.join(', ');
+            }
+            picker.value = '';
+        }
+
+        async function savePromoCode(e) {
+            e.preventDefault();
+            if (!isAdminLoggedIn) return;
+            const editingId = parseInt(document.getElementById('adm-p-editing-id').value, 10) || null;
+            const code = document.getElementById('adm-p-code').value.toUpperCase().trim().replace(/\s+/g, '');
+            const titleAr = document.getElementById('adm-p-title').value.trim();
+            const discountType = document.getElementById('adm-p-type').value;
+            const discountValue = parseFloat(document.getElementById('adm-p-value').value) || 0;
+            const autoApply = document.getElementById('adm-p-auto').value === 'true';
+            const allowedDays = Array.from(document.querySelectorAll('.adm-p-day-cb:checked')).map(cb => Number(cb.value));
+            const validFrom = document.getElementById('adm-p-from').value || null;
+            const validUntil = document.getElementById('adm-p-until').value || null;
+            const excludedDates = document.getElementById('adm-p-excluded-dates').value
+                .split(',')
+                .map(s => s.trim())
+                .filter(s => /^\d{4}-\d{2}-\d{2}$/.test(s));
+            const excludedFacilityIds = Array.from(document.querySelectorAll('.adm-p-ex-fac-cb:checked')).map(cb => Number(cb.value));
+
+            if (!code || !titleAr) {
+                showToast('⚠️ يرجى إدخال كود الخصم وعنوان العرض');
+                return;
+            }
+            if (discountValue <= 0 || (discountType === 'percent' && discountValue > 90)) {
+                showToast('⚠️ نسبة الخصم يجب أن تكون بين 1% و 90%');
+                return;
+            }
+            if (allowedDays.length === 0) {
+                showToast('⚠️ يرجى اختيار يوم واحد على الأقل ليعمل فيه الخصم');
+                return;
+            }
+
+            const promoObj = {
+                id: editingId || Date.now(),
+                code,
+                titleAr,
+                discountType,
+                discountValue,
+                allowedDays,
+                validFrom,
+                validUntil,
+                excludedDates,
+                excludedFacilityIds,
+                autoApply,
+                active: true
+            };
+
+            if (db) {
+                const dbRow = promoToRow(promoObj);
+                if (!editingId) delete dbRow.id;
+                const query = editingId
+                    ? db.from('promo_codes').update(dbRow).eq('id', editingId).select('*').single()
+                    : db.from('promo_codes').insert(dbRow).select('*').single();
+                const { data, error } = await query;
+                if (!error && data) {
+                    const saved = rowToPromo(data);
+                    if (editingId) {
+                        const idx = promoCodes.findIndex(p => p.id === editingId);
+                        if (idx !== -1) promoCodes[idx] = saved;
+                    } else {
+                        promoCodes.unshift(saved);
+                    }
+                } else {
+                    // توافق محلي فوري
+                    if (editingId) {
+                        const idx = promoCodes.findIndex(p => p.id === editingId);
+                        if (idx !== -1) promoCodes[idx] = promoObj;
+                    } else {
+                        promoCodes.unshift(promoObj);
+                    }
+                }
+            }
+            safeSetStorage('wknd_promos_fallback', JSON.stringify(promoCodes));
+            cancelPromoEdit();
+            renderAdminPromosSection();
+            liveSearch();
+            showToast(editingId ? '✅ تم تحديث العرض / الكود بنجاح' : '✅ تم إضافة وتفعيل كود الخصم بنجاح');
+        }
+
+        function editPromoCode(id) {
+            const p = promoCodes.find(x => x.id === Number(id));
+            if (!p) return;
+            document.getElementById('adm-p-editing-id').value = p.id;
+            document.getElementById('adm-p-code').value = p.code;
+            document.getElementById('adm-p-title').value = p.titleAr;
+            document.getElementById('adm-p-type').value = p.discountType;
+            document.getElementById('adm-p-value').value = p.discountValue;
+            document.getElementById('adm-p-auto').value = p.autoApply ? 'true' : 'false';
+            document.getElementById('adm-p-from').value = p.validFrom || '';
+            document.getElementById('adm-p-until').value = p.validUntil || '';
+            document.getElementById('adm-p-excluded-dates').value = (p.excludedDates || []).join(', ');
+            const daysSet = new Set((p.allowedDays || []).map(Number));
+            document.querySelectorAll('.adm-p-day-cb').forEach(cb => {
+                cb.checked = daysSet.has(Number(cb.value));
+            });
+            const exFacSet = new Set((p.excludedFacilityIds || []).map(Number));
+            document.querySelectorAll('.adm-p-ex-fac-cb').forEach(cb => {
+                cb.checked = exFacSet.has(Number(cb.value));
+            });
+            document.getElementById('promo-form-title').textContent = `✏️ تعديل الكود: ${p.code}`;
+            document.getElementById('adm-p-submit-btn').textContent = '💾 حفظ التعديلات';
+            document.getElementById('adm-p-cancel-btn').style.display = 'block';
+            document.getElementById('add-promo-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function cancelPromoEdit() {
+            document.getElementById('adm-p-editing-id').value = '';
+            document.getElementById('add-promo-form').reset();
+            document.querySelectorAll('.adm-p-day-cb').forEach(cb => { cb.checked = true; });
+            document.querySelectorAll('.adm-p-ex-fac-cb').forEach(cb => { cb.checked = false; });
+            document.getElementById('promo-form-title').textContent = '➕ إضافة كود خصم أو عرض يومي جديد';
+            document.getElementById('adm-p-submit-btn').textContent = '💾 حفظ وتفعيل العرض / الكود';
+            document.getElementById('adm-p-cancel-btn').style.display = 'none';
+        }
+
+        async function togglePromoActive(id) {
+            const p = promoCodes.find(x => x.id === Number(id));
+            if (!p) return;
+            p.active = !p.active;
+            if (db) {
+                await db.from('promo_codes').update({ active: p.active }).eq('id', p.id);
+            }
+            safeSetStorage('wknd_promos_fallback', JSON.stringify(promoCodes));
+            renderAdminPromosSection();
+            liveSearch();
+            showToast(p.active ? `▶️ تم تفعيل الكود (${p.code})` : `⏸️ تم إيقاف الكود (${p.code}) مؤقتاً`);
+        }
+
+        async function deletePromoCode(id) {
+            const numId = Number(id);
+            if (db) {
+                await db.from('promo_codes').delete().eq('id', numId);
+            }
+            promoCodes = promoCodes.filter(x => x.id !== numId);
+            safeSetStorage('wknd_promos_fallback', JSON.stringify(promoCodes));
+            renderAdminPromosSection();
+            liveSearch();
+            showToast('🗑️ تم حذف كود الخصم');
         }
 
         function sanitizeExcelCell(val) {
@@ -4067,6 +4966,23 @@
                 const id = this.dataset.id;
                 if (id) sharePropertyWhatsApp(Number(id));
             });
+            document.getElementById('det-copy-link-btn').addEventListener('click', function() {
+                const id = this.dataset.id;
+                if (id) copyPropertyDeepLink(Number(id));
+            });
+            document.getElementById('booking-date-transport').addEventListener('change', updateBookingCalculation);
+            document.getElementById('btn-apply-promo').addEventListener('click', applyBookingPromoCode);
+            document.getElementById('btn-clear-promo').addEventListener('click', clearBookingPromoCode);
+            document.getElementById('add-promo-form').addEventListener('submit', savePromoCode);
+            document.getElementById('btn-add-ex-date').addEventListener('click', addExcludedDateToInput);
+            document.getElementById('track-booking-form').addEventListener('submit', handleTrackBookingSubmit);
+            document.getElementById('btn-download-ticket-pdf').addEventListener('click', downloadTicketPDF);
+            document.getElementById('btn-copy-ticket-id').addEventListener('click', () => {
+                if (currentTicketBooking && navigator.clipboard) {
+                    const code = 'WKND-' + currentTicketBooking.id;
+                    navigator.clipboard.writeText(code).then(() => showToast('✅ تم نسخ رقم التذكرة: ' + code)).catch(() => {});
+                }
+            });
             document.getElementById('det-main-img').addEventListener('click', function() {
                 if (this.src) openImageModal(this.src, selectedItem ? localizedItemText(selectedItem, 'name') : 'معاينة الصورة');
             });
@@ -4136,6 +5052,27 @@
                     removeAdminExtraImage(el.dataset.form, Number(el.dataset.idx));
                 } else if (action === 'remove-admin-video') {
                     removeAdminVideo(el.dataset.form);
+                } else if (action === 'open-track-modal') {
+                    openTrackBookingModal();
+                    closeMobileMenu();
+                } else if (action === 'open-tracked-ticket') {
+                    const container = document.getElementById('track-results-container');
+                    const list = container && container._lastResults ? container._lastResults : [];
+                    const b = list[Number(el.dataset.idx)];
+                    if (b) openBookingTicketModal(b);
+                } else if (action === 'open-admin-ticket') {
+                    const b = [...pendingBookings, ...confirmedBookings, ...archivedBookings].find(x => x.id === Number(el.dataset.id));
+                    if (b) openBookingTicketModal(b);
+                } else if (action === 'promo-days-preset') {
+                    setPromoDaysPreset(el.dataset.preset);
+                } else if (action === 'edit-promo') {
+                    editPromoCode(Number(el.dataset.id));
+                } else if (action === 'toggle-promo') {
+                    togglePromoActive(Number(el.dataset.id));
+                } else if (action === 'delete-promo') {
+                    deletePromoCode(Number(el.dataset.id));
+                } else if (action === 'cancel-promo-edit') {
+                    cancelPromoEdit();
                 } else if (action === 'copy-text') {
                     const txt = el.dataset.copy || '';
                     if (txt && navigator.clipboard) {
@@ -4175,6 +5112,15 @@
             await loadFromDatabase();
             liveSearch();
             updateFavBadge();
+
+            // Feature 2: فتح نافذة المنشأة تلقائياً عند الدخول من رابط مشاركة مباشر (?venue=ID)
+            const venueParam = params.get('venue');
+            if (venueParam && !isNaN(Number(venueParam))) {
+                const targetVenue = items.find(i => i.id === Number(venueParam) && i.active);
+                if (targetVenue) {
+                    openDetailsModal(targetVenue.id);
+                }
+            }
         });
     </script>
 </body>
