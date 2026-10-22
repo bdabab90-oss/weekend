@@ -862,6 +862,60 @@
 
                 <!-- Bookings Tab -->
                 <div id="dash-bookings" class="admin-tab-page">
+                    <div class="admin-box" id="quick-block-box" style="background:linear-gradient(135deg,#FFF9EF,#FFFDF9);border:1.5px solid var(--accent-gold);">
+                        <h3 class="admin-section-title" style="margin-bottom:0.4rem;font-size:1.12rem;">🔒 قفل تاريخ / حجز خارجي سريع (بدون وصل أو عربون)</h3>
+                        <p style="color:var(--text-muted);font-size:0.84rem;margin-bottom:1rem;">أغلق أي يوم أو شفت أو ساعات ملعب فوراً إذا انحجزت المنشأة هاتفياً عند صاحبها أو ليوم صيانة، دون أن يؤثر ذلك على حسابات أرباح العربون:</p>
+                        <form id="quick-block-form">
+                            <div class="form-row">
+                                <div class="form-group" style="flex:1.4;min-width:180px;">
+                                    <label for="quick-block-facility">1. اختر المنشأة</label>
+                                    <select class="form-control" id="quick-block-facility" required></select>
+                                </div>
+                                <div class="form-group" style="flex:1;min-width:145px;">
+                                    <label for="quick-block-date">2. التاريخ المراد قفله</label>
+                                    <input type="date" class="form-control" id="quick-block-date" required>
+                                </div>
+                                <div class="form-group" style="flex:1.2;min-width:165px;" id="quick-block-shift-wrap">
+                                    <label for="quick-block-shift">3. الفترة / الشفت</label>
+                                    <select class="form-control" id="quick-block-shift">
+                                        <option value="fullday">🔒 يوم كامل (صباحي + مسائي)</option>
+                                        <option value="morning">☀️ شفت صباحي فقط</option>
+                                        <option value="evening">🌙 شفت مسائي فقط</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="flex:1.3;min-width:180px;display:none;" id="quick-block-pitch-wrap">
+                                    <label for="quick-block-pitch-mode">3. ساعات قفل الملعب</label>
+                                    <div style="display:flex;gap:6px;">
+                                        <select class="form-control" id="quick-block-pitch-start" title="ساعة البدء">
+                                            <option value="all">🔒 اليوم بالكامل</option>
+                                            <option value="6">من 06:00 ص</option>
+                                            <option value="8">من 08:00 ص</option>
+                                            <option value="10">من 10:00 ص</option>
+                                            <option value="12">من 12:00 ظ</option>
+                                            <option value="14">من 02:00 م</option>
+                                            <option value="16">من 04:00 م</option>
+                                            <option value="17">من 05:00 م</option>
+                                            <option value="18">من 06:00 م</option>
+                                            <option value="19">من 07:00 م</option>
+                                            <option value="20">من 08:00 م</option>
+                                            <option value="21">من 09:00 م</option>
+                                            <option value="22">من 10:00 م</option>
+                                        </select>
+                                        <input type="number" class="form-control" id="quick-block-pitch-hours" min="2" max="18" value="2" style="width:78px;display:none;" title="عدد الساعات" placeholder="ساعات">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row" style="align-items:flex-end;">
+                                <div class="form-group" style="flex:2;margin-bottom:0;">
+                                    <label for="quick-block-note">4. ملاحظة للإدارة (اختياري)</label>
+                                    <input type="text" class="form-control" id="quick-block-note" maxlength="80" placeholder="مثال: محجوز عند صاحب المزرعة / يوم صيانة المسبح">
+                                </div>
+                                <div class="form-group" style="flex:1;margin-bottom:0;">
+                                    <button type="submit" class="btn-action" id="btn-quick-block-submit" style="width:100%;padding:0.7rem 1rem;background:var(--primary-dark);color:var(--accent-gold);border:1.5px solid var(--accent-gold);">🔒 قفل الموعد فوراً</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                     <div class="admin-box">
                         <div id="custom-admin-tools">
                             <span class="export-label">📤 تصدير ونسخ احتياطي:</span>
@@ -3838,6 +3892,11 @@
             return aFrom < bTo && bFrom < aTo;
         }
 
+        function isAdminBlockedBooking(b) {
+            if (!b) return false;
+            return String(b.clientName || '').includes('قفل إداري') || String(b.details || '').includes('[قفل إداري');
+        }
+
         function hasPendingConflict(b) {
             return pendingBookings.some(other => other.id !== b.id && bookingsOverlap(b, other));
         }
@@ -3905,28 +3964,39 @@
             } else {
                 sortedConfirmed.forEach((b) => {
                     const itemName = currentLang === 'ar' ? (b.itemNameAr || 'منشأة') : (b.itemNameEn || b.itemNameAr || 'Facility');
-                    const totalNum = Number(b.total || 0);
-                    const depNum   = Number(b.deposit || 0);
+                    const isBlocked = isAdminBlockedBooking(b);
+                    const totalNum = isBlocked ? 0 : Number(b.total || 0);
+                    const depNum   = isBlocked ? 0 : Number(b.deposit || 0);
                     const waPhone  = toWhatsAppPhone(b.phone);
                     const waMsg    = encodeURIComponent(`تهانينا ${b.clientName || ''}، تم تأكيد حجزك لـ (${itemName})! التفاصيل: ${b.details || ''}.`);
                     const waUrl    = `https://wa.me/${waPhone}?text=${waMsg}`;
 
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td><strong>${escapeHtml(b.clientName)}</strong></td>
-                        <td style="direction:ltr;text-align:right;">${escapeHtml(b.phone)}</td>
-                        <td>${escapeHtml(itemName)}</td>
-                        <td><small>${escapeHtml(b.details)}</small>${buildLocationBoxHtml(b)}</td>
-                        <td>الإجمالي: ${totalNum.toFixed(2)} JOD<br><strong style="color:var(--success);">العربون: ${depNum.toFixed(2)} JOD</strong></td>
-                        <td><img src="${escapeHtml(b.receiptData)}" class="receipt-thumb" alt="وصل" data-action="preview-receipt" data-receipt="${escapeHtml(b.receiptData)}"></td>
-                        <td>
-                            <div class="action-menu-inline">
+                    const amountHtml = isBlocked
+                        ? `<span class="badge-status editing">🔒 قفل إداري / خارجي</span><br><small style="color:var(--text-muted);">عربون المنصة: 0.00 JOD</small>`
+                        : `الإجمالي: ${totalNum.toFixed(2)} JOD<br><strong style="color:var(--success);">العربون: ${depNum.toFixed(2)} JOD</strong>`;
+                    const receiptHtml = isBlocked
+                        ? `<span style="font-size:0.78rem;color:var(--text-muted);font-weight:700;">🔒 بدون وصل</span>`
+                        : `<img src="${escapeHtml(b.receiptData)}" class="receipt-thumb" alt="وصل" data-action="preview-receipt" data-receipt="${escapeHtml(b.receiptData)}">`;
+                    const actionsHtml = isBlocked
+                        ? `<div class="action-menu-inline">
+                                <button type="button" class="icon-btn danger" title="إلغاء القفل وفتح الموعد في التقويم فوراً" data-action="delete-booking" data-id="${b.id}">🔓</button>
+                           </div>`
+                        : `<div class="action-menu-inline">
                                 <button type="button" class="icon-btn edit-btn" title="عرض تذكرة الحجز" data-action="open-admin-ticket" data-id="${b.id}">🎫</button>
                                 <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="icon-btn whatsapp" title="واتساب">💬</a>
                                 <button type="button" class="icon-btn danger" title="إلغاء الحجز وتحرير الموعد" data-action="reject-booking" data-id="${b.id}">✕</button>
                                 <button type="button" class="icon-btn danger" title="حذف الحجز وإلغاء تذكرة العميل نهائياً" data-action="delete-booking" data-id="${b.id}">🗑️</button>
-                            </div>
-                        </td>`;
+                           </div>`;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${escapeHtml(b.clientName)}</strong></td>
+                        <td style="direction:ltr;text-align:right;">${isBlocked ? '—' : escapeHtml(b.phone)}</td>
+                        <td>${escapeHtml(itemName)}</td>
+                        <td><small>${escapeHtml(b.details)}</small>${buildLocationBoxHtml(b)}</td>
+                        <td>${amountHtml}</td>
+                        <td>${receiptHtml}</td>
+                        <td>${actionsHtml}</td>`;
                     tbodyConfirmed.appendChild(tr);
                 });
             }
@@ -3987,6 +4057,7 @@
                         <td>${statusHtml}</td>
                         <td>
                             <div class="action-menu-inline">
+                                <button type="button" class="icon-btn" title="قفل تاريخ سريع لهذه المنشأة" data-action="quick-block-goto" data-id="${item.id}">🔒</button>
                                 <button type="button" class="icon-btn ${isFeat ? 'featured-on' : ''}" title="تثبيت / إلغاء تثبيت كمنشأة مميزة في المقدمة" data-action="toggle-featured" data-id="${item.id}">${isFeat ? '⭐' : '☆'}</button>
                                 <button type="button" class="icon-btn edit-btn" title="تعديل" data-action="edit-listing" data-id="${item.id}">✏️</button>
                                 <button type="button" class="icon-btn" title="تفعيل / إيقاف" data-action="toggle-active" data-id="${item.id}">🔄</button>
@@ -4021,6 +4092,7 @@
                             <td>${statusHtml}</td>
                             <td>
                                 <div class="action-menu-inline">
+                                    <button type="button" class="icon-btn" title="قفل تاريخ أو ساعات سريعة لهذا الملعب" data-action="quick-block-goto" data-id="${item.id}">🔒</button>
                                     <button type="button" class="icon-btn ${isFeat ? 'featured-on' : ''}" title="تثبيت / إلغاء تثبيت كملعب مميز في المقدمة" data-action="toggle-featured" data-id="${item.id}">${isFeat ? '⭐' : '☆'}</button>
                                     <button type="button" class="icon-btn edit-btn" title="تعديل" data-action="edit-listing" data-id="${item.id}">✏️</button>
                                     <button type="button" class="icon-btn" title="تفعيل / إيقاف" data-action="toggle-active" data-id="${item.id}">🔄</button>
@@ -4097,12 +4169,14 @@
                 }
             }
 
-            // Stats
+            // Stats (تجاهل الأقفال الإدارية الخارجية حتى لا تضيف مبالغ وهمية لأرباح العربون)
+            const realConfirmed = confirmedBookings.filter(b => !isAdminBlockedBooking(b));
             document.getElementById('stat-pending-count').textContent  = pendingBookings.length;
-            document.getElementById('stat-approved-count').textContent = confirmedBookings.length;
-            const totalRev = confirmedBookings.reduce((s, b) => s + (Number(b.deposit) || 0), 0);
+            document.getElementById('stat-approved-count').textContent = realConfirmed.length;
+            const totalRev = realConfirmed.reduce((s, b) => s + (Number(b.deposit) || 0), 0);
             document.getElementById('stat-total-revenue').textContent  = `${totalRev.toFixed(2)} JOD`;
             renderAdminPromosSection();
+            populateQuickBlockFacilitiesDropdown();
         }
 
         // ─── إجراءات الأدمن تنتظر استجابة قاعدة البيانات أولاً قبل تعديل الواجهة ───
@@ -5193,6 +5267,187 @@
             showToast('🗑️ تم حذف كود الخصم');
         }
 
+
+        // =====================================================
+        //  FEATURE 6: ADMIN QUICK DATE BLOCK (EXTERNAL BOOKING / MAINTENANCE LOCK)
+        // =====================================================
+        const ADMIN_BLOCK_RECEIPT_PLACEHOLDER = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAABE0lEQVR4AQEIAff+AA0oGP/Uo1n/DSgY/9SjWf8NKBj/1KNZ/w0oGP/Uo1n/ANSjWf8NKBj/1KNZ/w0oGP/Uo1n/DSgY/9SjWf8NKBj/AA0oGP/Uo1n/DSgY/9SjWf8NKBj/1KNZ/w0oGP/Uo1n/ANSjWf8NKBj/1KNZ/w0oGP/Uo1n/DSgY/9SjWf8NKBj/AA0oGP/Uo1n/DSgY/9SjWf8NKBj/1KNZ/w0oGP/Uo1n/ANSjWf8NKBj/1KNZ/w0oGP/Uo1n/DSgY/9SjWf8NKBj/AA0oGP/Uo1n/DSgY/9SjWf8NKBj/1KNZ/w0oGP/Uo1n/ANSjWf8NKBj/1KNZ/w0oGP/Uo1n/DSgY/9SjWf8NKBj/kqWDYZCsew8AAAAASUVORK5CYII=';
+
+        function populateQuickBlockFacilitiesDropdown() {
+            const sel = document.getElementById('quick-block-facility');
+            if (!sel) return;
+            const prevVal = sel.value;
+            const dateInp = document.getElementById('quick-block-date');
+            if (dateInp && !dateInp.min) {
+                const { dateStr: today } = getAmmanNow();
+                dateInp.min = today;
+                if (!dateInp.value) dateInp.value = today;
+            }
+            sel.innerHTML = items.map(it => {
+                const icon = it.category === 'transport' ? '🚌' : (it.category === 'field' ? '⚽' : '🏡');
+                return `<option value="${it.id}">${icon} ${escapeHtml(it.nameAr)}</option>`;
+            }).join('') || '<option value="">لا توجد منشآت مضافة</option>';
+            if (prevVal && items.some(i => String(i.id) === String(prevVal))) {
+                sel.value = prevVal;
+            }
+            syncQuickBlockFormUI();
+        }
+
+        function syncQuickBlockFormUI() {
+            const sel = document.getElementById('quick-block-facility');
+            const shiftWrap = document.getElementById('quick-block-shift-wrap');
+            const pitchWrap = document.getElementById('quick-block-pitch-wrap');
+            const pitchStart = document.getElementById('quick-block-pitch-start');
+            const pitchHours = document.getElementById('quick-block-pitch-hours');
+            if (!sel || !shiftWrap || !pitchWrap) return;
+
+            const fac = items.find(i => i.id === Number(sel.value));
+            if (!fac || fac.category === 'farm') {
+                shiftWrap.style.display = 'block';
+                pitchWrap.style.display = 'none';
+            } else if (fac.category === 'field') {
+                shiftWrap.style.display = 'none';
+                pitchWrap.style.display = 'block';
+                if (pitchStart && pitchHours) {
+                    pitchHours.style.display = pitchStart.value === 'all' ? 'none' : 'block';
+                }
+            } else {
+                shiftWrap.style.display = 'none';
+                pitchWrap.style.display = 'none';
+            }
+        }
+
+        function gotoQuickBlockForFacility(facId) {
+            const sidebarBookingsItem = document.querySelector('.sidebar-item[data-tab="dash-bookings"]');
+            switchAdminTab('dash-bookings', sidebarBookingsItem);
+            populateQuickBlockFacilitiesDropdown();
+            const sel = document.getElementById('quick-block-facility');
+            if (sel) {
+                sel.value = String(facId);
+                syncQuickBlockFormUI();
+            }
+            const box = document.getElementById('quick-block-box');
+            if (box) box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const dateInp = document.getElementById('quick-block-date');
+            if (dateInp) setTimeout(() => dateInp.focus(), 200);
+        }
+
+        async function submitQuickBlockForm(e) {
+            e.preventDefault();
+            if (!db || !isAdminLoggedIn) return;
+            const facId = Number(document.getElementById('quick-block-facility')?.value);
+            const dateVal = document.getElementById('quick-block-date')?.value;
+            const noteVal = (document.getElementById('quick-block-note')?.value || '').trim();
+            const fac = items.find(i => i.id === facId);
+            if (!fac || !dateVal) {
+                showToast('⚠️ يرجى اختيار المنشأة والتاريخ المراد قفله');
+                return;
+            }
+
+            let shiftType = null;
+            let startHour = null;
+            let hoursCount = null;
+            let hFrom = 0;
+            let hTo = 24;
+            let detailsText = '';
+
+            if (fac.category === 'farm') {
+                shiftType = document.getElementById('quick-block-shift')?.value || 'fullday';
+                hFrom = shiftType === 'evening' ? 12 : 0;
+                hTo   = shiftType === 'morning' ? 12 : 24;
+                detailsText = `${dateVal} (${shiftType}) [قفل إداري${noteVal ? ': ' + noteVal : ''}]`;
+            } else if (fac.category === 'field') {
+                const pStartVal = document.getElementById('quick-block-pitch-start')?.value || 'all';
+                if (pStartVal === 'all') {
+                    startHour = 6;
+                    hoursCount = 18;
+                    hFrom = 6;
+                    hTo = 24;
+                    detailsText = `${dateVal} — اليوم بالكامل [قفل إداري${noteVal ? ': ' + noteVal : ''}]`;
+                } else {
+                    startHour = parseInt(pStartVal, 10) || 18;
+                    hoursCount = Math.min(24 - startHour, Math.max(2, parseInt(document.getElementById('quick-block-pitch-hours')?.value, 10) || 2));
+                    hFrom = startHour;
+                    hTo = startHour + hoursCount;
+                    detailsText = `${dateVal} — قفل ساعات (${hFrom}:00 إلى ${hTo}:00) [قفل إداري${noteVal ? ': ' + noteVal : ''}]`;
+                }
+            } else {
+                hFrom = 0;
+                hTo = 24;
+                detailsText = `${dateVal} — طوال اليوم [قفل إداري${noteVal ? ': ' + noteVal : ''}]`;
+            }
+
+            const submitBtn = document.getElementById('btn-quick-block-submit');
+            if (submitBtn) submitBtn.disabled = true;
+
+            try {
+                await refreshBookingsForItem(fac.id);
+                if (getIntervalBusyStatus(fac.id, dateVal, hFrom, hTo)) {
+                    showToast('⛔ هذا الموعد محجوز أو مقفول مسبقاً في هذا التاريخ');
+                    return;
+                }
+
+                const clientLabel = '🔒 قفل إداري' + (noteVal ? ` (${noteVal})` : ' (حجز خارجي)');
+                let lockedOk = false;
+
+                // المحاولة 1: عبر دالة admin_block_slot المباشرة
+                const rpcRes = await db.rpc('admin_block_slot', {
+                    p_facility_id: fac.id,
+                    p_booking_date: dateVal,
+                    p_shift_type: shiftType || 'fullday',
+                    p_start_hour: startHour,
+                    p_hours: hoursCount,
+                    p_note: noteVal || null
+                });
+
+                if (!rpcRes.error) {
+                    lockedOk = true;
+                } else {
+                    // المحاولة 2 (توافق تلقائي فوري بدون الحاجة لتشغيل SQL جديد): عبر create_booking ثم الترقية الفورية إلى confirmed
+                    const tempPhone = '0780' + String(Math.floor(100000 + Math.random() * 899999));
+                    const fallbackParams = {
+                        p_facility_id: fac.id,
+                        p_client_name: clientLabel,
+                        p_phone: tempPhone,
+                        p_booking_date: dateVal,
+                        p_receipt_data: ADMIN_BLOCK_RECEIPT_PLACEHOLDER,
+                        p_shift_type: fac.category === 'farm' ? shiftType : null,
+                        p_start_hour: fac.category === 'field' ? startHour : null,
+                        p_hours: fac.category === 'field' ? hoursCount : null,
+                        p_passengers: fac.category === 'transport' ? 1 : null,
+                        p_distance_km: fac.category === 'transport' ? 10 : null,
+                        p_is_round_trip: false,
+                        p_pickup_location: fac.category === 'transport' ? 'قفل إداري' : null,
+                        p_dropoff_location: fac.category === 'transport' ? 'قفل إداري' : null
+                    };
+                    const fbRes = await db.rpc('create_booking', fallbackParams);
+                    if (fbRes.error) {
+                        showToast('❌ تعذر قفل الموعد: ' + (fbRes.error.message || ''));
+                        return;
+                    }
+                    const newBookingId = fbRes.data?.id;
+                    if (newBookingId) {
+                        await db.from('bookings').update({
+                            status: 'confirmed',
+                            client_name: clientLabel,
+                            details: detailsText
+                        }).eq('id', newBookingId);
+                    }
+                    lockedOk = true;
+                }
+
+                if (lockedOk) {
+                    const noteInp = document.getElementById('quick-block-note');
+                    if (noteInp) noteInp.value = '';
+                    await loadFromDatabase();
+                    renderAdminPanel();
+                    showToast(`🔒 تم قفل الموعد لـ (${fac.nameAr}) بتاريخ ${dateVal} بنجاح!`);
+                }
+            } finally {
+                if (submitBtn) submitBtn.disabled = false;
+            }
+        }
+
         function sanitizeExcelCell(val) {
             const s = String(val ?? '');
             return /^[=+\-@\t\r]/.test(s) ? "'" + s : s;
@@ -5252,11 +5507,12 @@
         }
 
         function exportBookingsToExcel() {
-            if (!confirmedBookings || !confirmedBookings.length) {
+            const realBookings = (confirmedBookings || []).filter(b => !isAdminBlockedBooking(b));
+            if (!realBookings.length) {
                 showToast('⚠️ لا توجد حجوزات مؤكدة لتصديرها');
                 return;
             }
-            const data = confirmedBookings.map(function(b) {
+            const data = realBookings.map(function(b) {
                 const row = {
                     'اسم العميل': sanitizeExcelCell(b.clientName || ''),
                     'رقم الهاتف': sanitizeExcelCell(String(b.phone || '')),
@@ -5279,15 +5535,16 @@
         }
 
         function exportBookingsToPDF() {
-            if (!confirmedBookings || !confirmedBookings.length) {
+            const realBookings = (confirmedBookings || []).filter(b => !isAdminBlockedBooking(b));
+            if (!realBookings.length) {
                 showToast('⚠️ لا توجد حجوزات مؤكدة لتصديرها');
                 return;
             }
             const now = new Date().toLocaleDateString('ar-JO', { year: 'numeric', month: 'long', day: 'numeric' });
-            const totalDeposit = confirmedBookings.reduce((s, b) => s + (Number(b.deposit) || 0), 0);
-            const totalRevenue = confirmedBookings.reduce((s, b) => s + (Number(b.total) || 0), 0);
+            const totalDeposit = realBookings.reduce((s, b) => s + (Number(b.deposit) || 0), 0);
+            const totalRevenue = realBookings.reduce((s, b) => s + (Number(b.total) || 0), 0);
 
-            const rows = confirmedBookings.map(function(b, i) {
+            const rows = realBookings.map(function(b, i) {
                 const bg = i % 2 === 0 ? '#FFFFFF' : '#F8FAF9';
                 const locRow = (b.pickupLocation || b.dropoffLocation)
                     ? `<tr style="background:${bg};"><td colspan="8" style="padding:4px 10px;font-size:10px;color:#555;border-bottom:1px solid #F0F2F1;">📌 ${escapeHtml(b.pickupLocation || '')} → 🏁 ${escapeHtml(b.dropoffLocation || '')}</td></tr>`
@@ -5427,6 +5684,9 @@
             document.getElementById('btn-apply-promo').addEventListener('click', applyBookingPromoCode);
             document.getElementById('btn-clear-promo').addEventListener('click', clearBookingPromoCode);
             document.getElementById('add-promo-form').addEventListener('submit', savePromoCode);
+            document.getElementById('quick-block-form').addEventListener('submit', submitQuickBlockForm);
+            document.getElementById('quick-block-facility').addEventListener('change', syncQuickBlockFormUI);
+            document.getElementById('quick-block-pitch-start').addEventListener('change', syncQuickBlockFormUI);
             document.getElementById('btn-add-ex-date').addEventListener('click', addExcludedDateToInput);
             document.getElementById('track-booking-form').addEventListener('submit', handleTrackBookingSubmit);
             document.getElementById('btn-download-ticket-pdf').addEventListener('click', downloadTicketPDF);
@@ -5483,6 +5743,8 @@
                     rejectBooking(Number(el.dataset.id));
                 } else if (action === 'delete-booking') {
                     deleteBooking(Number(el.dataset.id));
+                } else if (action === 'quick-block-goto') {
+                    gotoQuickBlockForFacility(Number(el.dataset.id));
                 } else if (action === 'edit-listing') {
                     editListing(Number(el.dataset.id));
                 } else if (action === 'toggle-featured') {
