@@ -608,6 +608,46 @@
                         <div class="metric-card"><div class="metric-info"><h4 data-key="statConfirmed">إجمالي الحجوزات المؤكدة</h4><div id="stat-approved-count">0</div></div><div class="metric-icon">✅</div></div>
                         <div class="metric-card"><div class="metric-info"><h4 data-key="statRevenue">مجموع أرباح العربون</h4><div id="stat-total-revenue">0.0 JOD</div></div><div class="metric-icon">💰</div></div>
                     </div>
+
+                    <!-- Feature 7: Instant Telegram Bot Notifications for Admin -->
+                    <div class="admin-box" id="telegram-settings-box" style="background:linear-gradient(135deg,#F0F8FF,#F8FBFF);border:1.5px solid #90CAF9;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:0.6rem;">
+                            <h3 class="admin-section-title" style="margin:0;font-size:1.15rem;color:#0D47A1;">📲 إشعارات الحجوزات الفورية على هاتفك (Telegram Bot مجاني)</h3>
+                            <span id="tg-status-badge" class="badge-status inactive">⚪ غير مفعّل</span>
+                        </div>
+                        <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:0.8rem;line-height:1.6;">
+                            اربط الموقع ببوت تيليجرام مجاني ليصلك إشعار فوري على هاتفك في اللحظة التي يرسل فيها أي زبون طلب حجز جديد (مع تفاصيل الحجز، رابط الوصل، ورابط واتساب الزبون) حتى لو لم تكن فاتحاً للموقع:
+                        </p>
+                        <details style="background:#FFFFFF;border:1px dashed #90CAF9;border-radius:12px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.84rem;line-height:1.75;color:var(--text-dark);">
+                            <summary style="cursor:pointer;font-weight:700;color:#1565C0;">📖 كيف أحصل على كود البوت (Bot Token) في دقيقة واحدة؟ (اضغط للشرح)</summary>
+                            <div style="margin-top:0.5rem;">
+                                <div><strong>1️⃣</strong> افتح تطبيق <strong>Telegram</strong> وابحث عن الحساب الرسمي الموثّق <strong><a href="https://t.me/BotFather" target="_blank" rel="noopener noreferrer" style="color:#1565C0;">@BotFather</a></strong> واضغط <strong>Start</strong>.</div>
+                                <div><strong>2️⃣</strong> أرسل له الأمر <code>/newbot</code>، ثم اختر اسماً لبوتك (مثلاً: <code>Weekend Jordan</code>)، ثم معرّفاً ينتهي بكلمة bot (مثلاً: <code> weekend_jo_bot</code>).</div>
+                                <div><strong>3️⃣</strong> سيعطيك كوداً طويلاً اسمه <strong>HTTP API Token</strong> — انسخه والصقه في الخانة الأولى بالأسفل.</div>
+                                <div><strong>4️⃣</strong> اضغط على رابط بوتك الجديد الذي أعطاك إياه واكتب له كلمة <strong>مرحبا</strong> أو اضغط <strong>Start</strong>، ثم ارجع لهنا واضغط زر <strong>«🔍 جلب رقم محادثتي تلقائياً»</strong>!</div>
+                            </div>
+                        </details>
+                        <form id="telegram-config-form">
+                            <div class="form-row">
+                                <div class="form-group" style="flex:1.4;min-width:220px;">
+                                    <label for="tg-bot-token">1. كود البوت (Bot Token من @BotFather)</label>
+                                    <input type="text" class="form-control" id="tg-bot-token" placeholder="مثال: 7123456789:AAH_xyz123456..." style="direction:ltr;font-family:monospace;font-size:0.86rem;" autocomplete="off">
+                                </div>
+                                <div class="form-group" style="flex:1.2;min-width:210px;">
+                                    <label for="tg-chat-id">2. رقم محادثتك (Chat ID)</label>
+                                    <div style="display:flex;gap:6px;">
+                                        <input type="text" class="form-control" id="tg-chat-id" placeholder="مثال: 987654321" style="direction:ltr;font-family:monospace;font-size:0.88rem;flex:1;" autocomplete="off">
+                                        <button type="button" class="btn-details" id="btn-tg-detect-chat" style="margin:0;white-space:nowrap;font-size:0.8rem;padding:0 0.8rem;border-color:#1565C0;color:#1565C0;" title="أرسل رسالة لبوتك في تيليجرام ثم اضغط هنا لاكتشاف الرقم تلقائياً">🔍 جلب تلقائي</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:0.3rem;">
+                                <button type="submit" class="btn-action" id="btn-tg-save" style="background:#0D47A1;flex:1;min-width:170px;">💾 حفظ وتفعيل الإشعارات</button>
+                                <button type="button" class="btn-action" id="btn-tg-test" style="background:#2E7D32;flex:1;min-width:170px;">🔔 إرسال إشعار تجريبي لهاتفي</button>
+                                <button type="button" class="btn-details" id="btn-tg-disable" style="margin:0;border-color:var(--danger);color:var(--danger);">⏸️ إيقاف</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- Listings Tab -->
@@ -1821,7 +1861,8 @@
         let confirmedBookings = [];
         let archivedBookings = [];
         let allReviews = [];
-        let promoCodes = JSON.parse(safeGetStorage('wknd_promos_fallback', '[]'));
+        let promoCodes = JSON.parse(safeGetStorage('wknd_promos_fallback', '[]')).filter(p => p && p.code !== '__TG_CFG__');
+        let telegramConfig = JSON.parse(safeGetStorage('wknd_tg_config', '{"botToken":"","chatId":"","enabled":false}'));
         let appliedPromoCode = '';
         let currentTicketBooking = null;
         let pageShuffleSeed = Math.floor(Math.random() * 1000000) + 1;
@@ -2038,9 +2079,34 @@
                 ]);
 
                 if (!promoRes.error && Array.isArray(promoRes.data)) {
-                    promoCodes = promoRes.data.map(rowToPromo);
+                    const tgRow = promoRes.data.find(r => String(r.code || '').toUpperCase() === '__TG_CFG__');
+                    if (tgRow && tgRow.title_ar) {
+                        const parts = String(tgRow.title_ar).split('|');
+                        if (parts.length >= 2 && parts[0] && parts[1]) {
+                            telegramConfig = {
+                                botToken: parts[0].trim(),
+                                chatId: parts[1].trim(),
+                                enabled: parts[2] !== '0' && Boolean(tgRow.active)
+                            };
+                            safeSetStorage('wknd_tg_config', JSON.stringify(telegramConfig));
+                        }
+                    }
+                    promoCodes = promoRes.data
+                        .filter(r => String(r.code || '').toUpperCase() !== '__TG_CFG__')
+                        .map(rowToPromo);
                     safeSetStorage('wknd_promos_fallback', JSON.stringify(promoCodes));
                 }
+                try {
+                    const { data: tgSet } = await db.from('admin_settings').select('value_json').eq('key', 'telegram_notify').maybeSingle();
+                    if (tgSet && tgSet.value_json && tgSet.value_json.botToken && tgSet.value_json.chatId) {
+                        telegramConfig = {
+                            botToken: String(tgSet.value_json.botToken).trim(),
+                            chatId: String(tgSet.value_json.chatId).trim(),
+                            enabled: Boolean(tgSet.value_json.enabled)
+                        };
+                        safeSetStorage('wknd_tg_config', JSON.stringify(telegramConfig));
+                    }
+                } catch (e) {}
 
                 if (facRes.error) throw facRes.error;
                 const facilityRows = facRes.data;
@@ -2709,6 +2775,7 @@
                 document.getElementById('rev-user-name').value = '';
                 document.getElementById('rev-comment').value = '';
                 showToast('✅ تم استلام تقييمك وبانتظار اعتماد الإدارة');
+                sendTelegramReviewNotification(selectedItem, name, rating, comment);
                 if (isAdminLoggedIn) {
                     await loadFromDatabase();
                     renderAdminPanel();
@@ -3382,6 +3449,9 @@
                 const myLocalBookings = JSON.parse(safeGetStorage('wknd_my_bookings', '[]'));
                 myLocalBookings.unshift(ticketObj);
                 safeSetStorage('wknd_my_bookings', JSON.stringify(myLocalBookings.slice(0, 20)));
+
+                // إرسال إشعار فوري لهاتف الأدمن عبر Telegram Bot (Feature 7)
+                sendTelegramBookingNotification(ticketObj, currentUploadedReceiptBase64, rpcParams.p_pickup_location, rpcParams.p_dropoff_location);
 
                 // فتح تذكرة الحجز الإلكترونية فوراً (Feature 3)
                 setTimeout(() => openBookingTicketModal(ticketObj), 250);
@@ -4177,6 +4247,7 @@
             document.getElementById('stat-total-revenue').textContent  = `${totalRev.toFixed(2)} JOD`;
             renderAdminPromosSection();
             populateQuickBlockFacilitiesDropdown();
+            renderTelegramSettingsUI();
         }
 
         // ─── إجراءات الأدمن تنتظر استجابة قاعدة البيانات أولاً قبل تعديل الواجهة ───
@@ -5448,6 +5519,256 @@
             }
         }
 
+
+        // =====================================================
+        //  FEATURE 7: INSTANT TELEGRAM BOT NOTIFICATIONS FOR ADMIN
+        // =====================================================
+        function renderTelegramSettingsUI() {
+            const tokenInp = document.getElementById('tg-bot-token');
+            const chatInp  = document.getElementById('tg-chat-id');
+            const badge    = document.getElementById('tg-status-badge');
+            if (!tokenInp || !chatInp || !badge) return;
+
+            if (telegramConfig && telegramConfig.botToken && !tokenInp.value) {
+                tokenInp.value = telegramConfig.botToken;
+            }
+            if (telegramConfig && telegramConfig.chatId && !chatInp.value) {
+                chatInp.value = telegramConfig.chatId;
+            }
+            const isReady = Boolean(telegramConfig && telegramConfig.enabled && telegramConfig.botToken && telegramConfig.chatId);
+            badge.className = 'badge-status ' + (isReady ? 'active' : 'inactive');
+            badge.textContent = isReady ? '🟢 متّصل وفعّال' : '⚪ غير مفعّل';
+        }
+
+        async function persistTelegramConfigToDb(cfg) {
+            telegramConfig = cfg;
+            safeSetStorage('wknd_tg_config', JSON.stringify(cfg));
+            renderTelegramSettingsUI();
+            if (!db || !isAdminLoggedIn) return;
+
+            // 1) الحفظ في جدول admin_settings إن كان مفعّلاً
+            try {
+                await db.from('admin_settings').upsert({
+                    key: 'telegram_notify',
+                    value_json: cfg,
+                    updated_at: new Date().toISOString()
+                });
+            } catch (e) {}
+
+            // 2) الحفظ التوافقي في صف إعدادات مخفي داخل promo_codes ليعمل فوراً على جميع الهواتف حتى بدون تشغيل SQL جديد
+            try {
+                const encodedTitle = `${cfg.botToken}|${cfg.chatId}|${cfg.enabled ? '1' : '0'}`.slice(0, 120);
+                const { data: existing } = await db.from('promo_codes').select('id').eq('code', '__TG_CFG__').maybeSingle();
+                const payload = {
+                    code: '__TG_CFG__',
+                    title_ar: encodedTitle || 'TG_CFG',
+                    discount_type: 'fixed',
+                    discount_value: 1,
+                    allowed_days: [],
+                    valid_from: '2099-01-01',
+                    valid_until: '2099-01-01',
+                    excluded_dates: [],
+                    excluded_facility_ids: [],
+                    auto_apply: false,
+                    active: Boolean(cfg.enabled)
+                };
+                if (existing && existing.id) {
+                    await db.from('promo_codes').update(payload).eq('id', existing.id);
+                } else {
+                    await db.from('promo_codes').insert(payload);
+                }
+            } catch (e) {}
+        }
+
+        async function detectTelegramChatIdAutomatically() {
+            const tokenInp = document.getElementById('tg-bot-token');
+            const chatInp  = document.getElementById('tg-chat-id');
+            const btn      = document.getElementById('btn-tg-detect-chat');
+            const token    = (tokenInp?.value || '').trim();
+            if (!token || !token.includes(':')) {
+                showToast('⚠️ يرجى لصق كود البوت (Bot Token) في الخانة الأولى أولاً');
+                if (tokenInp) tokenInp.focus();
+                return;
+            }
+            if (btn) btn.disabled = true;
+            try {
+                const resp = await fetch(`https://api.telegram.org/bot${encodeURIComponent(token)}/getUpdates?limit=10`);
+                const json = await resp.json();
+                if (!json || !json.ok) {
+                    showToast('❌ كود البوت غير صحيح، تأكد من نسخه كاملاً من @BotFather');
+                    return;
+                }
+                const updates = Array.isArray(json.result) ? json.result : [];
+                let foundChat = null;
+                for (let i = updates.length - 1; i >= 0; i--) {
+                    const u = updates[i];
+                    const msgChat = u?.message?.chat || u?.edited_message?.chat || u?.my_chat_member?.chat || u?.channel_post?.chat;
+                    if (msgChat && msgChat.id) {
+                        foundChat = msgChat;
+                        break;
+                    }
+                }
+                if (!foundChat) {
+                    showToast('📩 افتح بوتك في تيليجرام وأرسل له كلمة "مرحبا" أو اضغط Start ثم اضغط "جلب تلقائي" مرة أخرى');
+                    return;
+                }
+                if (chatInp) chatInp.value = String(foundChat.id);
+                const chatName = [foundChat.first_name, foundChat.last_name, foundChat.title].filter(Boolean).join(' ') || foundChat.username || foundChat.id;
+                showToast(`✅ تم اكتشاف محادثتك تلقائياً (${chatName})! اضغط حفظ وتفعيل.`);
+            } catch (err) {
+                showToast('❌ تعذر الاتصال بتيليجرام، تحقق من اتصال الإنترنت أو كود البوت');
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        async function saveTelegramConfig(e) {
+            e.preventDefault();
+            if (!isAdminLoggedIn) return;
+            const token = (document.getElementById('tg-bot-token')?.value || '').trim();
+            const chatId = (document.getElementById('tg-chat-id')?.value || '').trim();
+            if (!token || !token.includes(':')) {
+                showToast('⚠️ يرجى إدخال كود البوت (Bot Token) بشكل صحيح');
+                return;
+            }
+            if (!chatId || !/^-?[0-9]+$/.test(chatId)) {
+                showToast('⚠️ يرجى إدخال رقم المحادثة (Chat ID) أو الضغط على زر "🔍 جلب تلقائي"');
+                return;
+            }
+            const btn = document.getElementById('btn-tg-save');
+            if (btn) btn.disabled = true;
+            try {
+                await persistTelegramConfigToDb({ botToken: token, chatId, enabled: true });
+                showToast('✅ تم حفظ وتفعيل إشعارات تيليجرام الفورية بنجاح!');
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        async function disableTelegramNotifications() {
+            if (!isAdminLoggedIn) return;
+            await persistTelegramConfigToDb({
+                botToken: (document.getElementById('tg-bot-token')?.value || telegramConfig.botToken || '').trim(),
+                chatId: (document.getElementById('tg-chat-id')?.value || telegramConfig.chatId || '').trim(),
+                enabled: false
+            });
+            showToast('⏸️ تم إيقاف إشعارات تيليجرام مؤقتاً');
+        }
+
+        async function sendRawTelegramMessage(token, chatId, text) {
+            if (!token || !chatId || !text) return false;
+            try {
+                const resp = await fetch(`https://api.telegram.org/bot${encodeURIComponent(token)}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: text,
+                        disable_web_page_preview: false
+                    })
+                });
+                const data = await resp.json();
+                return Boolean(data && data.ok);
+            } catch (e) {
+                return false;
+            }
+        }
+
+        async function sendTestTelegramNotification() {
+            const token = (document.getElementById('tg-bot-token')?.value || telegramConfig?.botToken || '').trim();
+            const chatId = (document.getElementById('tg-chat-id')?.value || telegramConfig?.chatId || '').trim();
+            if (!token || !chatId) {
+                showToast('⚠️ أدخل كود البوت ورقم المحادثة أولاً لتجربة الإشعار');
+                return;
+            }
+            const btn = document.getElementById('btn-tg-test');
+            if (btn) btn.disabled = true;
+            try {
+                const msg =
+                    `🔔 إشعار تجريبي ناجح — منصة Weekend الأردن!
+` +
+                    `━━━━━━━━━━━━━━━━━━
+` +
+                    `✅ تم ربط هاتفك بنجاح مع منصة Weekend.
+` +
+                    `📲 سيصلك إشعار فوري هنا في اللحظة التي يرسل فيها أي زبون طلب حجز جديد أو تقييم جديد!`;
+                const ok = await sendRawTelegramMessage(token, chatId, msg);
+                if (ok) {
+                    await persistTelegramConfigToDb({ botToken: token, chatId, enabled: true });
+                    showToast('🔔 تم إرسال الإشعار التجريبي! تفقد تطبيق تيليجرام على هاتفك الآن.');
+                } else {
+                    showToast('❌ تعذر الإرسال: تأكد أنك ضغطت Start لبوتك في تيليجرام وأن الكود صحيح');
+                }
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        async function sendTelegramBookingNotification(b, receiptUrl, pickupLoc, dropoffLoc) {
+            if (!telegramConfig || !telegramConfig.enabled || !telegramConfig.botToken || !telegramConfig.chatId) return;
+            try {
+                const total = Number(b.total || 0);
+                const deposit = Number(b.deposit || 0);
+                const remaining = Math.max(0, Number((total - deposit).toFixed(2)));
+                const waPhone = toWhatsAppPhone(b.phone);
+                const isHttpReceipt = /^https:\/\//i.test(String(receiptUrl || ''));
+                let msg =
+                    `🔔 طلب حجز جديد — منصة Weekend!
+` +
+                    `━━━━━━━━━━━━━━━━━━
+` +
+                    `🎫 رقم التذكرة: #WKND-${b.id}
+` +
+                    `🏡 المنشأة: ${b.itemNameAr || 'منشأة'}
+` +
+                    `👤 العميل: ${b.clientName || ''}
+` +
+                    `📞 الهاتف: ${b.phone || ''}
+` +
+                    `📅 التفاصيل: ${b.details || b.bookingDate || ''}
+`;
+                if (pickupLoc || dropoffLoc) {
+                    msg += `📌 الانطلاق: ${pickupLoc || '—'}
+🏁 الوصول: ${dropoffLoc || '—'}
+`;
+                }
+                msg +=
+                    `💰 الإجمالي: ${total.toFixed(2)} JOD
+` +
+                    `💳 العربون (CliQ): ${deposit.toFixed(2)} JOD
+` +
+                    `💵 المتبقي عند الوصول: ${remaining.toFixed(2)} JOD
+`;
+                if (isHttpReceipt) {
+                    msg += `🖼️ صورة وصل CliQ:
+${receiptUrl}
+`;
+                }
+                msg += `💬 مراسلة الزبون على واتساب:
+https://wa.me/${waPhone}`;
+                await sendRawTelegramMessage(telegramConfig.botToken, telegramConfig.chatId, msg);
+            } catch (e) {}
+        }
+
+        async function sendTelegramReviewNotification(item, userName, rating, comment) {
+            if (!telegramConfig || !telegramConfig.enabled || !telegramConfig.botToken || !telegramConfig.chatId) return;
+            try {
+                const msg =
+                    `⭐ تقييم جديد بانتظار المراجعة — منصة Weekend
+` +
+                    `━━━━━━━━━━━━━━━━━━
+` +
+                    `🏡 المنشأة: ${item ? item.nameAr : 'منشأة'}
+` +
+                    `👤 الزائر: ${userName}
+` +
+                    `🌟 التقييم: ${rating} / 5
+` +
+                    `💬 التعليق: ${comment}`;
+                await sendRawTelegramMessage(telegramConfig.botToken, telegramConfig.chatId, msg);
+            } catch (e) {}
+        }
+
         function sanitizeExcelCell(val) {
             const s = String(val ?? '');
             return /^[=+\-@\t\r]/.test(s) ? "'" + s : s;
@@ -5685,6 +6006,10 @@
             document.getElementById('btn-clear-promo').addEventListener('click', clearBookingPromoCode);
             document.getElementById('add-promo-form').addEventListener('submit', savePromoCode);
             document.getElementById('quick-block-form').addEventListener('submit', submitQuickBlockForm);
+            document.getElementById('telegram-config-form').addEventListener('submit', saveTelegramConfig);
+            document.getElementById('btn-tg-detect-chat').addEventListener('click', detectTelegramChatIdAutomatically);
+            document.getElementById('btn-tg-test').addEventListener('click', sendTestTelegramNotification);
+            document.getElementById('btn-tg-disable').addEventListener('click', disableTelegramNotifications);
             document.getElementById('quick-block-facility').addEventListener('change', syncQuickBlockFormUI);
             document.getElementById('quick-block-pitch-start').addEventListener('change', syncQuickBlockFormUI);
             document.getElementById('btn-add-ex-date').addEventListener('click', addExcludedDateToInput);
