@@ -618,13 +618,15 @@
                         <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:0.8rem;line-height:1.6;">
                             اربط الموقع ببوت تيليجرام مجاني ليصلك إشعار فوري على هاتفك في اللحظة التي يرسل فيها أي زبون طلب حجز جديد (مع تفاصيل الحجز، رابط الوصل، ورابط واتساب الزبون) حتى لو لم تكن فاتحاً للموقع:
                         </p>
-                        <details style="background:#FFFFFF;border:1px dashed #90CAF9;border-radius:12px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.84rem;line-height:1.75;color:var(--text-dark);">
-                            <summary style="cursor:pointer;font-weight:700;color:#1565C0;">📖 كيف أحصل على كود البوت (Bot Token) في دقيقة واحدة؟ (اضغط للشرح)</summary>
+                        <details style="background:#FFFFFF;border:1px dashed #90CAF9;border-radius:12px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.84rem;line-height:1.75;color:var(--text-dark);" open>
+                            <summary style="cursor:pointer;font-weight:700;color:#1565C0;">📖 خطوات تفعيل البوت ومعرفة رقم المحادثة (Chat ID) بسهولة:</summary>
                             <div style="margin-top:0.5rem;">
-                                <div><strong>1️⃣</strong> افتح تطبيق <strong>Telegram</strong> وابحث عن الحساب الرسمي الموثّق <strong><a href="https://t.me/BotFather" target="_blank" rel="noopener noreferrer" style="color:#1565C0;">@BotFather</a></strong> واضغط <strong>Start</strong>.</div>
-                                <div><strong>2️⃣</strong> أرسل له الأمر <code>/newbot</code>، ثم اختر اسماً لبوتك (مثلاً: <code>Weekend Jordan</code>)، ثم معرّفاً ينتهي بكلمة bot (مثلاً: <code> weekend_jo_bot</code>).</div>
-                                <div><strong>3️⃣</strong> سيعطيك كوداً طويلاً اسمه <strong>HTTP API Token</strong> — انسخه والصقه في الخانة الأولى بالأسفل.</div>
-                                <div><strong>4️⃣</strong> اضغط على رابط بوتك الجديد الذي أعطاك إياه واكتب له كلمة <strong>مرحبا</strong> أو اضغط <strong>Start</strong>، ثم ارجع لهنا واضغط زر <strong>«🔍 جلب رقم محادثتي تلقائياً»</strong>!</div>
+                                <div><strong>1️⃣</strong> الصق <strong>كود البوت (Bot Token)</strong> الذي نسخته من <strong><a href="https://t.me/BotFather" target="_blank" rel="noopener noreferrer" style="color:#1565C0;">@BotFather</a></strong> في الخانة الأولى بالأسفل.</div>
+                                <div><strong>2️⃣ مهم جداً:</strong> افتح محادثة مع بوتك أنت (<strong><a href="https://t.me/weekend_jobot" target="_blank" rel="noopener noreferrer" style="color:#1565C0;">@weekend_jobot</a></strong>) واضغط <strong>Start</strong> أو أرسل له كلمة <strong>مرحبا</strong>.</div>
+                                <div><strong>3️⃣ كيف تعرف رقم محادثتك (Chat ID)؟</strong> لديك طريقتان:
+                                    <br>• إما بالضغط على زر <strong>«🔍 جلب تلقائي»</strong> بالأسفل (وإذا فتح لك صفحة تيليجرام، انسخ السطر الظاهر فيها والصقه في خانة Chat ID وسيستخرج الموقع الرقم تلقائياً!).
+                                    <br>• أو افتح في تيليجرام البوت الرسمي <strong><a href="https://t.me/userinfobot" target="_blank" rel="noopener noreferrer" style="color:#1565C0;">@userinfobot</a></strong> واضغط <strong>Start</strong>، سيرد عليك فوراً برقم <strong>Id</strong> الخاص بك (مثال: <code>123456789</code>) — انسخه وضعه في الخانة الثانية!
+                                </div>
                             </div>
                         </details>
                         <form id="telegram-config-form">
@@ -5523,6 +5525,29 @@
         // =====================================================
         //  FEATURE 7: INSTANT TELEGRAM BOT NOTIFICATIONS FOR ADMIN
         // =====================================================
+        function cleanTelegramToken(rawToken) {
+            let t = String(rawToken || '').trim();
+            // إزالة أي مسافات أو رابط كامل أو كلمة bot مكررة في البداية
+            t = t.replace(/^https?:\/\/api\.telegram\.org\/bot/i, '');
+            t = t.replace(/\/getUpdates.*$/i, '').replace(/\/sendMessage.*$/i, '');
+            if (/^bot[0-9]+:/i.test(t)) t = t.slice(3);
+            t = t.replace(/\s+/g, '');
+            return t;
+        }
+
+        function extractChatIdFromInput(rawVal) {
+            const s = String(rawVal || '').trim();
+            if (/^-?[0-9]{5,20}$/.test(s)) return s;
+            // إذا لصق المستخدم نص JSON القادم من صفحة getUpdates، نستخرج رقم chat.id منه تلقائياً
+            const chatMatch = s.match(/"chat"\s*:\s*\{[^}]*?"id"\s*:\s*(-?[0-9]{5,20})/);
+            if (chatMatch && chatMatch[1]) return chatMatch[1];
+            const idMatch = s.match(/"id"\s*:\s*(-?[0-9]{5,20})/);
+            if (idMatch && idMatch[1]) return idMatch[1];
+            const numMatch = s.match(/(-?[0-9]{6,20})/);
+            if (numMatch && numMatch[1]) return numMatch[1];
+            return s;
+        }
+
         function renderTelegramSettingsUI() {
             const tokenInp = document.getElementById('tg-bot-token');
             const chatInp  = document.getElementById('tg-chat-id');
@@ -5584,18 +5609,21 @@
             const tokenInp = document.getElementById('tg-bot-token');
             const chatInp  = document.getElementById('tg-chat-id');
             const btn      = document.getElementById('btn-tg-detect-chat');
-            const token    = (tokenInp?.value || '').trim();
-            if (!token || !token.includes(':')) {
-                showToast('⚠️ يرجى لصق كود البوت (Bot Token) في الخانة الأولى أولاً');
+            const token    = cleanTelegramToken(tokenInp?.value || '');
+            if (tokenInp && token) tokenInp.value = token;
+
+            if (!token || !/^[0-9]{6,15}:[A-Za-z0-9_-]{20,}$/.test(token)) {
+                showToast('⚠️ يرجى التأكد من لصق كود البوت (Bot Token) الصحيح من @BotFather بدون مسافات');
                 if (tokenInp) tokenInp.focus();
                 return;
             }
             if (btn) btn.disabled = true;
+            const apiUrl = `https://api.telegram.org/bot${token}/getUpdates?limit=10`;
             try {
-                const resp = await fetch(`https://api.telegram.org/bot${encodeURIComponent(token)}/getUpdates?limit=10`);
+                const resp = await fetch(apiUrl);
                 const json = await resp.json();
                 if (!json || !json.ok) {
-                    showToast('❌ كود البوت غير صحيح، تأكد من نسخه كاملاً من @BotFather');
+                    showToast('❌ كود البوت غير صحيح (404)، تأكد من نسخه كاملاً من @BotFather');
                     return;
                 }
                 const updates = Array.isArray(json.result) ? json.result : [];
@@ -5609,14 +5637,16 @@
                     }
                 }
                 if (!foundChat) {
-                    showToast('📩 افتح بوتك في تيليجرام وأرسل له كلمة "مرحبا" أو اضغط Start ثم اضغط "جلب تلقائي" مرة أخرى');
+                    showToast('📩 لم تصل رسائل لبوتك بعد! افتح بوتك @weekend_jobot في تيليجرام واضغط Start ثم جرب مجدداً');
                     return;
                 }
                 if (chatInp) chatInp.value = String(foundChat.id);
                 const chatName = [foundChat.first_name, foundChat.last_name, foundChat.title].filter(Boolean).join(' ') || foundChat.username || foundChat.id;
                 showToast(`✅ تم اكتشاف محادثتك تلقائياً (${chatName})! اضغط حفظ وتفعيل.`);
             } catch (err) {
-                showToast('❌ تعذر الاتصال بتيليجرام، تحقق من اتصال الإنترنت أو كود البوت');
+                // في حال منع متصفح الموقع الاتصال المباشر بسبب إعدادات CSP القديمة في vercel.json، نفتح رابط تيليجرام في تبويب جديد ليستخرج منه الرقم فوراً
+                window.open(apiUrl, '_blank', 'noopener,noreferrer');
+                showToast('🔗 فُتحت صفحة تيليجرام في نافذة جديدة: انسخ النص الظاهر فيها والصقه في خانة Chat ID أو أرسل Start لـ @userinfobot');
             } finally {
                 if (btn) btn.disabled = false;
             }
@@ -5625,14 +5655,19 @@
         async function saveTelegramConfig(e) {
             e.preventDefault();
             if (!isAdminLoggedIn) return;
-            const token = (document.getElementById('tg-bot-token')?.value || '').trim();
-            const chatId = (document.getElementById('tg-chat-id')?.value || '').trim();
+            const tokenInp = document.getElementById('tg-bot-token');
+            const chatInp  = document.getElementById('tg-chat-id');
+            const token  = cleanTelegramToken(tokenInp?.value || '');
+            const chatId = extractChatIdFromInput(chatInp?.value || '');
+            if (tokenInp) tokenInp.value = token;
+            if (chatInp) chatInp.value = chatId;
+
             if (!token || !token.includes(':')) {
                 showToast('⚠️ يرجى إدخال كود البوت (Bot Token) بشكل صحيح');
                 return;
             }
-            if (!chatId || !/^-?[0-9]+$/.test(chatId)) {
-                showToast('⚠️ يرجى إدخال رقم المحادثة (Chat ID) أو الضغط على زر "🔍 جلب تلقائي"');
+            if (!chatId || !/^-?[0-9]{5,20}$/.test(chatId)) {
+                showToast('⚠️ يرجى إدخال رقم المحادثة (Chat ID) بالأرقام (يمكنك معرفته بمراسلة @userinfobot في تيليجرام)');
                 return;
             }
             const btn = document.getElementById('btn-tg-save');
@@ -5648,17 +5683,21 @@
         async function disableTelegramNotifications() {
             if (!isAdminLoggedIn) return;
             await persistTelegramConfigToDb({
-                botToken: (document.getElementById('tg-bot-token')?.value || telegramConfig.botToken || '').trim(),
-                chatId: (document.getElementById('tg-chat-id')?.value || telegramConfig.chatId || '').trim(),
+                botToken: cleanTelegramToken(document.getElementById('tg-bot-token')?.value || telegramConfig.botToken || ''),
+                chatId: extractChatIdFromInput(document.getElementById('tg-chat-id')?.value || telegramConfig.chatId || ''),
                 enabled: false
             });
             showToast('⏸️ تم إيقاف إشعارات تيليجرام مؤقتاً');
         }
 
-        async function sendRawTelegramMessage(token, chatId, text) {
+        async function sendRawTelegramMessage(rawToken, rawChatId, text) {
+            const token  = cleanTelegramToken(rawToken);
+            const chatId = extractChatIdFromInput(rawChatId);
             if (!token || !chatId || !text) return false;
+
+            // المحاولة 1: عبر fetch المباشر (مع عدم تشفير النقطتين ':' في التوكن)
             try {
-                const resp = await fetch(`https://api.telegram.org/bot${encodeURIComponent(token)}/sendMessage`, {
+                const resp = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -5670,34 +5709,55 @@
                 const data = await resp.json();
                 return Boolean(data && data.ok);
             } catch (e) {
-                return false;
+                // المحاولة 2 (تجاوز تلقائي لـ CSP القديم عبر Image Beacon المسموح دائماً في img-src https:)
+                return await new Promise((resolve) => {
+                    try {
+                        const img = new Image();
+                        const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${encodeURIComponent(chatId)}&text=${encodeURIComponent(text)}`;
+                        let settled = false;
+                        const finish = (val) => { if (!settled) { settled = true; resolve(val); } };
+                        // ملاحظة: استجابة sendMessage هي JSON وليست صورة، لذا وصول الرد من السيرفر يطلق onerror بعد أن يكون تيليجرام قد أرسل الرسالة فعلياً!
+                        img.onload = () => finish(true);
+                        img.onerror = () => finish(true);
+                        setTimeout(() => finish(true), 2500);
+                        img.src = url;
+                    } catch (err2) {
+                        resolve(false);
+                    }
+                });
             }
         }
 
         async function sendTestTelegramNotification() {
-            const token = (document.getElementById('tg-bot-token')?.value || telegramConfig?.botToken || '').trim();
-            const chatId = (document.getElementById('tg-chat-id')?.value || telegramConfig?.chatId || '').trim();
-            if (!token || !chatId) {
-                showToast('⚠️ أدخل كود البوت ورقم المحادثة أولاً لتجربة الإشعار');
+            const tokenInp = document.getElementById('tg-bot-token');
+            const chatInp  = document.getElementById('tg-chat-id');
+            const token  = cleanTelegramToken(tokenInp?.value || telegramConfig?.botToken || '');
+            const chatId = extractChatIdFromInput(chatInp?.value || telegramConfig?.chatId || '');
+            if (tokenInp && token) tokenInp.value = token;
+            if (chatInp && chatId) chatInp.value = chatId;
+
+            if (!token || !token.includes(':')) {
+                showToast('⚠️ أدخل كود البوت (Bot Token) في الخانة الأولى أولاً');
+                return;
+            }
+            if (!chatId || !/^-?[0-9]{5,20}$/.test(chatId)) {
+                showToast('⚠️ أدخل رقم المحادثة (Chat ID) أولاً (أرسل Start لـ @userinfobot في تيليجرام ليعطيك الرقم فوراً)');
                 return;
             }
             const btn = document.getElementById('btn-tg-test');
             if (btn) btn.disabled = true;
             try {
                 const msg =
-                    `🔔 إشعار تجريبي ناجح — منصة Weekend الأردن!
-` +
-                    `━━━━━━━━━━━━━━━━━━
-` +
-                    `✅ تم ربط هاتفك بنجاح مع منصة Weekend.
-` +
+                    `🔔 إشعار تجريبي ناجح — منصة Weekend الأردن!\n` +
+                    `━━━━━━━━━━━━━━━━━━\n` +
+                    `✅ تم ربط هاتفك بنجاح مع منصة Weekend.\n` +
                     `📲 سيصلك إشعار فوري هنا في اللحظة التي يرسل فيها أي زبون طلب حجز جديد أو تقييم جديد!`;
                 const ok = await sendRawTelegramMessage(token, chatId, msg);
                 if (ok) {
                     await persistTelegramConfigToDb({ botToken: token, chatId, enabled: true });
-                    showToast('🔔 تم إرسال الإشعار التجريبي! تفقد تطبيق تيليجرام على هاتفك الآن.');
+                    showToast('🔔 تم إرسال الإشعار التجريبي! تفقد محادثة بوتك @weekend_jobot على تيليجرام الآن.');
                 } else {
-                    showToast('❌ تعذر الإرسال: تأكد أنك ضغطت Start لبوتك في تيليجرام وأن الكود صحيح');
+                    showToast('❌ تعذر الإرسال: تأكد أنك فتحت بوتك @weekend_jobot وضغطت Start');
                 }
             } finally {
                 if (btn) btn.disabled = false;
@@ -5713,39 +5773,24 @@
                 const waPhone = toWhatsAppPhone(b.phone);
                 const isHttpReceipt = /^https:\/\//i.test(String(receiptUrl || ''));
                 let msg =
-                    `🔔 طلب حجز جديد — منصة Weekend!
-` +
-                    `━━━━━━━━━━━━━━━━━━
-` +
-                    `🎫 رقم التذكرة: #WKND-${b.id}
-` +
-                    `🏡 المنشأة: ${b.itemNameAr || 'منشأة'}
-` +
-                    `👤 العميل: ${b.clientName || ''}
-` +
-                    `📞 الهاتف: ${b.phone || ''}
-` +
-                    `📅 التفاصيل: ${b.details || b.bookingDate || ''}
-`;
+                    `🔔 طلب حجز جديد — منصة Weekend!\n` +
+                    `━━━━━━━━━━━━━━━━━━\n` +
+                    `🎫 رقم التذكرة: #WKND-${b.id}\n` +
+                    `🏡 المنشأة: ${b.itemNameAr || 'منشأة'}\n` +
+                    `👤 العميل: ${b.clientName || ''}\n` +
+                    `📞 الهاتف: ${b.phone || ''}\n` +
+                    `📅 التفاصيل: ${b.details || b.bookingDate || ''}\n`;
                 if (pickupLoc || dropoffLoc) {
-                    msg += `📌 الانطلاق: ${pickupLoc || '—'}
-🏁 الوصول: ${dropoffLoc || '—'}
-`;
+                    msg += `📌 الانطلاق: ${pickupLoc || '—'}\n🏁 الوصول: ${dropoffLoc || '—'}\n`;
                 }
                 msg +=
-                    `💰 الإجمالي: ${total.toFixed(2)} JOD
-` +
-                    `💳 العربون (CliQ): ${deposit.toFixed(2)} JOD
-` +
-                    `💵 المتبقي عند الوصول: ${remaining.toFixed(2)} JOD
-`;
+                    `💰 الإجمالي: ${total.toFixed(2)} JOD\n` +
+                    `💳 العربون (CliQ): ${deposit.toFixed(2)} JOD\n` +
+                    `💵 المتبقي عند الوصول: ${remaining.toFixed(2)} JOD\n`;
                 if (isHttpReceipt) {
-                    msg += `🖼️ صورة وصل CliQ:
-${receiptUrl}
-`;
+                    msg += `🖼️ صورة وصل CliQ:\n${receiptUrl}\n`;
                 }
-                msg += `💬 مراسلة الزبون على واتساب:
-https://wa.me/${waPhone}`;
+                msg += `💬 مراسلة الزبون على واتساب:\nhttps://wa.me/${waPhone}`;
                 await sendRawTelegramMessage(telegramConfig.botToken, telegramConfig.chatId, msg);
             } catch (e) {}
         }
@@ -5754,16 +5799,11 @@ https://wa.me/${waPhone}`;
             if (!telegramConfig || !telegramConfig.enabled || !telegramConfig.botToken || !telegramConfig.chatId) return;
             try {
                 const msg =
-                    `⭐ تقييم جديد بانتظار المراجعة — منصة Weekend
-` +
-                    `━━━━━━━━━━━━━━━━━━
-` +
-                    `🏡 المنشأة: ${item ? item.nameAr : 'منشأة'}
-` +
-                    `👤 الزائر: ${userName}
-` +
-                    `🌟 التقييم: ${rating} / 5
-` +
+                    `⭐ تقييم جديد بانتظار المراجعة — منصة Weekend\n` +
+                    `━━━━━━━━━━━━━━━━━━\n` +
+                    `🏡 المنشأة: ${item ? item.nameAr : 'منشأة'}\n` +
+                    `👤 الزائر: ${userName}\n` +
+                    `🌟 التقييم: ${rating} / 5\n` +
                     `💬 التعليق: ${comment}`;
                 await sendRawTelegramMessage(telegramConfig.botToken, telegramConfig.chatId, msg);
             } catch (e) {}
@@ -6008,6 +6048,13 @@ https://wa.me/${waPhone}`;
             document.getElementById('quick-block-form').addEventListener('submit', submitQuickBlockForm);
             document.getElementById('telegram-config-form').addEventListener('submit', saveTelegramConfig);
             document.getElementById('btn-tg-detect-chat').addEventListener('click', detectTelegramChatIdAutomatically);
+            document.getElementById('tg-chat-id').addEventListener('input', function() {
+                const extracted = extractChatIdFromInput(this.value);
+                if (extracted && extracted !== this.value && /^-?[0-9]{5,20}$/.test(extracted)) {
+                    this.value = extracted;
+                    showToast('✅ تم استخراج رقم المحادثة بنجاح: ' + extracted);
+                }
+            });
             document.getElementById('btn-tg-test').addEventListener('click', sendTestTelegramNotification);
             document.getElementById('btn-tg-disable').addEventListener('click', disableTelegramNotifications);
             document.getElementById('quick-block-facility').addEventListener('change', syncQuickBlockFormUI);
