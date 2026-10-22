@@ -400,6 +400,19 @@
         .day-check-pill input { accent-color: var(--primary-dark); width: 16px; height: 16px; cursor: pointer; }
         .excluded-facs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; max-height: 150px; overflow-y: auto; background: #FAFBFB; border: 1px solid #E0E0E0; border-radius: 10px; padding: 0.7rem; margin-top: 5px; }
 
+
+        /* Fair Rotation, Sort Bar & Featured Facility Styling */
+        .venue-card.featured-card { border: 2px solid var(--accent-gold); box-shadow: 0 12px 32px rgba(212, 163, 89, 0.18); }
+        .card-featured-ribbon { position: absolute; top: 14px; right: 95px; background: linear-gradient(135deg, #D4A359, #B27517); color: #0D2818; padding: 4px 11px; border-radius: 20px; font-size: 0.73rem; font-weight: 700; z-index: 2; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        [dir="ltr"] .card-featured-ribbon { right: auto; left: 95px; }
+        .sort-controls-wrap { margin-right: auto; display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        [dir="ltr"] .sort-controls-wrap { margin-right: 0; margin-left: auto; }
+        .sort-select { background: white; border: 1.5px solid #D0D9D4; color: var(--primary-dark); padding: 0.36rem 0.8rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; outline: none; }
+        .sort-select:focus { border-color: var(--accent-gold); }
+        .reshuffle-btn { background: #FFF9EF; border: 1.5px solid var(--accent-gold); color: var(--primary-dark); padding: 0.36rem 0.85rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .reshuffle-btn:hover { background: var(--accent-gold); color: var(--primary-dark); }
+        .icon-btn.featured-on { background: #FFF3CD; color: #B27517; border: 1px solid var(--accent-gold); }
+
         /* Mobile */
         @media (max-width: 768px) {
             .navbar { padding: 0.8rem 1rem; }
@@ -476,6 +489,15 @@
             <button type="button" class="season-chip" data-action="toggle-season" data-season="summer" data-key="seasonSummer">☀️ صيفية</button>
             <button type="button" class="season-chip" data-action="toggle-season" data-season="private_screened" data-key="filterPrivatePool">🔒 مسبح مستور (خصوصية تامة)</button>
             <button type="button" class="season-chip" data-action="toggle-season" data-season="families_only" data-key="filterFamiliesOnly">👨‍👩‍👧‍👦 عائلات فقط</button>
+            <div class="sort-controls-wrap">
+                <select id="sort-order-select" class="sort-select" aria-label="ترتيب العرض">
+                    <option value="fair" data-key="sortFair">🔀 ترتيب متنوع وعادل</option>
+                    <option value="price_asc" data-key="sortPriceAsc">💰 الأقل سعراً أولاً</option>
+                    <option value="price_desc" data-key="sortPriceDesc">💎 الأعلى سعراً أولاً</option>
+                    <option value="rating_desc" data-key="sortRatingDesc">⭐ الأعلى تقييماً</option>
+                </select>
+                <button type="button" class="reshuffle-btn" id="btn-reshuffle-items" data-action="reshuffle-items" title="تغيير ترتيب العرض عشوائياً">🔄 تقليب</button>
+            </div>
         </div>
         <div class="cards-grid" id="items-container"></div>
     </div>
@@ -680,6 +702,7 @@
                             <div class="form-group">
                                 <label>المرافق، الخصوصية، وتصنيف الجمهور (اختر ما ينطبق):</label>
                                 <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:5px;padding:0.75rem;background:#F5F9F6;border-radius:12px;border:1px solid #C8E0D0;">
+                                    <label style="display:flex;align-items:center;gap:6px;font-weight:700;color:#B27517;background:#FFF9EF;padding:3px 10px;border-radius:8px;border:1px solid #E5C384;"><input type="checkbox" id="adm-v-am-featured"> ⭐ تثبيت كمنشأة مميزة في المقدمة</label>
                                     <label style="display:flex;align-items:center;gap:6px;font-weight:700;color:#1B5E20;"><input type="checkbox" id="adm-v-am-private_screened"> 🔒 مسبح مستور (خصوصية تامة للعائلات)</label>
                                     <label style="display:flex;align-items:center;gap:6px;font-weight:700;color:#0D47A1;"><input type="checkbox" id="adm-v-am-families_only"> 👨‍👩‍👧‍👦 عائلات فقط</label>
                                     <label style="display:flex;align-items:center;gap:6px;font-weight:600;"><input type="checkbox" id="adm-v-am-youth_allowed"> 👥 عائلات وشباب</label>
@@ -772,6 +795,7 @@
                             <div class="form-group">
                                 <label>المرافق والمميزات:</label>
                                 <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:5px;">
+                                    <label style="display:flex;align-items:center;gap:6px;font-weight:700;color:#B27517;background:#FFF9EF;padding:3px 10px;border-radius:8px;border:1px solid #E5C384;"><input type="checkbox" id="adm-t-am-featured"> ⭐ تثبيت كمركبة مميزة في المقدمة</label>
                                     <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="adm-t-am-wifi"> 📶 واي فاي</label>
                                     <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="adm-t-am-heating"> 🌡️ تكييف / تدفئة</label>
                                     <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="adm-t-am-outdoor"> 🎵 نظام صوت</label>
@@ -1708,10 +1732,27 @@
         let promoCodes = JSON.parse(safeGetStorage('wknd_promos_fallback', '[]'));
         let appliedPromoCode = '';
         let currentTicketBooking = null;
+        let pageShuffleSeed = Math.floor(Math.random() * 1000000) + 1;
+        let currentSortOrder = 'fair';
+
+        function getFairShuffleScore(itemId) {
+            let h = (Number(itemId) * 2654435761) ^ pageShuffleSeed;
+            h = Math.imul(h ^ (h >>> 16), 2246822507);
+            h = Math.imul(h ^ (h >>> 13), 3266489909);
+            return (h ^ (h >>> 16)) >>> 0;
+        }
+
+        function getItemSortPrice(item) {
+            if (!item) return 0;
+            if (item.category === 'transport') return Number(item.pricePerPerson || item.pricePerKm || 0);
+            if (item.category === 'field') return Number(item.hourlyRate || 0);
+            return Number(item.priceDay || item.priceNight || item.priceFull || 0);
+        }
 
         // جميع الفترات المحجوزة أو قيد المراجعة من الـ View العام:
         // [{ facilityId, date, hourFrom, hourTo, shiftType, status }]
         let busyIntervals = [];
+        let busyIntervalsLoaded = false;
         const tempHolds = new Map();
         let activeTempHoldKey = null;
 
@@ -1825,6 +1866,7 @@
                 } else {
                     busyIntervals = [];
                 }
+                busyIntervalsLoaded = true;
                 data.forEach(row => {
                     if (!row.facility_id) return;
                     if (row.booking_date && row.hour_from !== null && row.hour_from !== undefined && row.hour_to !== null && row.hour_to !== undefined) {
@@ -1953,6 +1995,7 @@
                 manageListingsTitle:'قائمة المنشآت الحالية (المزارع والشاليهات ووسائل النقل)', logoutBtn:'تسجيل الخروج',
                 filterAll:'الكل', filterFarms:'مزارع وشاليهات 🌴', filterFields:'ملاعب ⚽', filterTransport:'وسائل نقل وباصات 🚌', seasonFilterLabel:'الموسم والخصوصية:', seasonWinter:'❄️ شتوية', seasonSummer:'☀️ صيفية',
                 filterPrivatePool:'🔒 مسبح مستور (خصوصية تامة)', filterFamiliesOnly:'👨‍👩‍👧‍👦 عائلات فقط',
+                sortFair:'🔀 ترتيب متنوع وعادل', sortPriceAsc:'💰 الأقل سعراً أولاً', sortPriceDesc:'💎 الأعلى سعراً أولاً', sortRatingDesc:'⭐ الأعلى تقييماً',
                 btnDetails:'التفاصيل', btnBookNow:'ابدأ الحجز', badgeFarm:'مزرعة', badgeField:'ملعب', badgeTransport:'حافلة / باص'
             },
             en: {
@@ -1963,6 +2006,7 @@
                 manageListingsTitle:'Current Listings (Farms, Chalets & Transportation)', logoutBtn:'Log Out',
                 filterAll:'All', filterFarms:'Farms & Chalets 🌴', filterFields:'Sports Fields ⚽', filterTransport:'Transportation & Buses 🚌', seasonFilterLabel:'Season & Privacy:', seasonWinter:'❄️ Winter', seasonSummer:'☀️ Summer',
                 filterPrivatePool:'🔒 Private Screened Pool', filterFamiliesOnly:'👨‍👩‍👧‍👦 Families Only',
+                sortFair:'🔀 Fair Rotation', sortPriceAsc:'💰 Price: Low to High', sortPriceDesc:'💎 Price: High to Low', sortRatingDesc:'⭐ Highest Rated',
                 btnDetails:'Details', btnBookNow:'Book Now', badgeFarm:'Farm', badgeField:'Field', badgeTransport:'Bus'
             }
         };
@@ -2150,11 +2194,25 @@
             const seasonFilters = document.getElementById('season-filters');
             if (!seasonFilters) return;
             const visible = category !== 'transport';
-            seasonFilters.style.display = visible ? 'flex' : 'none';
+            seasonFilters.style.display = 'flex';
+            const labelEl = seasonFilters.querySelector('.season-filters-label');
+            if (labelEl) labelEl.style.display = visible ? 'inline' : 'none';
+            seasonFilters.querySelectorAll('.season-chip').forEach(b => {
+                b.style.display = visible ? 'inline-block' : 'none';
+            });
             if (!visible && selectedSeasons.size) {
                 selectedSeasons.clear();
                 document.querySelectorAll('.season-chip').forEach(b => b.classList.remove('active'));
             }
+        }
+
+        function reshuffleItems() {
+            pageShuffleSeed = Math.floor(Math.random() * 1000000) + 1;
+            currentSortOrder = 'fair';
+            const sortSel = document.getElementById('sort-order-select');
+            if (sortSel) sortSel.value = 'fair';
+            liveSearch();
+            showToast(currentLang === 'ar' ? '🔀 تم تقليب وتنويع ترتيب العرض!' : '🔀 Display order shuffled!');
         }
 
         function toggleSeasonFilter(season, button) {
@@ -2196,8 +2254,28 @@
                 container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);">${currentLang === 'ar' ? 'لا توجد منشآت مطابقة حالياً.' : 'No matching listings found.'}</div>`;
                 return;
             }
+
+            const sorted = [...filtered].sort((a, b) => {
+                if (currentSortOrder === 'price_asc') {
+                    return getItemSortPrice(a) - getItemSortPrice(b);
+                }
+                if (currentSortOrder === 'price_desc') {
+                    return getItemSortPrice(b) - getItemSortPrice(a);
+                }
+                if (currentSortOrder === 'rating_desc') {
+                    const rDiff = (Number(b.rating) || 5) - (Number(a.rating) || 5);
+                    if (rDiff !== 0) return rDiff;
+                    return getFairShuffleScore(a.id) - getFairShuffleScore(b.id);
+                }
+                // الوضع الافتراضي (fair): المنشآت المميزة أولاً (وتدور فيما بينها بعدالة)، ثم بقية المنشآت تدور بعدالة لكل زائر
+                const aFeat = Array.isArray(a.amenities) && a.amenities.includes('featured') ? 1 : 0;
+                const bFeat = Array.isArray(b.amenities) && b.amenities.includes('featured') ? 1 : 0;
+                if (aFeat !== bFeat) return bFeat - aFeat;
+                return getFairShuffleScore(a.id) - getFairShuffleScore(b.id);
+            });
+
             const frag = document.createDocumentFragment();
-            filtered.forEach(item => buildCard(item, frag));
+            sorted.forEach(item => buildCard(item, frag));
             container.appendChild(frag);
         }
 
@@ -2335,13 +2413,19 @@
                 ? `<span class="card-promo-ribbon">🔥 ${escapeHtml(activeAutoPromo.discountType === 'percent' ? `خصم ${activeAutoPromo.discountValue}%` : `خصم ${activeAutoPromo.discountValue} د.أ`)}</span>`
                 : '';
 
+            const isFeatured = amList.includes('featured');
+            const featuredRibbonHtml = isFeatured
+                ? `<span class="card-featured-ribbon">${currentLang==='ar'?'⭐ مميز':'⭐ Featured'}</span>`
+                : '';
+
             const card = document.createElement('div');
-            card.className = 'venue-card';
+            card.className = 'venue-card' + (isFeatured ? ' featured-card' : '');
             card.innerHTML = `
                 <div>
                     <div class="card-img-holder" tabindex="0" role="button" data-action="open-details" data-id="${item.id}">
                         <img src="${imgSrc}" alt="${name}" loading="lazy">
                         <span class="card-badge">${escapeHtml(badgeText)}</span>
+                        ${featuredRibbonHtml}
                         ${privacyRibbonHtml}
                         ${promoRibbonHtml}
                         <span class="card-rating-badge">${renderStars(item.rating)} ${ratingVal}</span>
@@ -3175,6 +3259,9 @@
                     clientName,
                     phone,
                     bookingDate,
+                    hourFrom: Number(result?.hour_from ?? checkHFrom ?? 0),
+                    hourTo: Number(result?.hour_to ?? checkHTo ?? 24),
+                    shiftType: result?.shift_type || (selectedItem.category === 'farm' ? selectedShiftType : null),
                     details: String(result?.details || ''),
                     promoCode: result?.promo_code || appliedPromoCode || null,
                     discountAmount: Number(result?.discount_amount || 0),
@@ -3436,7 +3523,7 @@
                 lng           = document.getElementById('adm-v-lng').value.trim();
                 cancelAr      = document.getElementById('adm-v-cancel').value.trim();
                 cancelEn      = document.getElementById('adm-v-cancel-en').value.trim();
-                amenities     = ['private_screened','families_only','youth_allowed','events_allowed','pool','bbq','wifi','heating','outdoor'].filter(a => document.getElementById(`adm-v-am-${a}`)?.checked);
+                amenities     = ['featured','private_screened','families_only','youth_allowed','events_allowed','pool','bbq','wifi','heating','outdoor'].filter(a => document.getElementById(`adm-v-am-${a}`)?.checked);
             } else {
                 category       = 'transport';
                 nameAr         = document.getElementById('adm-t-name').value.trim();
@@ -3461,7 +3548,7 @@
                 lng           = document.getElementById('adm-t-lng').value.trim();
                 cancelAr      = document.getElementById('adm-t-cancel').value.trim();
                 cancelEn      = document.getElementById('adm-t-cancel-en').value.trim();
-                amenities     = ['wifi','heating','outdoor'].filter(a => document.getElementById(`adm-t-am-${a}`).checked);
+                amenities     = ['featured','wifi','heating','outdoor'].filter(a => document.getElementById(`adm-t-am-${a}`)?.checked);
             }
 
             const uploadedExtras = formType === 'venue' ? venueExtraUploadedImages : transportExtraUploadedImages;
@@ -3587,7 +3674,7 @@
                 document.getElementById('adm-t-lng').value          = item.lng ?? '';
                 document.getElementById('adm-t-cancel').value       = item.cancelPolicyAr || '';
                 document.getElementById('adm-t-cancel-en').value    = item.cancelPolicyEn || '';
-                ['wifi','heating','outdoor'].forEach(a => {
+                ['featured','wifi','heating','outdoor'].forEach(a => {
                     const el = document.getElementById(`adm-t-am-${a}`);
                     if (el) el.checked = (item.amenities || []).includes(a);
                 });
@@ -3626,7 +3713,7 @@
                 document.getElementById('adm-v-lng').value          = item.lng ?? '';
                 document.getElementById('adm-v-cancel').value       = item.cancelPolicyAr || '';
                 document.getElementById('adm-v-cancel-en').value    = item.cancelPolicyEn || '';
-                ['private_screened','families_only','youth_allowed','events_allowed','pool','bbq','wifi','heating','outdoor'].forEach(a => {
+                ['featured','private_screened','families_only','youth_allowed','events_allowed','pool','bbq','wifi','heating','outdoor'].forEach(a => {
                     const el = document.getElementById(`adm-v-am-${a}`);
                     if (el) el.checked = (item.amenities || []).includes(a);
                 });
@@ -3749,6 +3836,7 @@
                                 <button type="button" class="icon-btn edit-btn" title="عرض تذكرة الحجز" data-action="open-admin-ticket" data-id="${b.id}">🎫</button>
                                 <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="icon-btn whatsapp" title="واتساب">💬</a>
                                 <button type="button" class="icon-btn danger" title="رفض الطلب (حفظ بالسجل)" data-action="reject-booking" data-id="${b.id}">✕</button>
+                                <button type="button" class="icon-btn danger" title="حذف الحجز وإلغاء تذكرة العميل نهائياً" data-action="delete-booking" data-id="${b.id}">🗑️</button>
                             </div>
                         </td>`;
                     tbodyPending.appendChild(tr);
@@ -3783,6 +3871,7 @@
                                 <button type="button" class="icon-btn edit-btn" title="عرض تذكرة الحجز" data-action="open-admin-ticket" data-id="${b.id}">🎫</button>
                                 <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="icon-btn whatsapp" title="واتساب">💬</a>
                                 <button type="button" class="icon-btn danger" title="إلغاء الحجز وتحرير الموعد" data-action="reject-booking" data-id="${b.id}">✕</button>
+                                <button type="button" class="icon-btn danger" title="حذف الحجز وإلغاء تذكرة العميل نهائياً" data-action="delete-booking" data-id="${b.id}">🗑️</button>
                             </div>
                         </td>`;
                     tbodyConfirmed.appendChild(tr);
@@ -3836,14 +3925,16 @@
                     else if (item.active) statusHtml = `<span class="badge-status active">نشط</span>`;
                     else statusHtml = `<span class="badge-status inactive">موقوف</span>`;
                     const typeLabel = item.category === 'transport' ? `🚌 نقل (${item.capacity || 23} راكب)` : '🏡 مزرعة/شاليه';
+                    const isFeat = (item.amenities || []).includes('featured');
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td><strong>${escapeHtml(itemName)}</strong></td>
+                        <td><strong>${escapeHtml(itemName)}</strong> ${isFeat ? '<span style="background:#FFF3CD;color:#B27517;padding:2px 7px;border-radius:10px;font-size:0.72rem;font-weight:700;">⭐ مميز</span>' : ''}</td>
                         <td>${escapeHtml(typeLabel)}</td>
                         <td>${escapeHtml(itemLoc)}</td>
                         <td>${statusHtml}</td>
                         <td>
                             <div class="action-menu-inline">
+                                <button type="button" class="icon-btn ${isFeat ? 'featured-on' : ''}" title="تثبيت / إلغاء تثبيت كمنشأة مميزة في المقدمة" data-action="toggle-featured" data-id="${item.id}">${isFeat ? '⭐' : '☆'}</button>
                                 <button type="button" class="icon-btn edit-btn" title="تعديل" data-action="edit-listing" data-id="${item.id}">✏️</button>
                                 <button type="button" class="icon-btn" title="تفعيل / إيقاف" data-action="toggle-active" data-id="${item.id}">🔄</button>
                                 <button type="button" class="icon-btn danger" title="حذف" data-action="delete-listing" data-id="${item.id}">🗑️</button>
@@ -3868,14 +3959,16 @@
                         if (item._editing) statusHtml = `<span class="badge-status editing">⏸️ قيد التعديل</span>`;
                         else if (item.active) statusHtml = `<span class="badge-status active">نشط</span>`;
                         else statusHtml = `<span class="badge-status inactive">موقوف</span>`;
+                        const isFeat = (item.amenities || []).includes('featured');
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
-                            <td><strong>${escapeHtml(itemName)}</strong></td>
+                            <td><strong>${escapeHtml(itemName)}</strong> ${isFeat ? '<span style="background:#FFF3CD;color:#B27517;padding:2px 7px;border-radius:10px;font-size:0.72rem;font-weight:700;">⭐ مميز</span>' : ''}</td>
                             <td>${escapeHtml(itemLoc)}</td>
                             <td><strong style="color:var(--primary-dark);">${Number(item.hourlyRate || 0).toFixed(1)} JOD/ساعة</strong></td>
                             <td>${statusHtml}</td>
                             <td>
                                 <div class="action-menu-inline">
+                                    <button type="button" class="icon-btn ${isFeat ? 'featured-on' : ''}" title="تثبيت / إلغاء تثبيت كملعب مميز في المقدمة" data-action="toggle-featured" data-id="${item.id}">${isFeat ? '⭐' : '☆'}</button>
                                     <button type="button" class="icon-btn edit-btn" title="تعديل" data-action="edit-listing" data-id="${item.id}">✏️</button>
                                     <button type="button" class="icon-btn" title="تفعيل / إيقاف" data-action="toggle-active" data-id="${item.id}">🔄</button>
                                     <button type="button" class="icon-btn danger" title="حذف" data-action="delete-listing" data-id="${item.id}">🗑️</button>
@@ -3914,6 +4007,7 @@
                                     ${isConfirmed ? '<span class="badge-status active">✅ مؤكد</span>' : `<button type="button" class="icon-btn approve" title="تأكيد" data-action="approve-booking" data-id="${b.id}">✓</button>`}
                                     <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="icon-btn whatsapp" title="واتساب">💬</a>
                                     <button type="button" class="icon-btn danger" title="رفض / إلغاء" data-action="reject-booking" data-id="${b.id}">✕</button>
+                                    <button type="button" class="icon-btn danger" title="حذف نهائي" data-action="delete-booking" data-id="${b.id}">🗑️</button>
                                 </div>
                             </td>`;
                         tbodyPitchesBookings.appendChild(tr);
@@ -3991,6 +4085,16 @@
             showToast('✅ تم تأكيد الحجز وتحديث حالة تذكرة العميل رسمياً');
         }
 
+        function removeLocalMyBooking(bookingId) {
+            try {
+                const list = JSON.parse(safeGetStorage('wknd_my_bookings', '[]'));
+                const filtered = list.filter(item => Number(item.id) !== Number(bookingId));
+                if (filtered.length !== list.length) {
+                    safeSetStorage('wknd_my_bookings', JSON.stringify(filtered));
+                }
+            } catch (e) {}
+        }
+
         async function rejectBooking(bookingId) {
             if (!db || !isAdminLoggedIn) return;
             const numId = Number(bookingId);
@@ -3999,10 +4103,10 @@
                 showToast('❌ تعذر رفض/إلغاء الحجز: ' + (error.message || ''));
                 return;
             }
-            updateLocalMyBookingStatus(numId, 'rejected');
+            removeLocalMyBooking(numId);
             await loadFromDatabase();
             renderAdminPanel();
-            showToast('تم رفض/إلغاء الحجز وتحرير الموعد مع حفظه في السجل');
+            showToast('تم إلغاء الحجز وإبطال تذكرة العميل وتحرير الموعد');
         }
 
         async function deleteBooking(bookingId) {
@@ -4013,9 +4117,28 @@
                 showToast('❌ تعذر حذف السجل: ' + (error.message || ''));
                 return;
             }
+            removeLocalMyBooking(numId);
             await loadFromDatabase();
             renderAdminPanel();
-            showToast('تم حذف السجل نهائياً');
+            showToast('🗑️ تم حذف الحجز نهائياً وإلغاء تذكرة العميل');
+        }
+
+        async function toggleItemFeatured(id) {
+            if (!db || !isAdminLoggedIn) return;
+            const item = items.find(i => i.id === Number(id));
+            if (!item) return;
+            const currentAm = Array.isArray(item.amenities) ? [...item.amenities] : [];
+            const isFeat = currentAm.includes('featured');
+            const nextAm = isFeat ? currentAm.filter(a => a !== 'featured') : ['featured', ...currentAm];
+            const { error } = await db.from('facilities').update({ amenities: nextAm }).eq('id', item.id);
+            if (error) {
+                showToast('❌ تعذر تحديث حالة تمييز المنشأة');
+                return;
+            }
+            item.amenities = nextAm;
+            renderAdminPanel();
+            liveSearch();
+            showToast(!isFeat ? '⭐ تم تثبيت المنشأة كمميزة في مقدمة العرض' : 'تم إلغاء تثبيت المنشأة كمميزة');
         }
 
         async function approveReview(reviewId) {
@@ -4339,8 +4462,51 @@
             return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalDim} ${totalDim}" width="92" height="92" aria-label="QR Code">${rects}</svg>`;
         }
 
+        // التحقق مما إذا كان موعد الحجز قد انتهى زمنياً بتوقيت الأردن (اليوم مضى أو ساعة انتهاء الحجز مضت)
+        function isTicketExpiredByTime(b) {
+            if (!b) return true;
+            const { dateStr: today, hour: nowHour } = getAmmanNow();
+            const bDate = String(b.bookingDate || b.booking_date || '').trim() ||
+                          ((String(b.details || '').match(/(\d{4}-\d{2}-\d{2})/) || [])[1] || '');
+            if (!bDate) return false;
+            if (bDate < today) return true;
+            if (bDate === today) {
+                let hTo = (b.hourTo !== null && b.hourTo !== undefined) ? Number(b.hourTo) :
+                          ((b.hour_to !== null && b.hour_to !== undefined) ? Number(b.hour_to) : null);
+                if (hTo === null || !Number.isFinite(hTo)) {
+                    const det = String(b.details || '');
+                    if (det.includes('(morning)')) hTo = 12;
+                    else {
+                        const pitchMatch = det.match(/(\d+) ساعة بدءاً من (\d+):00(ص|ظ|م)/);
+                        if (pitchMatch) {
+                            const hrs = parseInt(pitchMatch[1], 10);
+                            const stNum = parseInt(pitchMatch[2], 10);
+                            const suf = pitchMatch[3];
+                            const stH = suf === 'ص' ? stNum : (suf === 'ظ' ? 12 : stNum + 12);
+                            hTo = Math.min(24, stH + hrs);
+                        } else {
+                            hTo = 24;
+                        }
+                    }
+                }
+                if (nowHour >= hTo) return true;
+            }
+            return false;
+        }
+
         function openBookingTicketModal(b) {
             if (!b) return;
+            const status = resolveLiveBookingStatus(b);
+            b.status = status;
+
+            // إذا انتهى وقت الحجز أو قام الأدمن بحذفه/رفضه من الموقع، تنتهي التذكرة فوراً ولا تفتح كحجز فعال
+            if ((status === 'expired' || status === 'deleted' || status === 'rejected') && !isAdminLoggedIn) {
+                removeLocalMyBooking(b.id);
+                closeModal('ticket-modal');
+                showToast('⌛ انتهت صلاحية هذه التذكرة لانتهاء موعد الحجز أو إلغائه من الإدارة');
+                return;
+            }
+
             currentTicketBooking = b;
             const fac = items.find(i => i.id === Number(b.facilityId || b.itemId));
             const ticketCode = `WKND-${b.id}`;
@@ -4356,13 +4522,11 @@
             const deposit = Number(b.deposit || 0);
             const discount = Number(b.discountAmount || 0);
             const remaining = Math.max(0, Number((total - deposit).toFixed(2)));
-            const status = resolveLiveBookingStatus(b);
-            b.status = status;
             let statusBadgeHtml = '<span style="background:#FFF3CD;color:#8A5E00;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:700;">⏳ بانتظار تأكيد الإدارة</span>';
             if (status === 'confirmed') {
                 statusBadgeHtml = '<span style="background:#E8F5E9;color:#2E7D32;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:700;">✅ حجز مؤكد رسمياً</span>';
-            } else if (status === 'rejected' || status === 'expired') {
-                statusBadgeHtml = '<span style="background:#FFEBEE;color:#D32F2F;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:700;">❌ ملغى / منتهي</span>';
+            } else if (status === 'rejected' || status === 'expired' || status === 'deleted') {
+                statusBadgeHtml = '<span style="background:#FFEBEE;color:#D32F2F;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:700;">❌ منتهية الصلاحية / ملغاة</span>';
             }
 
             const qrSvg = buildQrSvg(`${ticketCode}|${b.phone}|${total}`);
@@ -4400,7 +4564,7 @@
                         </div>
                     </div>
                     <div class="ticket-footer">
-                        <span>📌 أبرِز هذه التذكرة عند الوصول للمنشأة</span>
+                        <span>📌 تنتهي صلاحية هذه التذكرة تلقائياً بانتهاء موعد الحجز</span>
                         <a href="${escapeHtml(mapsHref)}" target="_blank" rel="noopener noreferrer" style="color:var(--primary-dark);font-weight:700;text-decoration:underline;">🗺️ فتح الموقع على Google Maps</a>
                     </div>
                 </div>`;
@@ -4448,26 +4612,38 @@
         }
 
         // =====================================================
-        //  FEATURE 4: TRACK MY BOOKING (CUSTOMER SELF-SERVICE + LIVE DB SYNC)
+        //  FEATURE 4: TRACK MY BOOKING (AUTO-EXPIRY ON BOOKING END OR ADMIN DELETION)
         // =====================================================
         function resolveLiveBookingStatus(b) {
-            if (!b) return 'pending';
+            if (!b) return 'expired';
+
+            // 1) إذا انتهى وقت الحجز زمنياً بتوقيت الأردن، تنتهي التذكرة فوراً
+            if (isTicketExpiredByTime(b)) {
+                return 'expired';
+            }
+
             const numId = Number(b.id);
             const facId = Number(b.facilityId || b.itemId || b.facility_id);
             const bDate = String(b.bookingDate || b.booking_date || '').trim() ||
                           ((String(b.details || '').match(/(\d{4}-\d{2}-\d{2})/) || [])[1] || '');
             const bDetails = String(b.details || '').trim();
 
-            // 1) إذا كانت بيانات الأدمن محمّلة في المتصفح، نتحقق منها مباشرةً
-            if (confirmedBookings.some(x => Number(x.id) === numId || (facId && Number(x.itemId) === facId && x.bookingDate === bDate && x.details === bDetails))) {
-                return 'confirmed';
+            // 2) إذا كان الأدمن مسجلاً الدخول على نفس المتصفح، نتحقق مباشرةً من قوائم الأدمن
+            if (isAdminLoggedIn) {
+                if (confirmedBookings.some(x => Number(x.id) === numId || (facId && Number(x.itemId) === facId && x.bookingDate === bDate && x.details === bDetails))) {
+                    return 'confirmed';
+                }
+                if (pendingBookings.some(x => Number(x.id) === numId || (facId && Number(x.itemId) === facId && x.bookingDate === bDate && x.details === bDetails))) {
+                    return 'pending';
+                }
+                const archMatch = archivedBookings.find(x => Number(x.id) === numId);
+                if (archMatch) return archMatch.status || 'rejected';
+                // إذا لم يكن في المؤكدة ولا المعلقة ولا الأرشيف، فهذا يعني أن الأدمن حذفه نهائياً
+                return 'deleted';
             }
-            const archMatch = archivedBookings.find(x => Number(x.id) === numId || (facId && Number(x.itemId) === facId && x.bookingDate === bDate && x.details === bDetails));
-            if (archMatch) return archMatch.status || 'rejected';
-            if (pendingBookings.some(x => Number(x.id) === numId)) return 'pending';
 
-            // 2) التحقق من جدول المواعيد العام المباشر من السيرفر (public_confirmed_slots / busyIntervals)
-            if (facId && bDate && Array.isArray(busyIntervals)) {
+            // 3) للزبون العام: التحقق من جدول المواعيد العام المباشر من السيرفر (public_confirmed_slots / busyIntervals)
+            if (facId && bDate && busyIntervalsLoaded) {
                 const slotMatches = busyIntervals.filter(s => Number(s.facilityId) === facId && String(s.date) === bDate);
                 if (slotMatches.some(s => s.status === 'confirmed')) {
                     return 'confirmed';
@@ -4475,10 +4651,10 @@
                 if (slotMatches.some(s => s.status === 'pending')) {
                     return 'pending';
                 }
-                // إذا لم يعد الموعد موجوداً في المواعيد المحجوزة أو المعلقة بعد مرور 15 ثانية على إنشائه، فهذا يعني أنه رُفض أو أُلغي
+                // إذا تم تحميل المواعيد من السيرفر ولم يعد هذا الموعد موجوداً فيها إطلاقاً، فهذا يعني أن الأدمن حذفه أو ألغاه
                 const createdMs = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-                if (busyIntervals.length > 0 && slotMatches.length === 0 && (!createdMs || (Date.now() - createdMs > 15000))) {
-                    return 'rejected';
+                if (slotMatches.length === 0 && (!createdMs || (Date.now() - createdMs > 10000))) {
+                    return 'deleted';
                 }
             }
 
@@ -4490,14 +4666,14 @@
             const savedList = JSON.parse(safeGetStorage('wknd_my_bookings', '[]'));
             const targetPhone = normalizePhone(phoneFilter || (savedList[0] ? savedList[0].phone : ''));
 
-            let serverResults = [];
+            let serverResults = null;
             if (db && targetPhone && isValidPhone(targetPhone)) {
                 try {
                     const { data, error } = await db.rpc('track_my_bookings', {
                         p_phone: targetPhone,
                         p_booking_id: idFilter
                     });
-                    if (!error && Array.isArray(data) && data.length > 0) {
+                    if (!error && Array.isArray(data)) {
                         serverResults = data.map(r => ({
                             id: Number(r.id),
                             facilityId: Number(r.facility_id),
@@ -4509,33 +4685,43 @@
                             clientName: r.client_name,
                             phone: r.phone,
                             bookingDate: r.booking_date,
+                            hourFrom: r.hour_from !== null && r.hour_from !== undefined ? Number(r.hour_from) : 0,
+                            hourTo: r.hour_to !== null && r.hour_to !== undefined ? Number(r.hour_to) : 24,
+                            shiftType: r.shift_type || null,
                             details: r.details,
                             promoCode: r.promo_code,
                             discountAmount: Number(r.discount_amount || 0),
                             total: Number(r.total || 0),
                             deposit: Number(r.deposit || 0),
                             status: r.status || 'pending'
-                        }));
+                        })).filter(item => !isTicketExpiredByTime(item) && (item.status === 'pending' || item.status === 'confirmed'));
                     }
                 } catch (e) {}
             }
 
-            // تحديث الحجوزات المحفوظة محلياً بأحدث حالة حقيقية من السيرفر
-            if (savedList.length > 0) {
-                savedList.forEach(localItem => {
+            // تنظيف الذاكرة المحلية: حذف أي تذكرة انتهى وقت حجزها أو تم حذفها/إلغاؤها من الموقع
+            const activeLocalList = [];
+            savedList.forEach(localItem => {
+                if (serverResults !== null && (!targetPhone || normalizePhone(localItem.phone).slice(-9) === targetPhone.slice(-9))) {
                     const srv = serverResults.find(s => Number(s.id) === Number(localItem.id));
                     if (srv) {
                         localItem.status = srv.status;
-                    } else {
-                        localItem.status = resolveLiveBookingStatus(localItem);
+                        activeLocalList.push(localItem);
                     }
-                });
-                safeSetStorage('wknd_my_bookings', JSON.stringify(savedList));
-            }
+                    // إذا لم يعد موجوداً في نتائج السيرفر لنفس الرقم، فهذا يعني أنه حُذف أو انتهى فلا نبقيه
+                } else {
+                    const liveSt = resolveLiveBookingStatus(localItem);
+                    if (liveSt === 'confirmed' || liveSt === 'pending') {
+                        localItem.status = liveSt;
+                        activeLocalList.push(localItem);
+                    }
+                }
+            });
+            safeSetStorage('wknd_my_bookings', JSON.stringify(activeLocalList));
 
-            if (serverResults.length > 0) return serverResults;
+            if (serverResults !== null && serverResults.length > 0) return serverResults;
 
-            return savedList.filter(b => {
+            return activeLocalList.filter(b => {
                 const pMatch = !targetPhone || normalizePhone(b.phone).slice(-9) === targetPhone.slice(-9);
                 const idMatch = !idFilter || Number(b.id) === Number(idFilter);
                 return pMatch && idMatch;
@@ -4550,25 +4736,27 @@
                 phoneInp.value = savedList[0].phone || '';
             }
             const currentPhone = phoneInp ? phoneInp.value.trim() : '';
-            if (currentPhone || savedList.length > 0) {
-                const synced = await syncLocalBookingsWithDatabase(currentPhone, null);
-                renderTrackBookingResults(synced);
-            }
+            const synced = await syncLocalBookingsWithDatabase(currentPhone, null);
+            renderTrackBookingResults(synced);
         }
 
         function renderTrackBookingResults(list) {
             const container = document.getElementById('track-results-container');
             if (!container) return;
-            if (!Array.isArray(list) || list.length === 0) {
-                container.innerHTML = `<div style="text-align:center;padding:1.5rem;color:var(--text-muted);background:#FAFBFB;border-radius:12px;">لا توجد حجوزات مطابقة لرقم الهاتف المدخل.</div>`;
+            const validList = (Array.isArray(list) ? list : []).filter(b => {
+                const st = resolveLiveBookingStatus(b);
+                b.status = st;
+                return st === 'confirmed' || st === 'pending';
+            });
+            if (validList.length === 0) {
+                container.innerHTML = `<div style="text-align:center;padding:1.5rem;color:var(--text-muted);background:#FAFBFB;border-radius:12px;">لا توجد تذاكر حجز نشطة حالياً لهذا الرقم.<br><small style="color:#888;">(ملاحظة: تنتهي صلاحية التذكرة تلقائياً فور انتهاء موعد الحجز أو في حال إلغاء/حذف الحجز من الإدارة)</small></div>`;
+                container._lastResults = [];
                 return;
             }
-            container.innerHTML = list.map((b, idx) => {
-                const status = resolveLiveBookingStatus(b);
-                b.status = status;
-                let badge = '<span class="badge-status editing">⏳ قيد المراجعة</span>';
-                if (status === 'confirmed') badge = '<span class="badge-status active">✅ مؤكد رسمياً</span>';
-                else if (status === 'rejected' || status === 'expired') badge = '<span class="badge-status inactive">❌ مرفوض / منتهي</span>';
+            container.innerHTML = validList.map((b, idx) => {
+                const badge = b.status === 'confirmed'
+                    ? '<span class="badge-status active">✅ مؤكد رسمياً</span>'
+                    : '<span class="badge-status editing">⏳ قيد المراجعة</span>';
                 const vName = (currentLang === 'ar' ? b.itemNameAr : b.itemNameEn) || b.item_name_ar || 'منشأة';
                 return `
                     <div class="track-result-card">
@@ -4583,7 +4771,7 @@
                         <button type="button" class="btn-action" data-action="open-tracked-ticket" data-idx="${idx}" style="font-size:0.82rem;padding:0.45rem 0.9rem;">🎫 عرض التذكرة</button>
                     </div>`;
             }).join('');
-            container._lastResults = list;
+            container._lastResults = validList;
         }
 
         async function handleTrackBookingSubmit(e) {
@@ -5007,6 +5195,10 @@
                 searchDebounceTimer = setTimeout(liveSearch, 100);
             });
             document.getElementById('search-category').addEventListener('change', liveSearch);
+            document.getElementById('sort-order-select').addEventListener('change', function() {
+                currentSortOrder = this.value || 'fair';
+                liveSearch();
+            });
             document.getElementById('adm-v-type').addEventListener('change', toggleVenueTypePricing);
             document.getElementById('adm-v-img-file').addEventListener('change', function() { handleAdminImageUpload(this, 'venue'); });
             document.getElementById('adm-v-extra-files').addEventListener('change', function() { handleAdminExtraImagesUpload(this, 'venue'); });
@@ -5113,6 +5305,10 @@
                     deleteBooking(Number(el.dataset.id));
                 } else if (action === 'edit-listing') {
                     editListing(Number(el.dataset.id));
+                } else if (action === 'toggle-featured') {
+                    toggleItemFeatured(Number(el.dataset.id));
+                } else if (action === 'reshuffle-items') {
+                    reshuffleItems();
                 } else if (action === 'toggle-active') {
                     toggleItemActive(Number(el.dataset.id));
                 } else if (action === 'delete-listing') {
@@ -5191,6 +5387,7 @@
             if (bdt) bdt.min = today;
 
             await loadFromDatabase();
+            await syncLocalBookingsWithDatabase('', null);
             liveSearch();
             updateFavBadge();
 
