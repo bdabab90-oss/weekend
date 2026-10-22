@@ -757,9 +757,19 @@
                                     </div>
                                 </details>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group" style="flex:1;"><label>خط العرض Latitude</label><input type="number" step="any" min="-90" max="90" class="form-control" id="adm-v-lat" placeholder="31.9000"></div>
-                                <div class="form-group" style="flex:1;"><label>خط الطول Longitude</label><input type="number" step="any" min="-180" max="180" class="form-control" id="adm-v-lng" placeholder="35.8500"></div>
+                            <div class="media-upload-box" style="background:#EFF8FF;border-color:#90CAF9;">
+                                <div class="media-upload-box-title" style="color:#0D47A1;">📍 موقع المنشأة على الخريطة التفاعلية والتذكرة (Google Maps)</div>
+                                <div class="media-upload-box-sub">الصق رابط اللوكيشن من خرائط Google (أو اضغط مباشرة على الخريطة بالأسفل لتثبيت الدبوس على موقع المزرعة)، وسيظهر الموقع على الخريطة التفاعلية وداخل تذكرة الحجز تلقائياً:</div>
+                                <div class="form-group" style="margin-bottom:0.7rem;">
+                                    <label for="adm-v-map-url" style="color:#0D47A1;">🔗 رابط اللوكيشن من خرائط Google (أو الإحداثيات)</label>
+                                    <input type="text" class="form-control" id="adm-v-map-url" placeholder="الصق رابط Google Maps هنا (مثال: https://www.google.com/maps?... أو https://maps.app.goo.gl/...)" style="direction:ltr;">
+                                    <small id="adm-v-map-status" style="display:block;margin-top:4px;font-size:0.8rem;font-weight:600;color:var(--text-muted);"></small>
+                                </div>
+                                <div id="adm-v-map-picker" style="height:210px;border-radius:12px;border:1.5px solid #90CAF9;margin-bottom:0.7rem;background:#E3F2FD;"></div>
+                                <div class="form-row" style="margin-bottom:0;">
+                                    <div class="form-group" style="flex:1;margin-bottom:0;"><label>خط العرض Latitude (يُملأ تلقائياً)</label><input type="number" step="any" min="-90" max="90" class="form-control" id="adm-v-lat" placeholder="31.9000"></div>
+                                    <div class="form-group" style="flex:1;margin-bottom:0;"><label>خط الطول Longitude (يُملأ تلقائياً)</label><input type="number" step="any" min="-180" max="180" class="form-control" id="adm-v-lng" placeholder="35.8500"></div>
+                                </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group" style="flex:1;"><label>سياسة الإلغاء والاسترداد (عربي)</label><textarea class="form-control" id="adm-v-cancel" rows="2" maxlength="1200" placeholder="إلغاء مجاني قبل 48 ساعة..."></textarea></div>
@@ -850,9 +860,17 @@
                                     </div>
                                 </details>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group" style="flex:1;"><label>خط العرض Latitude</label><input type="number" step="any" min="-90" max="90" class="form-control" id="adm-t-lat" placeholder="31.9510"></div>
-                                <div class="form-group" style="flex:1;"><label>خط الطول Longitude</label><input type="number" step="any" min="-180" max="180" class="form-control" id="adm-t-lng" placeholder="35.9270"></div>
+                            <div class="media-upload-box" style="background:#EFF8FF;border-color:#90CAF9;">
+                                <div class="media-upload-box-title" style="color:#0D47A1;">📍 رابط موقع التجمع / المكتب على الخريطة (اختياري)</div>
+                                <div class="form-group" style="margin-bottom:0.7rem;">
+                                    <label for="adm-t-map-url" style="color:#0D47A1;">🔗 رابط اللوكيشن من خرائط Google</label>
+                                    <input type="text" class="form-control" id="adm-t-map-url" placeholder="الصق رابط Google Maps هنا..." style="direction:ltr;">
+                                    <small id="adm-t-map-status" style="display:block;margin-top:4px;font-size:0.8rem;font-weight:600;color:var(--text-muted);"></small>
+                                </div>
+                                <div class="form-row" style="margin-bottom:0;">
+                                    <div class="form-group" style="flex:1;margin-bottom:0;"><label>خط العرض Latitude</label><input type="number" step="any" min="-90" max="90" class="form-control" id="adm-t-lat" placeholder="31.9510"></div>
+                                    <div class="form-group" style="flex:1;margin-bottom:0;"><label>خط الطول Longitude</label><input type="number" step="any" min="-180" max="180" class="form-control" id="adm-t-lng" placeholder="35.9270"></div>
+                                </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group" style="flex:1;"><label>سياسة الإلغاء والاسترداد (عربي)</label><textarea class="form-control" id="adm-t-cancel" rows="2" maxlength="1200" placeholder="إلغاء مجاني قبل 48 ساعة..."></textarea></div>
@@ -1569,6 +1587,57 @@
             return true;
         }
 
+        function parseCoordsFromGoogleMapsInput(raw) {
+            const s = String(raw || '').trim();
+            if (!s) return null;
+            let decoded = s;
+            try { decoded = decodeURIComponent(s); } catch (e) {}
+
+            // 1) !3dLAT!4dLNG (إحداثيات الدبوس الدقيقة داخل روابط Google Maps)
+            let m = decoded.match(/!3d(-?\d{1,2}\.\d+)!4d(-?\d{1,3}\.\d+)/);
+            if (m) {
+                const lat = parseFloat(m[1]), lng = parseFloat(m[2]);
+                if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) return { lat, lng };
+            }
+            // 2) @LAT,LNG
+            m = decoded.match(/@(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)/);
+            if (m) {
+                const lat = parseFloat(m[1]), lng = parseFloat(m[2]);
+                if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) return { lat, lng };
+            }
+            // 3) ?q=LAT,LNG or &ll=LAT,LNG or query=LAT,LNG or center=LAT,LNG
+            m = decoded.match(/[?&](?:q|ll|query|center|daddr|saddr)=(?:loc:)?(-?\d{1,2}\.\d+)\s*[,+]\s*\+?(-?\d{1,3}\.\d+)/i);
+            if (m) {
+                const lat = parseFloat(m[1]), lng = parseFloat(m[2]);
+                if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) return { lat, lng };
+            }
+            // 4) /search/LAT,LNG or /place/LAT,LNG
+            m = decoded.match(/\/(?:search|place|dir)\/(-?\d{1,2}\.\d+)\s*[,+]\s*\+?(-?\d{1,3}\.\d+)/i);
+            if (m) {
+                const lat = parseFloat(m[1]), lng = parseFloat(m[2]);
+                if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) return { lat, lng };
+            }
+            // 5) إحداثيات مباشرة مثل: 31.8542, 35.8123
+            m = decoded.match(/(?:^|[^0-9.-])(-?\d{1,2}\.\d{3,})\s*,\s*\+?(-?\d{1,3}\.\d{3,})(?:$|[^0-9.])/);
+            if (m) {
+                const lat = parseFloat(m[1]), lng = parseFloat(m[2]);
+                if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) return { lat, lng };
+            }
+            return null;
+        }
+
+        function inferRegionCoords(locationText) {
+            const loc = String(locationText || '').toLowerCase();
+            if (loc.includes('الميت') || loc.includes('dead sea')) return { lat: 31.7190, lng: 35.5870 };
+            if (loc.includes('جرش') || loc.includes('jerash')) return { lat: 32.2746, lng: 35.8914 };
+            if (loc.includes('عجلون') || loc.includes('ajloun')) return { lat: 32.3327, lng: 35.7518 };
+            if (loc.includes('الأغوار') || loc.includes('الاغوار') || loc.includes('غور') || loc.includes('الشونة')) return { lat: 31.9020, lng: 35.5780 };
+            if (loc.includes('السلط') || loc.includes('سلط') || loc.includes('salt')) return { lat: 32.0392, lng: 35.7272 };
+            if (loc.includes('مادبا') || loc.includes('مأدبا') || loc.includes('madaba')) return { lat: 31.7160, lng: 35.7930 };
+            if (loc.includes('المطار') || loc.includes('مطار') || loc.includes('airport')) return { lat: 31.8350, lng: 35.8900 };
+            return { lat: 31.9539, lng: 35.9106 };
+        }
+
         function buildSafeMapsHref(loc) {
             const s = String(loc || '').trim();
             if (/^https:\/\/(www\.google\.com\/maps|maps\.google\.com|maps\.app\.goo\.gl|goo\.gl\/maps)[^\s<>"]*$/i.test(s)) {
@@ -1709,6 +1778,16 @@
         // ─── تحويل بين صفوف قاعدة البيانات والأوبجكت في المتصفح مع حماية كاملة من القيم الفارغة (null) ───
         function rowToItem(r) {
             const safeImgs = Array.isArray(r.images) ? r.images.map(sanitizeImageUrl).filter(Boolean) : [];
+            const rawAm = Array.isArray(r.amenities) ? r.amenities : [];
+            const mapAmEntry = rawAm.find(a => typeof a === 'string' && a.startsWith('mapurl:'));
+            const cleanAm = rawAm.filter(a => typeof a === 'string' && !a.startsWith('mapurl:'));
+            const savedMapUrl = (r.map_url ? String(r.map_url).trim() : '') || (mapAmEntry ? mapAmEntry.slice(7).trim() : '');
+            let latVal = r.lat !== null && r.lat !== undefined ? Number(r.lat) : null;
+            let lngVal = r.lng !== null && r.lng !== undefined ? Number(r.lng) : null;
+            if ((latVal === null || lngVal === null) && savedMapUrl) {
+                const parsed = parseCoordsFromGoogleMapsInput(savedMapUrl);
+                if (parsed) { latVal = parsed.lat; lngVal = parsed.lng; }
+            }
             return {
                 id: Number(r.id),
                 category: r.category || 'farm',
@@ -1727,11 +1806,12 @@
                 specsEn: r.specs_en || '',
                 images: safeImgs.length ? safeImgs : ['https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80'],
                 videoUrl: sanitizeVideoUrl(r.video_url),
-                lat: r.lat !== null && r.lat !== undefined ? Number(r.lat) : null,
-                lng: r.lng !== null && r.lng !== undefined ? Number(r.lng) : null,
+                lat: latVal,
+                lng: lngVal,
+                mapUrl: savedMapUrl,
                 cancelPolicyAr: r.cancel_policy_ar || '',
                 cancelPolicyEn: r.cancel_policy_en || '',
-                amenities: Array.isArray(r.amenities) ? r.amenities : [],
+                amenities: cleanAm,
                 seasons: Array.isArray(r.seasons) && r.seasons.length ? r.seasons : ['summer', 'winter'],
                 rating: Number(r.rating) || 5.0,
                 active: r.active !== false,
@@ -1740,6 +1820,11 @@
         }
 
         function itemToRow(it) {
+            const cleanAm = Array.isArray(it.amenities) ? it.amenities.filter(a => typeof a === 'string' && !a.startsWith('mapurl:')) : [];
+            const mapUrlClean = String(it.mapUrl || '').trim();
+            if (mapUrlClean && /^https:\/\//i.test(mapUrlClean)) {
+                cleanAm.push('mapurl:' + mapUrlClean);
+            }
             const row = {
                 category: it.category,
                 name_ar: String(it.nameAr || '').trim(),
@@ -1761,7 +1846,7 @@
                 lng: (it.lng !== null && it.lng !== '' && Number.isFinite(Number(it.lng))) ? Number(it.lng) : null,
                 cancel_policy_ar: String(it.cancelPolicyAr || '').trim() || null,
                 cancel_policy_en: String(it.cancelPolicyEn || '').trim() || null,
-                amenities: Array.isArray(it.amenities) ? it.amenities : [],
+                amenities: cleanAm,
                 seasons: Array.isArray(it.seasons) && it.seasons.length ? it.seasons : ['summer', 'winter'],
                 rating: Number(it.rating) || 5.0,
                 active: Boolean(it.active)
@@ -2694,19 +2779,35 @@
                 policyBox.style.display = 'none';
             }
 
-            // Map (Safe DOM Node in bindPopup to prevent XSS)
+            // Map (Safe DOM Node in bindPopup to prevent XSS + supports direct Google Maps link & interactive map)
             const mapSec = document.getElementById('det-map-section');
-            if (selectedItem.lat !== null && selectedItem.lng !== null && Number.isFinite(selectedItem.lat) && Number.isFinite(selectedItem.lng)) {
+            let effLat = (selectedItem.lat !== null && selectedItem.lat !== undefined && Number.isFinite(Number(selectedItem.lat))) ? Number(selectedItem.lat) : null;
+            let effLng = (selectedItem.lng !== null && selectedItem.lng !== undefined && Number.isFinite(Number(selectedItem.lng))) ? Number(selectedItem.lng) : null;
+            if ((effLat === null || effLng === null) && selectedItem.mapUrl) {
+                const parsed = parseCoordsFromGoogleMapsInput(selectedItem.mapUrl);
+                if (parsed) {
+                    effLat = parsed.lat;
+                    effLng = parsed.lng;
+                } else {
+                    const reg = inferRegionCoords(selectedItem.locationAr);
+                    effLat = reg.lat;
+                    effLng = reg.lng;
+                }
+            }
+            if (effLat !== null && effLng !== null) {
                 mapSec.style.display = 'block';
-                document.getElementById('det-map-link').href = `https://www.google.com/maps?q=${encodeURIComponent(selectedItem.lat)},${encodeURIComponent(selectedItem.lng)}`;
+                const directMapLink = (selectedItem.mapUrl && /^https:\/\//i.test(selectedItem.mapUrl))
+                    ? selectedItem.mapUrl
+                    : `https://www.google.com/maps?q=${encodeURIComponent(effLat)},${encodeURIComponent(effLng)}`;
+                document.getElementById('det-map-link').href = directMapLink;
                 setTimeout(() => {
                     if (!window.L) return;
                     if (detailsMap) { detailsMap.remove(); detailsMap = null; }
-                    detailsMap = L.map('det-map').setView([selectedItem.lat, selectedItem.lng], 15);
+                    detailsMap = L.map('det-map').setView([effLat, effLng], 15);
                     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 19, attribution: '© OpenStreetMap © CARTO' }).addTo(detailsMap);
                     const popupStrong = document.createElement('strong');
                     popupStrong.textContent = name;
-                    L.marker([selectedItem.lat, selectedItem.lng]).addTo(detailsMap).bindPopup(popupStrong).openPopup();
+                    L.marker([effLat, effLng]).addTo(detailsMap).bindPopup(popupStrong).openPopup();
                 }, 150);
             } else {
                 mapSec.style.display = 'none';
@@ -3432,6 +3533,7 @@
                     locationAr: bookedItem.locationAr,
                     lat: bookedItem.lat,
                     lng: bookedItem.lng,
+                    mapUrl: bookedItem.mapUrl || '',
                     clientName,
                     phone,
                     bookingDate,
@@ -3662,7 +3764,7 @@
                 showToast('⏳ يرجى الانتظار ثواني حتى يكتمل رفع الصور أو الفيديو أولاً');
                 return;
             }
-            let category, nameAr, nameEn, locationAr, locationEn, specsAr, specsEn, imgStore, imgUrl, extraImgs, videoStore, videoUrlInput, lat, lng, cancelAr, cancelEn, amenities, seasons = ['summer', 'winter'];
+            let category, nameAr, nameEn, locationAr, locationEn, specsAr, specsEn, imgStore, imgUrl, extraImgs, videoStore, videoUrlInput, mapUrlInput, lat, lng, cancelAr, cancelEn, amenities, seasons = ['summer', 'winter'];
             let priceDay = null, priceNight = null, priceFull = null, pricePerKm = null, pricePerPerson = null, hourlyRate = null, capacity = null;
 
             if (formType === 'venue') {
@@ -3698,6 +3800,7 @@
                 extraImgs     = document.getElementById('adm-v-extra-imgs').value;
                 videoStore    = document.getElementById('venue-video-store').value.trim();
                 videoUrlInput = document.getElementById('adm-v-video-url').value.trim();
+                mapUrlInput   = (document.getElementById('adm-v-map-url')?.value || '').trim();
                 lat           = document.getElementById('adm-v-lat').value.trim();
                 lng           = document.getElementById('adm-v-lng').value.trim();
                 cancelAr      = document.getElementById('adm-v-cancel').value.trim();
@@ -3723,6 +3826,7 @@
                 extraImgs     = document.getElementById('adm-t-extra-imgs').value;
                 videoStore    = document.getElementById('transport-video-store').value.trim();
                 videoUrlInput = document.getElementById('adm-t-video-url').value.trim();
+                mapUrlInput   = (document.getElementById('adm-t-map-url')?.value || '').trim();
                 lat           = document.getElementById('adm-t-lat').value.trim();
                 lng           = document.getElementById('adm-t-lng').value.trim();
                 cancelAr      = document.getElementById('adm-t-cancel').value.trim();
@@ -3742,6 +3846,30 @@
                 ? parseInt(document.getElementById('adm-v-editing-id').value, 10)
                 : parseInt(document.getElementById('adm-t-editing-id').value, 10);
 
+            let parsedLat = lat !== '' ? parseFloat(lat) : null;
+            let parsedLng = lng !== '' ? parseFloat(lng) : null;
+            let finalMapUrl = '';
+            if (mapUrlInput) {
+                const coordsFromLink = parseCoordsFromGoogleMapsInput(mapUrlInput);
+                if (coordsFromLink && (parsedLat === null || parsedLng === null || !Number.isFinite(parsedLat) || !Number.isFinite(parsedLng))) {
+                    parsedLat = coordsFromLink.lat;
+                    parsedLng = coordsFromLink.lng;
+                }
+                if (/^https:\/\//i.test(mapUrlInput)) {
+                    finalMapUrl = mapUrlInput;
+                } else if (parsedLat !== null && parsedLng !== null) {
+                    finalMapUrl = `https://www.google.com/maps?q=${parsedLat},${parsedLng}`;
+                }
+                // إذا كان الرابط مختصراً (مثل maps.app.goo.gl) ولم تُحدد الإحداثيات يدوياً، نضع إحداثيات المنطقة لتعمل الخريطة التفاعلية دائماً
+                if ((parsedLat === null || parsedLng === null) && finalMapUrl) {
+                    const regCoords = inferRegionCoords(locationAr);
+                    parsedLat = regCoords.lat;
+                    parsedLng = regCoords.lng;
+                }
+            } else if (parsedLat !== null && parsedLng !== null && Number.isFinite(parsedLat) && Number.isFinite(parsedLng)) {
+                finalMapUrl = `https://www.google.com/maps?q=${parsedLat},${parsedLng}`;
+            }
+
             const payloadObj = {
                 category,
                 nameAr, nameEn,
@@ -3752,8 +3880,9 @@
                 specsAr, specsEn,
                 images: allImages,
                 videoUrl: finalVideoUrl,
-                lat: lat !== '' ? parseFloat(lat) : null,
-                lng: lng !== '' ? parseFloat(lng) : null,
+                lat: parsedLat,
+                lng: parsedLng,
+                mapUrl: finalMapUrl,
                 cancelPolicyAr: cancelAr,
                 cancelPolicyEn: cancelEn,
                 amenities: amenities || [],
@@ -3851,6 +3980,9 @@
                 renderAdminMediaPreviews('transport');
                 document.getElementById('adm-t-lat').value          = item.lat ?? '';
                 document.getElementById('adm-t-lng').value          = item.lng ?? '';
+                if (document.getElementById('adm-t-map-url')) {
+                    document.getElementById('adm-t-map-url').value = item.mapUrl || ((item.lat !== null && item.lng !== null) ? `https://www.google.com/maps?q=${item.lat},${item.lng}` : '');
+                }
                 document.getElementById('adm-t-cancel').value       = item.cancelPolicyAr || '';
                 document.getElementById('adm-t-cancel-en').value    = item.cancelPolicyEn || '';
                 ['featured','wifi','heating','outdoor'].forEach(a => {
@@ -3890,6 +4022,10 @@
                 renderAdminMediaPreviews('venue');
                 document.getElementById('adm-v-lat').value          = item.lat ?? '';
                 document.getElementById('adm-v-lng').value          = item.lng ?? '';
+                if (document.getElementById('adm-v-map-url')) {
+                    document.getElementById('adm-v-map-url').value = item.mapUrl || ((item.lat !== null && item.lng !== null) ? `https://www.google.com/maps?q=${item.lat},${item.lng}` : '');
+                }
+                setTimeout(() => initOrUpdateAdminMapPicker(), 120);
                 document.getElementById('adm-v-cancel').value       = item.cancelPolicyAr || '';
                 document.getElementById('adm-v-cancel-en').value    = item.cancelPolicyEn || '';
                 ['featured','private_screened','families_only','youth_allowed','events_allowed','pool','bbq','wifi','heating','outdoor'].forEach(a => {
@@ -4250,6 +4386,9 @@
             renderAdminPromosSection();
             populateQuickBlockFacilitiesDropdown();
             renderTelegramSettingsUI();
+            if (document.getElementById('dash-listings')?.classList.contains('active')) {
+                setTimeout(() => initOrUpdateAdminMapPicker(), 120);
+            }
         }
 
         // ─── إجراءات الأدمن تنتظر استجابة قاعدة البيانات أولاً قبل تعديل الواجهة ───
@@ -4714,9 +4853,12 @@
             const venueLoc  = b.locationAr || (fac ? localizedItemText(fac, 'location') : 'الأردن');
             const lat = b.lat ?? (fac ? fac.lat : null);
             const lng = b.lng ?? (fac ? fac.lng : null);
-            const mapsHref = (lat !== null && lng !== null && Number.isFinite(Number(lat)) && Number.isFinite(Number(lng)))
-                ? `https://www.google.com/maps?q=${encodeURIComponent(lat)},${encodeURIComponent(lng)}`
-                : buildSafeMapsHref(venueLoc);
+            const savedMapUrl = String(b.mapUrl || (fac ? fac.mapUrl : '') || '').trim();
+            const mapsHref = (savedMapUrl && /^https:\/\//i.test(savedMapUrl))
+                ? savedMapUrl
+                : ((lat !== null && lng !== null && Number.isFinite(Number(lat)) && Number.isFinite(Number(lng)))
+                    ? `https://www.google.com/maps?q=${encodeURIComponent(lat)},${encodeURIComponent(lng)}`
+                    : buildSafeMapsHref(venueLoc));
 
             const total = Number(b.total || 0);
             const deposit = Number(b.deposit || 0);
@@ -4749,6 +4891,10 @@
                             <div class="ticket-info-item"><strong>📞 رقم الهاتف</strong><span style="direction:ltr;display:inline-block;">${escapeHtml(b.phone || '')}</span></div>
                             <div class="ticket-info-item"><strong>🏡 المنشأة / الخدمة</strong><span>${escapeHtml(venueName)}</span></div>
                             <div class="ticket-info-item"><strong>📍 الموقع</strong><span>${escapeHtml(venueLoc)}</span></div>
+                            <div class="ticket-info-item" style="grid-column:1/-1;background:#EFF8FF;padding:8px 10px;border-radius:10px;border:1px solid #90CAF9;">
+                                <strong style="color:#0D47A1;">🗺️ رابط اللوكيشن على الخريطة (Google Maps)</strong>
+                                <a href="${escapeHtml(mapsHref)}" target="_blank" rel="noopener noreferrer" style="color:#1565C0;font-weight:700;text-decoration:underline;word-break:break-all;font-size:0.84rem;display:inline-block;margin-top:2px;">📍 اضغط هنا لفتح موقع المنشأة على Google Maps</a>
+                            </div>
                             <div class="ticket-info-item" style="grid-column:1/-1;"><strong>📅 تفاصيل الموعد والحجز</strong><span>${escapeHtml(b.details || b.bookingDate || '')}</span></div>
                             ${discount > 0 ? `<div class="ticket-info-item" style="grid-column:1/-1;"><strong>🎁 الخصم المطبق (${escapeHtml(b.promoCode || 'عرض')})</strong><span style="color:var(--success);">-${discount.toFixed(2)} JOD</span></div>` : ''}
                             <div class="ticket-info-item"><strong>💰 المبلغ الإجمالي</strong><span>${total.toFixed(2)} JOD</span></div>
@@ -4784,7 +4930,10 @@
 ` +
                 `الإجمالي: ${total.toFixed(2)} JOD | العربون: ${deposit.toFixed(2)} JOD
 ` +
-                `المتبقي عند الوصول: ${remaining.toFixed(2)} JOD`
+                `المتبقي عند الوصول: ${remaining.toFixed(2)} JOD
+` +
+                `📍 رابط اللوكيشن على الخريطة:
+${mapsHref}`
             );
             const waBtn = document.getElementById('btn-share-ticket-wa');
             if (waBtn) waBtn.href = `https://wa.me/?text=${waText}`;
@@ -5548,6 +5697,115 @@
             return s;
         }
 
+
+        // =====================================================
+        //  FEATURE 8: INTERACTIVE ADMIN MAP PICKER & GOOGLE MAPS LINK PARSER
+        // =====================================================
+        let adminPickerMap = null;
+        let adminPickerMarker = null;
+
+        function initOrUpdateAdminMapPicker() {
+            const mapEl = document.getElementById('adm-v-map-picker');
+            if (!mapEl || !window.L) return;
+
+            const latInp = document.getElementById('adm-v-lat');
+            const lngInp = document.getElementById('adm-v-lng');
+            const urlInp = document.getElementById('adm-v-map-url');
+            const statusEl = document.getElementById('adm-v-map-status');
+
+            let curLat = parseFloat(latInp?.value);
+            let curLng = parseFloat(lngInp?.value);
+            const hasCoords = Number.isFinite(curLat) && Number.isFinite(curLng);
+            if (!hasCoords) {
+                const reg = inferRegionCoords(document.getElementById('adm-v-location')?.value || '');
+                curLat = reg.lat;
+                curLng = reg.lng;
+            }
+
+            if (!adminPickerMap) {
+                adminPickerMap = L.map('adm-v-map-picker').setView([curLat, curLng], hasCoords ? 14 : 11);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                    subdomains: 'abcd',
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap'
+                }).addTo(adminPickerMap);
+
+                adminPickerMap.on('click', function(ev) {
+                    const clickedLat = Number(ev.latlng.lat.toFixed(6));
+                    const clickedLng = Number(ev.latlng.lng.toFixed(6));
+                    if (latInp) latInp.value = String(clickedLat);
+                    if (lngInp) lngInp.value = String(clickedLng);
+                    if (urlInp && (!urlInp.value || !urlInp.value.includes('maps.app.goo.gl'))) {
+                        urlInp.value = `https://www.google.com/maps?q=${clickedLat},${clickedLng}`;
+                    }
+                    if (adminPickerMarker) {
+                        adminPickerMarker.setLatLng([clickedLat, clickedLng]);
+                    } else {
+                        adminPickerMarker = L.marker([clickedLat, clickedLng]).addTo(adminPickerMap);
+                    }
+                    if (statusEl) {
+                        statusEl.style.color = 'var(--success)';
+                        statusEl.textContent = `✅ تم تحديد موقع الدبوس على الخريطة التفاعلية (${clickedLat}, ${clickedLng})`;
+                    }
+                });
+            } else {
+                setTimeout(() => {
+                    adminPickerMap.invalidateSize();
+                    adminPickerMap.setView([curLat, curLng], hasCoords ? 15 : 11);
+                }, 80);
+            }
+
+            if (hasCoords) {
+                if (adminPickerMarker) {
+                    adminPickerMarker.setLatLng([curLat, curLng]);
+                } else {
+                    adminPickerMarker = L.marker([curLat, curLng]).addTo(adminPickerMap);
+                }
+            } else if (adminPickerMarker) {
+                adminPickerMap.removeLayer(adminPickerMarker);
+                adminPickerMarker = null;
+            }
+        }
+
+        function handleAdminMapUrlInput(formType) {
+            const isVenue = formType === 'venue';
+            const urlInp = document.getElementById(isVenue ? 'adm-v-map-url' : 'adm-t-map-url');
+            const latInp = document.getElementById(isVenue ? 'adm-v-lat' : 'adm-t-lat');
+            const lngInp = document.getElementById(isVenue ? 'adm-v-lng' : 'adm-t-lng');
+            const statusEl = document.getElementById(isVenue ? 'adm-v-map-status' : 'adm-t-map-status');
+            if (!urlInp) return;
+
+            const val = urlInp.value.trim();
+            if (!val) {
+                if (statusEl) statusEl.textContent = '';
+                return;
+            }
+            const parsed = parseCoordsFromGoogleMapsInput(val);
+            if (parsed) {
+                if (latInp) latInp.value = String(parsed.lat);
+                if (lngInp) lngInp.value = String(parsed.lng);
+                if (!/^https:\/\//i.test(val)) {
+                    urlInp.value = `https://www.google.com/maps?q=${parsed.lat},${parsed.lng}`;
+                }
+                if (statusEl) {
+                    statusEl.style.color = 'var(--success)';
+                    statusEl.textContent = `✅ تم استخراج اللوكيشن وتفعيل الخريطة التفاعلية والتذكرة تلقائياً (${parsed.lat.toFixed(5)}, ${parsed.lng.toFixed(5)})`;
+                }
+                if (isVenue) initOrUpdateAdminMapPicker();
+            } else if (/^https:\/\/(maps\.app\.goo\.gl|goo\.gl\/maps|www\.google\.com\/maps|maps\.google\.com)/i.test(val)) {
+                if (statusEl) {
+                    statusEl.style.color = '#1565C0';
+                    statusEl.textContent = '✅ تم حفظ رابط Google Maps للتذكرة والخريطة! (يمكنك أيضاً الضغط على الخريطة بالأسفل لتحديد مكان الدبوس بدقة)';
+                }
+                if (isVenue) initOrUpdateAdminMapPicker();
+            } else {
+                if (statusEl) {
+                    statusEl.style.color = 'var(--danger)';
+                    statusEl.textContent = '⚠️ يرجى لصق رابط صحيح من خرائط Google (يبدأ بـ https://) أو إحداثيات الموقع';
+                }
+            }
+        }
+
         function renderTelegramSettingsUI() {
             const tokenInp = document.getElementById('tg-bot-token');
             const chatInp  = document.getElementById('tg-chat-id');
@@ -6047,6 +6305,10 @@
             document.getElementById('add-promo-form').addEventListener('submit', savePromoCode);
             document.getElementById('quick-block-form').addEventListener('submit', submitQuickBlockForm);
             document.getElementById('telegram-config-form').addEventListener('submit', saveTelegramConfig);
+            document.getElementById('adm-v-map-url').addEventListener('input', () => handleAdminMapUrlInput('venue'));
+            document.getElementById('adm-t-map-url').addEventListener('input', () => handleAdminMapUrlInput('transport'));
+            document.getElementById('adm-v-lat').addEventListener('change', initOrUpdateAdminMapPicker);
+            document.getElementById('adm-v-lng').addEventListener('change', initOrUpdateAdminMapPicker);
             document.getElementById('btn-tg-detect-chat').addEventListener('click', detectTelegramChatIdAutomatically);
             document.getElementById('tg-chat-id').addEventListener('input', function() {
                 const extracted = extractChatIdFromInput(this.value);
