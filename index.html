@@ -2804,7 +2804,7 @@
                     if (!window.L) return;
                     if (detailsMap) { detailsMap.remove(); detailsMap = null; }
                     detailsMap = L.map('det-map').setView([effLat, effLng], 15);
-                    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 19, attribution: '© OpenStreetMap © CARTO' }).addTo(detailsMap);
+                    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { subdomains: 'abcd', maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(detailsMap);
                     const popupStrong = document.createElement('strong');
                     popupStrong.textContent = name;
                     L.marker([effLat, effLng]).addTo(detailsMap).bindPopup(popupStrong).openPopup();
@@ -5724,7 +5724,7 @@ ${mapsHref}`
 
             if (!adminPickerMap) {
                 adminPickerMap = L.map('adm-v-map-picker').setView([curLat, curLng], hasCoords ? 14 : 11);
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     subdomains: 'abcd',
                     maxZoom: 19,
                     attribution: '© OpenStreetMap'
