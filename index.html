@@ -105,6 +105,13 @@
         [dir="ltr"] .season-filters-label { direction:ltr; }
         @media (max-width: 768px) { .season-filters { overflow-x:auto; flex-wrap:nowrap; white-space:nowrap; padding-bottom:8px; } .season-chip { flex:0 0 auto; } }
 
+        /* Skeleton Shimmer Cards for Instant Perceived Load */
+        @keyframes wkndShimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+        .skeleton-card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: var(--card-shadow); border: 1px solid rgba(0,0,0,0.04); height: 360px; display: flex; flex-direction: column; justify-content: space-between; }
+        .skeleton-img { height: 210px; background: linear-gradient(90deg, #ECEFEA 25%, #F5F7F4 50%, #ECEFEA 75%); background-size: 800px 100%; animation: wkndShimmer 1.4s infinite linear; }
+        .skeleton-line { height: 14px; border-radius: 8px; margin: 10px 1.5rem; background: linear-gradient(90deg, #ECEFEA 25%, #F5F7F4 50%, #ECEFEA 75%); background-size: 800px 100%; animation: wkndShimmer 1.4s infinite linear; }
+        .skeleton-line.short { width: 55%; }
+
         /* Cards Grid */
         .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.8rem; }
         .venue-card { background: var(--card-bg); border-radius: 20px; box-shadow: var(--card-shadow); overflow: hidden; transition: all 0.3s ease; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(0,0,0,0.04); }
@@ -523,7 +530,11 @@
                 </select>
             </div>
         </div>
-        <div class="cards-grid" id="items-container"></div>
+        <div class="cards-grid" id="items-container">
+            <div class="skeleton-card"><div class="skeleton-img"></div><div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-card"><div class="skeleton-img"></div><div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div><div class="skeleton-line"></div></div>
+            <div class="skeleton-card"><div class="skeleton-img"></div><div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div><div class="skeleton-line"></div></div>
+        </div>
     </div>
 
     <!-- TERMS VIEW -->
@@ -666,7 +677,7 @@
                     <div class="admin-box">
                         <h3 class="admin-section-title" id="add-form-title">إضافة منشأة أو وسيلة نقل جديدة</h3>
                         <div class="edit-mode-banner" id="edit-mode-banner">
-                            ✏️ وضع التعديل: المنشأة موقوفة مؤقتاً عن العرض العام في قاعدة البيانات. احفظ التعديلات لإعادة نشرها أو اضغط إلغاء التعديل لاستعادة حالتها السابقة.
+                            ✏️ أنت الآن في وضع تعديل المنشأة. المنشأة تظل ظاهرة للزوار وتتحدث بياناتها فوراً عند الضغط على «حفظ التعديلات».
                         </div>
                         <div class="form-tabs">
                             <button type="button" class="tab-btn active" id="tab-venue-btn" data-action="switch-admin-form" data-form="venue">🏡 إضافة (مزرعة / شاليه / ملعب)</button>
@@ -1312,8 +1323,18 @@
                             <input type="number" class="form-control" id="trans-passengers" min="1" max="60" placeholder="10">
                         </div>
                         <div class="form-group" style="flex:1;">
-                            <label>المسافة (كيلومتر)</label>
-                            <input type="number" class="form-control" id="trans-distance" min="1" max="2000" step="0.5" placeholder="50">
+                            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;margin-bottom:0.3rem;">
+                                <label style="margin:0;">المسافة (كيلومتر)</label>
+                                <span style="font-size:0.75rem;color:var(--text-muted);">أو اختر مساراً سريعاً:</span>
+                            </div>
+                            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
+                                <button type="button" class="copy-chip-btn" data-action="set-trans-route" data-km="55" data-from="عمّان" data-to="البحر الميت (55 كم)">البحر الميت 55 كم</button>
+                                <button type="button" class="copy-chip-btn" data-action="set-trans-route" data-km="50" data-from="عمّان" data-to="جرش وعجلون (50 كم)">جرش 50 كم</button>
+                                <button type="button" class="copy-chip-btn" data-action="set-trans-route" data-km="25" data-from="عمّان" data-to="طريق المطار (25 كم)">طريق المطار 25 كم</button>
+                                <button type="button" class="copy-chip-btn" data-action="set-trans-route" data-km="30" data-from="عمّان" data-to="السلط (30 كم)">السلط 30 كم</button>
+                                <button type="button" class="copy-chip-btn" data-action="set-trans-route" data-km="45" data-from="عمّان" data-to="الأغوار والشونة (45 كم)">الأغوار 45 كم</button>
+                            </div>
+                            <input type="number" class="form-control" id="trans-distance" min="1" max="2000" step="0.5" placeholder="أدخل المسافة بالكيلومتر...">
                         </div>
                     </div>
                     <div class="form-group">
@@ -1410,19 +1431,19 @@
         <div class="modal-content" style="max-width:560px;">
             <button type="button" class="close-modal" data-action="close-modal" data-modal="track-booking-modal" aria-label="إغلاق">&times;</button>
             <h3 style="color:var(--primary-dark);margin-bottom:0.4rem;">🔍 تتبّع حالة حجزي وتذكرتي</h3>
-            <p style="color:var(--text-muted);font-size:0.86rem;margin-bottom:1rem;">أدخل رقم الهاتف الذي استخدمته أثناء الحجز لمعرفة حالة طلبك فوراً وتحميل تذكرة الحجز الإلكترونية:</p>
+            <p style="color:var(--text-muted);font-size:0.86rem;margin-bottom:1rem;">حفاظاً على خصوصية حجوزاتك، أدخل <strong>رقم الهاتف</strong> مع <strong>رقم التذكرة</strong> لمعرفة حالة طلبك فوراً وتحميل تذكرة الحجز الإلكترونية:</p>
             <form id="track-booking-form">
                 <div class="form-row">
-                    <div class="form-group" style="flex:1.5;">
+                    <div class="form-group" style="flex:1.4;">
                         <label for="track-phone-input">رقم الهاتف</label>
                         <input type="tel" class="form-control" id="track-phone-input" required placeholder="مثال: 0791234567" maxlength="20">
                     </div>
-                    <div class="form-group" style="flex:1;">
-                        <label for="track-id-input">رقم التذكرة (اختياري)</label>
-                        <input type="text" class="form-control" id="track-id-input" placeholder="مثال: 15 أو WKND-15" maxlength="20">
+                    <div class="form-group" style="flex:1.1;">
+                        <label for="track-id-input">رقم التذكرة (إلزامي للتحقق)</label>
+                        <input type="text" class="form-control" id="track-id-input" required placeholder="مثال: 15 أو WKND-15" maxlength="20">
                     </div>
                 </div>
-                <button type="submit" class="btn-action" id="track-submit-btn" style="width:100%;padding:0.8rem;">🔍 بحث عن حجوزاتي</button>
+                <button type="submit" class="btn-action" id="track-submit-btn" style="width:100%;padding:0.8rem;">🔍 بحث آمن عن تذكرتي</button>
             </form>
             <div id="track-results-container" style="margin-top:1.2rem;"></div>
         </div>
@@ -1489,8 +1510,7 @@
     <!-- Export & Map Libraries (Pinned Versions + Verified SRI) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
     <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous"></script>
+    <!-- Excel & PDF libraries loaded on-demand to save 1.4MB on initial mobile load -->
 
     <script>
         // =====================================================
@@ -1499,6 +1519,29 @@
         const SUPABASE_URL = 'https://yeysruiowtjpwyicsukf.supabase.co';
         const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_--ZBMiy0SK8D-IQ4_Ab0hw_XneXxcCJ';
         const db = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null;
+
+        // التحميل الذكي للمكتبات الثقيلة عند الطلب فقط (توفير 1.4 ميجابايت على باقة الموبايل)
+        function loadExternalScript(src) {
+            return new Promise((resolve, reject) => {
+                if (document.querySelector(`script[src="${src}"]`)) return resolve();
+                const s = document.createElement('script');
+                s.src = src;
+                s.crossOrigin = 'anonymous';
+                s.onload = resolve;
+                s.onerror = () => reject(new Error('تعذر تحميل المكتبة: ' + src));
+                document.head.appendChild(s);
+            });
+        }
+        async function ensureXlsxLibrary() {
+            if (window.XLSX) return;
+            showToast('⏳ جاري تجهيز مكتبة Excel...');
+            await loadExternalScript('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js');
+        }
+        async function ensureHtml2PdfLibrary() {
+            if (window.html2pdf) return;
+            showToast('⏳ جاري تجهيز مكتبة PDF...');
+            await loadExternalScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js');
+        }
 
         function safeGetStorage(key, fallback) {
             try { return localStorage.getItem(key) || fallback; } catch (e) { return fallback; }
@@ -1707,6 +1750,9 @@
             if (db && db.storage) {
                 try {
                     const blob = dataUrlToBlob(compressedDataUrl);
+                    if (folder === 'cliq-receipts' && blob.size > 2 * 1024 * 1024) {
+                        throw new Error('حجم صورة الوصل يتجاوز الحد المسموح (2MB).');
+                    }
                     const filePath = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2, 9)}.jpg`;
                     const { error: upErr } = await db.storage.from(STORAGE_BUCKET).upload(filePath, blob, {
                         contentType: 'image/jpeg',
@@ -2155,45 +2201,42 @@
         async function loadFromDatabase() {
             if (!db) return;
             try {
-                // جلب جميع البيانات الأساسية بالتوازي (Parallel Fetch) لتقليص زمن التحميل بنسبة 70%
-                const [facRes, revRes, , favRes, admBookRes, promoRes] = await Promise.all([
+                // جلب جميع البيانات الأساسية بالتوازي (Parallel Fetch) مع إخفاء إعدادات الأدمن السرية عن الزوار
+                const [facRes, revRes, , favRpcRes, admBookRes, promoRes] = await Promise.all([
                     db.from('facilities').select('*').order('id'),
                     db.from('reviews').select('id,facility_id,user_name,rating,comment,status,created_at').order('id', { ascending: false }),
                     loadPublicConfirmedSlots(),
-                    db.from('favorites').select('facility_id').eq('device_id', DEVICE_ID),
-                    isAdminLoggedIn ? db.from('bookings').select('*').order('id', { ascending: false }) : Promise.resolve({ data: null, error: null }),
+                    db.rpc('get_my_favorites', { p_device_id: DEVICE_ID }),
+                    isAdminLoggedIn ? (async () => {
+                        try { await db.rpc('clean_expired_bookings'); } catch(e) {}
+                        return await db.from('bookings').select('*').order('id', { ascending: false });
+                    })() : Promise.resolve({ data: null, error: null }),
                     db.from('promo_codes').select('*').order('id', { ascending: false })
                 ]);
 
                 if (!promoRes.error && Array.isArray(promoRes.data)) {
-                    const tgRow = promoRes.data.find(r => String(r.code || '').toUpperCase() === '__TG_CFG__');
-                    if (tgRow && tgRow.title_ar) {
-                        const parts = String(tgRow.title_ar).split('|');
-                        if (parts.length >= 2 && parts[0] && parts[1]) {
-                            telegramConfig = {
-                                botToken: parts[0].trim(),
-                                chatId: parts[1].trim(),
-                                enabled: parts[2] !== '0' && Boolean(tgRow.active)
-                            };
-                            safeSetStorage('wknd_tg_config', JSON.stringify(telegramConfig));
-                        }
-                    }
                     promoCodes = promoRes.data
                         .filter(r => String(r.code || '').toUpperCase() !== '__TG_CFG__')
                         .map(rowToPromo);
                     safeSetStorage('wknd_promos_fallback', JSON.stringify(promoCodes));
                 }
-                try {
-                    const { data: tgSet } = await db.from('admin_settings').select('value_json').eq('key', 'telegram_notify').maybeSingle();
-                    if (tgSet && tgSet.value_json && tgSet.value_json.botToken && tgSet.value_json.chatId) {
-                        telegramConfig = {
-                            botToken: String(tgSet.value_json.botToken).trim(),
-                            chatId: String(tgSet.value_json.chatId).trim(),
-                            enabled: Boolean(tgSet.value_json.enabled)
-                        };
-                        safeSetStorage('wknd_tg_config', JSON.stringify(telegramConfig));
-                    }
-                } catch (e) {}
+
+                // لا يتم جلب إعدادات بوت التيليجرام السرية إلا إذا كان الأدمن مسجلاً للدخول
+                if (isAdminLoggedIn) {
+                    try {
+                        const { data: tgSet } = await db.from('admin_settings').select('value_json').eq('key', 'telegram_notify').maybeSingle();
+                        if (tgSet && tgSet.value_json && tgSet.value_json.botToken && tgSet.value_json.chatId) {
+                            telegramConfig = {
+                                botToken: String(tgSet.value_json.botToken).trim(),
+                                chatId: String(tgSet.value_json.chatId).trim(),
+                                enabled: Boolean(tgSet.value_json.enabled)
+                            };
+                            safeSetStorage('wknd_tg_config', JSON.stringify(telegramConfig));
+                        }
+                    } catch (e) {}
+                } else {
+                    telegramConfig = { botToken: '', chatId: '', enabled: false };
+                }
 
                 if (facRes.error) throw facRes.error;
                 const facilityRows = facRes.data;
@@ -2207,6 +2250,7 @@
                             .map(rv => ({ id: rv.id, user: rv.user_name, rating: Number(rv.rating) || 5, comment: rv.comment }));
                         return it;
                     });
+                    safeSetStorage('wknd_facilities_cache', JSON.stringify(items.filter(i => i.active)));
                 }
 
                 if (isAdminLoggedIn && !admBookRes.error && Array.isArray(admBookRes.data)) {
@@ -2219,9 +2263,17 @@
                     archivedBookings = [];
                 }
 
-                if (Array.isArray(favRes.data)) {
-                    favorites = new Set(favRes.data.map(f => Number(f.facility_id)));
+                if (!favRpcRes.error && Array.isArray(favRpcRes.data)) {
+                    favorites = new Set(favRpcRes.data.map(id => Number(id)));
                     saveFavorites();
+                } else {
+                    try {
+                        const { data: fallbackFavs } = await db.from('favorites').select('facility_id').eq('device_id', DEVICE_ID);
+                        if (Array.isArray(fallbackFavs)) {
+                            favorites = new Set(fallbackFavs.map(f => Number(f.facility_id)));
+                            saveFavorites();
+                        }
+                    } catch (e) {}
                 }
             } catch (err) {
                 console.error('تعذر تحميل البيانات من قاعدة البيانات:', err?.message || '');
@@ -2344,7 +2396,7 @@
             }
             document.getElementById('admin-email-input').value = '';
             document.getElementById('admin-pass-input').value = '';
-            document.getElementById('admin-login-modal').classList.add('active');
+            openModalSafely('admin-login-modal');
             setTimeout(() => document.getElementById('admin-email-input').focus(), 100);
         }
 
@@ -2384,6 +2436,8 @@
 
         async function logoutAdmin() {
             isAdminLoggedIn = false;
+            telegramConfig = { botToken: '', chatId: '', enabled: false };
+            try { localStorage.removeItem('wknd_tg_config'); } catch (e) {}
             if (db) await db.auth.signOut();
             pendingBookings = [];
             confirmedBookings = [];
@@ -2583,8 +2637,10 @@
                 saveFavorites();
                 updateFavBadge();
                 if (db) {
-                    const { error } = await db.from('favorites').delete().eq('device_id', DEVICE_ID).eq('facility_id', numId);
-                    if (error) console.error('تعذر حذف المفضلة من القاعدة:', error?.message || '');
+                    const { error } = await db.rpc('toggle_my_favorite', { p_device_id: DEVICE_ID, p_facility_id: numId, p_add: false });
+                    if (error) {
+                        try { await db.from('favorites').delete().eq('device_id', DEVICE_ID).eq('facility_id', numId); } catch (e) {}
+                    }
                 }
             } else {
                 favorites.add(numId);
@@ -2593,8 +2649,10 @@
                 saveFavorites();
                 updateFavBadge();
                 if (db) {
-                    const { error } = await db.from('favorites').upsert({ device_id: DEVICE_ID, facility_id: numId });
-                    if (error) console.error('تعذر حفظ المفضلة بالقاعدة:', error?.message || '');
+                    const { error } = await db.rpc('toggle_my_favorite', { p_device_id: DEVICE_ID, p_facility_id: numId, p_add: true });
+                    if (error) {
+                        try { await db.from('favorites').upsert({ device_id: DEVICE_ID, facility_id: numId }); } catch (e) {}
+                    }
                 }
             }
         }
@@ -2800,15 +2858,12 @@
                     ? selectedItem.mapUrl
                     : `https://www.google.com/maps?q=${encodeURIComponent(effLat)},${encodeURIComponent(effLng)}`;
                 document.getElementById('det-map-link').href = directMapLink;
-                setTimeout(() => {
-                    if (!window.L) return;
-                    if (detailsMap) { detailsMap.remove(); detailsMap = null; }
-                    detailsMap = L.map('det-map').setView([effLat, effLng], 15);
-                    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { subdomains: 'abcd', maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(detailsMap);
-                    const popupStrong = document.createElement('strong');
-                    popupStrong.textContent = name;
-                    L.marker([effLat, effLng]).addTo(detailsMap).bindPopup(popupStrong).openPopup();
-                }, 150);
+                const mapContainer = document.getElementById('det-map');
+                if (detailsMap) { try { detailsMap.remove(); } catch(e) {} detailsMap = null; }
+                if (mapContainer) {
+                    const gmapEmbedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(effLat + ',' + effLng)}&hl=${currentLang === 'ar' ? 'ar' : 'en'}&z=15&output=embed`;
+                    mapContainer.innerHTML = `<iframe src="${gmapEmbedUrl}" width="100%" height="100%" style="border:0;border-radius:12px;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="${escapeHtml(name)}"></iframe>`;
+                }
             } else {
                 mapSec.style.display = 'none';
             }
@@ -2830,7 +2885,7 @@
             calItemId = selectedItem.id;
             renderAvailCalendar(selectedItem.id);
             renderReviewsList();
-            document.getElementById('details-modal').classList.add('active');
+            openModalSafely('details-modal');
         }
 
         function renderReviewsList() {
@@ -3011,6 +3066,42 @@
             return false;
         }
 
+        function updatePitchHoursAvailability() {
+            if (!selectedItem || selectedItem.category !== 'field') return;
+            const date = document.getElementById('booking-date').value;
+            const startHourSel = document.getElementById('pitch-start-hour');
+            if (!startHourSel) return;
+            const { dateStr: todayStr, hour: nowHour } = getAmmanNow();
+            const isToday = date === todayStr;
+
+            let firstFree = null;
+            Array.from(startHourSel.options).forEach(opt => {
+                const h = parseInt(opt.value, 10);
+                const isPast = isToday && h <= nowHour;
+                // فحص ما إذا كانت الساعتان التاليتان محجوزتين
+                const isBusy = date ? Boolean(getIntervalBusyStatus(selectedItem.id, date, h, h + 2)) : false;
+                const baseText = `${h < 12 ? (h < 10 ? '0' + h : h) + ':00 صباحاً' : (h === 12 ? '12:00 ظهراً' : (h - 12 < 10 ? '0' + (h - 12) : (h - 12)) + ':00 مساءً')}`;
+
+                if (isPast) {
+                    opt.disabled = true;
+                    opt.textContent = `${baseText} (⌛ مضت)`;
+                } else if (isBusy) {
+                    opt.disabled = true;
+                    opt.textContent = `${baseText} (🔒 محجوز)`;
+                } else {
+                    opt.disabled = false;
+                    opt.textContent = baseText;
+                    if (firstFree === null) firstFree = opt.value;
+                }
+            });
+
+            const curVal = startHourSel.value;
+            const curOpt = startHourSel.querySelector(`option[value="${curVal}"]`);
+            if (curOpt && curOpt.disabled && firstFree !== null) {
+                startHourSel.value = firstFree;
+            }
+        }
+
         function updateShiftAvailability() {
             if (!selectedItem || selectedItem.category !== 'farm') return;
             const date = document.getElementById('booking-date').value;
@@ -3066,6 +3157,7 @@
                 }
             }
             if (selectedItem && selectedItem.category === 'field') {
+                updatePitchHoursAvailability();
                 updateBookingCalculation();
             } else {
                 updateShiftAvailability();
@@ -3123,6 +3215,7 @@
                 document.getElementById('pitch-start-hour').value = '18';
                 document.getElementById('pitch-hours').value = '2';
                 document.getElementById('pitch-hours').max = '6';
+                updatePitchHoursAvailability();
             } else {
                 document.getElementById('farm-shift-section').style.display = 'block';
                 document.getElementById('pitch-hourly-section').style.display = 'none';
@@ -3139,7 +3232,7 @@
                 });
             }
 
-            document.getElementById('booking-modal').classList.add('active');
+            openModalSafely('booking-modal');
             startLockTimer(300);
             updateBookingCalculation();
         }
@@ -3161,6 +3254,14 @@
             }, 1000);
         }
 
+        function openModalSafely(modalId) {
+            const m = document.getElementById(modalId);
+            if (m) {
+                m.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
         function closeModal(modalId) {
             const modalEl = document.getElementById(modalId);
             if (modalEl) modalEl.classList.remove('active');
@@ -3172,6 +3273,10 @@
                 if (vp) { try { vp.pause(); } catch (e) {} }
                 const vf = document.getElementById('det-video-iframe');
                 if (vf) vf.src = '';
+            }
+            // استعادة التمرير فقط إذا أُغلقت جميع النوافذ المنبثقة
+            if (!document.querySelector('.modal.active')) {
+                document.body.style.overflow = '';
             }
         }
 
@@ -3487,7 +3592,12 @@
             }
 
             const submitBtn = document.getElementById('booking-submit-btn');
-            if (submitBtn) submitBtn.disabled = true;
+            if (submitBtn) {
+                if (submitBtn.disabled) return;
+                submitBtn.disabled = true;
+                submitBtn._origText = submitBtn.textContent;
+                submitBtn.textContent = '⏳ جاري إرسال وتأكيد الحجز...';
+            }
 
             try {
                 await refreshBookingsForItem(selectedItem.id);
@@ -3565,7 +3675,10 @@
                     renderAdminPanel();
                 }
             } finally {
-                if (submitBtn) submitBtn.disabled = false;
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    if (submitBtn._origText) submitBtn.textContent = submitBtn._origText;
+                }
             }
         }
 
@@ -3731,9 +3844,21 @@
             }
         }
 
+        async function tryDeleteStorageFile(url) {
+            if (!db || !db.storage || !url) return;
+            const s = String(url).trim();
+            const prefix = `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/`;
+            if (s.startsWith(prefix)) {
+                const filePath = s.slice(prefix.length).split('?')[0];
+                try { await db.storage.from(STORAGE_BUCKET).remove([filePath]); } catch(e) {}
+            }
+        }
+
         function removeAdminMainImage(formType) {
             const isVenue = formType === 'venue';
-            document.getElementById(isVenue ? 'venue-img-store' : 'transport-img-store').value = '';
+            const storeEl = document.getElementById(isVenue ? 'venue-img-store' : 'transport-img-store');
+            if (storeEl && storeEl.value) tryDeleteStorageFile(storeEl.value);
+            storeEl.value = '';
             const fileInput = document.getElementById(isVenue ? 'adm-v-img-file' : 'adm-t-img-file');
             if (fileInput) fileInput.value = '';
             renderAdminMediaPreviews(formType);
@@ -3742,14 +3867,17 @@
         function removeAdminExtraImage(formType, idx) {
             const arr = formType === 'venue' ? venueExtraUploadedImages : transportExtraUploadedImages;
             if (idx >= 0 && idx < arr.length) {
-                arr.splice(idx, 1);
+                const removedUrl = arr.splice(idx, 1)[0];
+                tryDeleteStorageFile(removedUrl);
                 renderAdminMediaPreviews(formType);
             }
         }
 
         function removeAdminVideo(formType) {
             const isVenue = formType === 'venue';
-            document.getElementById(isVenue ? 'venue-video-store' : 'transport-video-store').value = '';
+            const storeEl = document.getElementById(isVenue ? 'venue-video-store' : 'transport-video-store');
+            if (storeEl && storeEl.value) tryDeleteStorageFile(storeEl.value);
+            storeEl.value = '';
             const vidInput = document.getElementById(isVenue ? 'adm-v-video-file' : 'adm-t-video-file');
             if (vidInput) vidInput.value = '';
             const urlInput = document.getElementById(isVenue ? 'adm-v-video-url' : 'adm-t-video-url');
@@ -3947,12 +4075,7 @@
 
             editingItemId = item.id;
             editingPreviousActive = Boolean(item.active);
-
-            const { error } = await db.from('facilities').update({ active: false }).eq('id', item.id);
-            if (!error) {
-                item.active = false;
-                item._editing = true;
-            }
+            item._editing = true;
 
             switchAdminTab('dash-listings', document.querySelectorAll('.sidebar-item')[1]);
 
@@ -4044,16 +4167,14 @@
 
             renderAdminPanel();
             liveSearch();
-            showToast('⏸️ تم إيقاف المنشأة مؤقتاً حتى حفظ التعديلات');
+            showToast('✏️ تم فتح بيانات المنشأة للتعديل');
         }
 
         async function cancelEditMode(formType, skipDbRestore = false) {
-            if (editingItemId && !skipDbRestore) {
+            if (editingItemId) {
                 const idx = items.findIndex(i => i.id === editingItemId);
                 if (idx !== -1) {
-                    items[idx].active   = editingPreviousActive;
                     items[idx]._editing = false;
-                    if (db) await db.from('facilities').update({ active: editingPreviousActive }).eq('id', editingItemId);
                 }
             }
             editingItemId = null;
@@ -4451,6 +4572,7 @@
         async function deleteBooking(bookingId) {
             if (!db || !isAdminLoggedIn) return;
             const numId = Number(bookingId);
+            if (!confirm(`هل أنت متأكد من حذف الحجز #${numId} نهائياً وإلغاء تذكرة العميل؟`)) return;
             const { error } = await db.from('bookings').delete().eq('id', numId);
             if (error) {
                 showToast('❌ تعذر حذف السجل: ' + (error.message || ''));
@@ -4495,6 +4617,7 @@
 
         async function deleteReview(reviewId) {
             if (!db || !isAdminLoggedIn) return;
+            if (!confirm('هل أنت متأكد من حذف هذا التقييم؟')) return;
             const { error } = await db.from('reviews').delete().eq('id', Number(reviewId));
             if (error) {
                 showToast('❌ تعذر حذف التقييم: ' + (error.message || ''));
@@ -4526,6 +4649,9 @@
         async function deleteListing(id) {
             if (!db || !isAdminLoggedIn) return;
             const numId = Number(id);
+            const item = items.find(i => i.id === numId);
+            const name = item ? item.nameAr : `منشأة #${numId}`;
+            if (!confirm(`هل أنت متأكد من حذف (${name}) نهائياً؟`)) return;
             const { error } = await db.from('facilities').delete().eq('id', numId);
             if (error) {
                 // إذا كانت المنشأة مرتبطة بحجوزات سابقة (قيد RESTRICT 23503)، نقوم بتعطيلها بدلاً من حذفها
@@ -4553,7 +4679,7 @@
             const titleEl = document.getElementById('image-modal-title');
             if (titleEl) titleEl.textContent = titleText;
             document.getElementById('enlarged-receipt-img').src = sanitizeImageUrl(imgSrc);
-            document.getElementById('image-modal').classList.add('active');
+            openModalSafely('image-modal');
         }
 
         // =====================================================
@@ -4939,7 +5065,7 @@ ${mapsHref}`
             if (waBtn) waBtn.href = `https://wa.me/?text=${waText}`;
 
             renderRandomBusUpsellInTicket(b, fac, venueName, venueLoc);
-            document.getElementById('ticket-modal').classList.add('active');
+            openModalSafely('ticket-modal');
         }
 
         let lastUpsellBusId = null;
@@ -5063,12 +5189,19 @@ ${mapsHref}`
                         <div style="margin-top:6px;"><strong>2️⃣</strong> اختر <strong>«📲 تثبيت التطبيق / Install app»</strong> أو <strong>«الإضافة إلى الشاشة الرئيسية»</strong> ثم اضغط تثبيت.</div>`;
                 }
             }
-            document.getElementById('pwa-install-modal').classList.add('active');
+            openModalSafely('pwa-install-modal');
         }
 
-        function downloadTicketPDF() {
+        async function downloadTicketPDF() {
             const node = document.getElementById('ticket-card-node');
-            if (!node || !window.html2pdf) {
+            if (!node) return;
+            try {
+                await ensureHtml2PdfLibrary();
+            } catch (e) {
+                window.print();
+                return;
+            }
+            if (!window.html2pdf) {
                 window.print();
                 return;
             }
@@ -5116,16 +5249,27 @@ ${mapsHref}`
                 return 'deleted';
             }
 
-            // 3) للزبون العام: التحقق من جدول المواعيد العام المباشر من السيرفر (public_confirmed_slots / busyIntervals)
+            // 3) للزبون العام: التحقق الدقيق بمطابقة رقم المنشأة والتاريخ ونفس الساعات/الشفت (منع تداخل شفتين بنفس اليوم)
             if (facId && bDate && busyIntervalsLoaded) {
-                const slotMatches = busyIntervals.filter(s => Number(s.facilityId) === facId && String(s.date) === bDate);
+                let bFrom = (b.hourFrom !== null && b.hourFrom !== undefined) ? Number(b.hourFrom) : null;
+                let bTo   = (b.hourTo !== null && b.hourTo !== undefined) ? Number(b.hourTo) : null;
+                if (bFrom === null || bTo === null) {
+                    const st = b.shiftType || (String(b.details || '').includes('evening') ? 'evening' : (String(b.details || '').includes('morning') ? 'morning' : 'fullday'));
+                    bFrom = st === 'evening' ? 12 : 0;
+                    bTo   = st === 'morning' ? 12 : 24;
+                }
+                const slotMatches = busyIntervals.filter(s =>
+                    Number(s.facilityId) === facId &&
+                    String(s.date) === bDate &&
+                    s.hourFrom < bTo && bFrom < s.hourTo
+                );
                 if (slotMatches.some(s => s.status === 'confirmed')) {
                     return 'confirmed';
                 }
                 if (slotMatches.some(s => s.status === 'pending')) {
                     return 'pending';
                 }
-                // إذا تم تحميل المواعيد من السيرفر ولم يعد هذا الموعد موجوداً فيها إطلاقاً، فهذا يعني أن الأدمن حذفه أو ألغاه
+                // إذا تم تحميل المواعيد من السيرفر ولم يعد هذا الموعد بالذات موجوداً، فهذا يعني أن الأدمن حذفه أو ألغاه
                 const createdMs = b.createdAt ? new Date(b.createdAt).getTime() : 0;
                 if (slotMatches.length === 0 && (!createdMs || (Date.now() - createdMs > 10000))) {
                     return 'deleted';
@@ -5136,16 +5280,17 @@ ${mapsHref}`
         }
 
         async function syncLocalBookingsWithDatabase(phoneFilter = '', idFilter = null) {
-            await loadPublicConfirmedSlots();
+            if (!busyIntervalsLoaded) await loadPublicConfirmedSlots();
             const savedList = JSON.parse(safeGetStorage('wknd_my_bookings', '[]'));
             const targetPhone = normalizePhone(phoneFilter || (savedList[0] ? savedList[0].phone : ''));
+            const targetBookingId = idFilter ? Number(idFilter) : (savedList[0] && savedList[0].id ? Number(savedList[0].id) : null);
 
             let serverResults = null;
-            if (db && targetPhone && isValidPhone(targetPhone)) {
+            if (db && targetPhone && isValidPhone(targetPhone) && targetBookingId) {
                 try {
                     const { data, error } = await db.rpc('track_my_bookings', {
                         p_phone: targetPhone,
-                        p_booking_id: idFilter
+                        p_booking_id: targetBookingId
                     });
                     if (!error && Array.isArray(data)) {
                         serverResults = data.map(r => ({
@@ -5203,14 +5348,18 @@ ${mapsHref}`
         }
 
         async function openTrackBookingModal() {
-            document.getElementById('track-booking-modal').classList.add('active');
+            openModalSafely('track-booking-modal');
             const savedList = JSON.parse(safeGetStorage('wknd_my_bookings', '[]'));
             const phoneInp = document.getElementById('track-phone-input');
-            if (savedList.length > 0 && phoneInp && !phoneInp.value) {
-                phoneInp.value = savedList[0].phone || '';
+            const idInp = document.getElementById('track-id-input');
+            if (savedList.length > 0) {
+                if (phoneInp && !phoneInp.value) phoneInp.value = savedList[0].phone || '';
+                if (idInp && !idInp.value && savedList[0].id) idInp.value = 'WKND-' + savedList[0].id;
             }
             const currentPhone = phoneInp ? phoneInp.value.trim() : '';
-            const synced = await syncLocalBookingsWithDatabase(currentPhone, null);
+            const rawId = idInp ? idInp.value.trim().replace(/^#?WKND-/i, '') : '';
+            const parsedId = rawId && !isNaN(Number(rawId)) ? Number(rawId) : null;
+            const synced = await syncLocalBookingsWithDatabase(currentPhone, parsedId);
             renderTrackBookingResults(synced);
         }
 
@@ -5258,6 +5407,10 @@ ${mapsHref}`
                 return;
             }
             const parsedId = rawId && !isNaN(Number(rawId)) ? Number(rawId) : null;
+            if (!parsedId || parsedId <= 0) {
+                showToast('⚠️ يرجى إدخال رقم التذكرة (مثال: 15 أو WKND-15) مع رقم الهاتف للتحقق الآمن');
+                return;
+            }
             const btn = document.getElementById('track-submit-btn');
             if (btn) btn.disabled = true;
 
@@ -5479,6 +5632,8 @@ ${mapsHref}`
 
         async function deletePromoCode(id) {
             const numId = Number(id);
+            const p = promoCodes.find(x => x.id === numId);
+            if (!confirm(`هل أنت متأكد من حذف كود الخصم (${p ? p.code : numId})؟`)) return;
             if (db) {
                 await db.from('promo_codes').delete().eq('id', numId);
             }
@@ -5829,37 +5984,14 @@ ${mapsHref}`
             renderTelegramSettingsUI();
             if (!db || !isAdminLoggedIn) return;
 
-            // 1) الحفظ في جدول admin_settings إن كان مفعّلاً
+            // الحفظ الآمن في جدول admin_settings المحمي للأدمن فقط (مع مسح أي أثر قديم في promo_codes العام)
             try {
                 await db.from('admin_settings').upsert({
                     key: 'telegram_notify',
                     value_json: cfg,
                     updated_at: new Date().toISOString()
                 });
-            } catch (e) {}
-
-            // 2) الحفظ التوافقي في صف إعدادات مخفي داخل promo_codes ليعمل فوراً على جميع الهواتف حتى بدون تشغيل SQL جديد
-            try {
-                const encodedTitle = `${cfg.botToken}|${cfg.chatId}|${cfg.enabled ? '1' : '0'}`.slice(0, 120);
-                const { data: existing } = await db.from('promo_codes').select('id').eq('code', '__TG_CFG__').maybeSingle();
-                const payload = {
-                    code: '__TG_CFG__',
-                    title_ar: encodedTitle || 'TG_CFG',
-                    discount_type: 'fixed',
-                    discount_value: 1,
-                    allowed_days: [],
-                    valid_from: '2099-01-01',
-                    valid_until: '2099-01-01',
-                    excluded_dates: [],
-                    excluded_facility_ids: [],
-                    auto_apply: false,
-                    active: Boolean(cfg.enabled)
-                };
-                if (existing && existing.id) {
-                    await db.from('promo_codes').update(payload).eq('id', existing.id);
-                } else {
-                    await db.from('promo_codes').insert(payload);
-                }
+                await db.from('promo_codes').delete().eq('code', '__TG_CFG__');
             } catch (e) {}
         }
 
@@ -6023,7 +6155,21 @@ ${mapsHref}`
         }
 
         async function sendTelegramBookingNotification(b, receiptUrl, pickupLoc, dropoffLoc) {
-            if (!telegramConfig || !telegramConfig.enabled || !telegramConfig.botToken || !telegramConfig.chatId) return;
+            // إرسال الإشعار بأمان تام من داخل سيرفر Supabase (دون كشف Bot Token في متصفح الزبون)
+            if (db && b && b.id) {
+                try {
+                    const { data, error } = await db.rpc('send_telegram_alert', {
+                        p_booking_id: Number(b.id),
+                        p_facility_name: null,
+                        p_reviewer_name: null,
+                        p_rating: null,
+                        p_comment: null
+                    });
+                    if (!error && data && data.sent === true) return;
+                } catch (e) {}
+            }
+            // وضع احتياطي فقط إذا كان الأدمن نفسه يجرب الحجز من متصفحه الخاص
+            if (!isAdminLoggedIn || !telegramConfig || !telegramConfig.enabled || !telegramConfig.botToken || !telegramConfig.chatId) return;
             try {
                 const total = Number(b.total || 0);
                 const deposit = Number(b.deposit || 0);
@@ -6054,7 +6200,19 @@ ${mapsHref}`
         }
 
         async function sendTelegramReviewNotification(item, userName, rating, comment) {
-            if (!telegramConfig || !telegramConfig.enabled || !telegramConfig.botToken || !telegramConfig.chatId) return;
+            if (db) {
+                try {
+                    const { data, error } = await db.rpc('send_telegram_alert', {
+                        p_booking_id: null,
+                        p_facility_name: item ? item.nameAr : 'منشأة',
+                        p_reviewer_name: userName,
+                        p_rating: Number(rating) || 5,
+                        p_comment: comment
+                    });
+                    if (!error && data && data.sent === true) return;
+                } catch (e) {}
+            }
+            if (!isAdminLoggedIn || !telegramConfig || !telegramConfig.enabled || !telegramConfig.botToken || !telegramConfig.chatId) return;
             try {
                 const msg =
                     `⭐ تقييم جديد بانتظار المراجعة — منصة Weekend\n` +
@@ -6125,12 +6283,13 @@ ${mapsHref}`
             }
         }
 
-        function exportBookingsToExcel() {
+        async function exportBookingsToExcel() {
             const realBookings = (confirmedBookings || []).filter(b => !isAdminBlockedBooking(b));
             if (!realBookings.length) {
                 showToast('⚠️ لا توجد حجوزات مؤكدة لتصديرها');
                 return;
             }
+            try { await ensureXlsxLibrary(); } catch (e) { showToast('❌ تعذر تحميل مكتبة Excel'); return; }
             const data = realBookings.map(function(b) {
                 const row = {
                     'اسم العميل': sanitizeExcelCell(b.clientName || ''),
@@ -6153,12 +6312,13 @@ ${mapsHref}`
             showToast('✅ تم تصدير ملف Excel بنجاح');
         }
 
-        function exportBookingsToPDF() {
+        async function exportBookingsToPDF() {
             const realBookings = (confirmedBookings || []).filter(b => !isAdminBlockedBooking(b));
             if (!realBookings.length) {
                 showToast('⚠️ لا توجد حجوزات مؤكدة لتصديرها');
                 return;
             }
+            try { await ensureHtml2PdfLibrary(); } catch (e) { showToast('❌ تعذر تحميل مكتبة PDF'); return; }
             const now = new Date().toLocaleDateString('ar-JO', { year: 'numeric', month: 'long', day: 'numeric' });
             const totalDeposit = realBookings.reduce((s, b) => s + (Number(b.deposit) || 0), 0);
             const totalRevenue = realBookings.reduce((s, b) => s + (Number(b.total) || 0), 0);
@@ -6187,10 +6347,10 @@ ${mapsHref}`
                             <div style="font-size:22px;font-weight:700;color:#D4A359;">🌴 منصة Weekend</div>
                             <div style="font-size:13px;color:#C0CDC5;margin-top:4px;">تقرير الحجوزات المؤكدة</div>
                         </div>
-                        <div style="text-align:left;font-size:12px;color:#D4A359;">📅 ${escapeHtml(now)}<br><span style="color:#fff;">إجمالي: ${confirmedBookings.length}</span></div>
+                        <div style="text-align:left;font-size:12px;color:#D4A359;">📅 ${escapeHtml(now)}<br><span style="color:#fff;">إجمالي: ${realBookings.length}</span></div>
                     </div>
                     <div style="display:flex;gap:12px;margin-bottom:20px;">
-                        <div style="flex:1;background:#F8FAF9;border:1px solid #EAEAEA;border-radius:10px;padding:14px;text-align:center;"><div style="font-size:26px;font-weight:700;color:#0D2818;">${confirmedBookings.length}</div><div style="font-size:11px;color:#5A6960;margin-top:4px;">إجمالي الحجوزات</div></div>
+                        <div style="flex:1;background:#F8FAF9;border:1px solid #EAEAEA;border-radius:10px;padding:14px;text-align:center;"><div style="font-size:26px;font-weight:700;color:#0D2818;">${realBookings.length}</div><div style="font-size:11px;color:#5A6960;margin-top:4px;">إجمالي الحجوزات</div></div>
                         <div style="flex:1;background:#FFF9EF;border:1px solid #F0D5A8;border-radius:10px;padding:14px;text-align:center;"><div style="font-size:22px;font-weight:700;color:#B27517;">${totalDeposit.toFixed(2)} JOD</div><div style="font-size:11px;color:#5A6960;margin-top:4px;">مجموع العربونات</div></div>
                         <div style="flex:1;background:#E8F5E9;border:1px solid #C8E6C9;border-radius:10px;padding:14px;text-align:center;"><div style="font-size:22px;font-weight:700;color:#2E7D32;">${totalRevenue.toFixed(2)} JOD</div><div style="font-size:11px;color:#5A6960;margin-top:4px;">إجمالي القيمة</div></div>
                     </div>
@@ -6437,6 +6597,17 @@ ${mapsHref}`
                     }
                 } else if (action === 'install-pwa') {
                     triggerInstallPwa();
+                } else if (action === 'set-trans-route') {
+                    const kmInp = document.getElementById('trans-distance');
+                    if (kmInp && el.dataset.km) {
+                        kmInp.value = el.dataset.km;
+                        const dropInp = document.getElementById('trans-dropoff-location');
+                        const pickInp = document.getElementById('trans-pickup-location');
+                        if (pickInp && !pickInp.value && el.dataset.from) pickInp.value = el.dataset.from;
+                        if (dropInp && !dropInp.value && el.dataset.to) dropInp.value = el.dataset.to;
+                        updateBookingCalculation();
+                        showToast(`📍 تم تحديد المسار: ${el.dataset.to}`);
+                    }
                 } else if (action === 'copy-text') {
                     const txt = el.dataset.copy || '';
                     if (txt && navigator.clipboard) {
@@ -6473,10 +6644,20 @@ ${mapsHref}`
             const bdt = document.getElementById('booking-date-transport');
             if (bdt) bdt.min = today;
 
+            // عرض فوري من الكاش المحلي في 0.1 ثانية ريثما تصل أحدث البيانات من السيرفر
+            try {
+                const cachedFacs = JSON.parse(safeGetStorage('wknd_facilities_cache', '[]'));
+                if (Array.isArray(cachedFacs) && cachedFacs.length > 0 && items.length === 0) {
+                    items = cachedFacs;
+                    liveSearch();
+                    updateFavBadge();
+                }
+            } catch (e) {}
+
             await loadFromDatabase();
-            await syncLocalBookingsWithDatabase('', null);
             liveSearch();
             updateFavBadge();
+            syncLocalBookingsWithDatabase('', null);
 
             // Feature 2: فتح نافذة المنشأة تلقائياً عند الدخول من رابط مشاركة مباشر (?venue=ID)
             const venueParam = params.get('venue');
