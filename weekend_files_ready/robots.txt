@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://weekend-three-xi.vercel.app/sitemap.xml
