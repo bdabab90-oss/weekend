@@ -872,13 +872,14 @@
                 </div>
 
                 <div class="bill-box" id="bill-details"></div>
-                <div class="split-cost-box" id="booking-split-box">
-                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                        <label for="split-people-count" style="margin:0;font-weight:700;font-size:0.86rem;color:#0D47A1;">👥 تقسيم الفاتورة بين الأصدقاء / اللاعبين (كم عددكم؟)</label>
-                        <input type="number" id="split-people-count" min="1" max="100" value="1" class="form-control" style="width:90px;padding:0.35rem 0.6rem;text-align:center;font-weight:700;">
+                <details class="split-cost-box" id="booking-split-box" style="margin-top:0.75rem;padding:0.7rem 1rem;">
+                    <summary style="cursor:pointer;font-weight:700;font-size:0.85rem;color:#0D47A1;">👥 حاسبة تقسيم الفاتورة بين الأصدقاء (اختياري)</summary>
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-top:0.65rem;">
+                        <label for="split-people-count" style="margin:0;font-weight:600;font-size:0.84rem;color:var(--text-dark);">عدد الأشخاص / اللاعبين:</label>
+                        <input type="number" id="split-people-count" min="1" max="100" value="2" class="form-control" style="width:90px;padding:0.35rem 0.6rem;text-align:center;font-weight:700;">
                     </div>
-                    <div id="split-cost-result" style="margin-top:6px;font-size:0.85rem;color:#0D47A1;font-weight:600;"></div>
-                </div>
+                    <div id="split-cost-result" style="margin-top:6px;font-size:0.84rem;color:#0D47A1;font-weight:600;"></div>
+                </details>
 
                 <div class="form-group" style="display:flex;align-items:flex-start;gap:10px;margin-top:1rem;background:#FAFBFB;padding:0.8rem;border-radius:10px;border:1px solid #EAEAEA;">
                     <input type="checkbox" id="accept-terms-checkbox" required style="margin-top:4px;width:18px;height:18px;accent-color:var(--primary-dark);cursor:pointer;">
@@ -935,14 +936,15 @@
                 <a id="btn-share-ticket-wa" href="#" target="_blank" rel="noopener noreferrer" class="btn-wa-share" style="flex:1;justify-content:center;text-decoration:none;">💬 إرسال عبر واتساب</a>
                 <button type="button" class="btn-details" id="btn-copy-ticket-id" style="margin:0;">📋 نسخ رقم التذكرة</button>
             </div>
-            <div id="ticket-split-share-wrap" class="split-cost-box" style="margin-top:0.9rem;">
-                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                    <label for="ticket-split-count" style="margin:0;font-weight:700;font-size:0.85rem;color:#0D47A1;">👥 قسّم مبلغ الحجز على مجموعتك:</label>
+            <details id="ticket-split-share-wrap" class="split-cost-box" style="margin-top:0.85rem;padding:0.7rem 1rem;">
+                <summary style="cursor:pointer;font-weight:700;font-size:0.85rem;color:#0D47A1;">👥 تقسيم مبلغ التذكرة ومشاركته مع الأصدقاء (اختياري)</summary>
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-top:0.65rem;">
+                    <label for="ticket-split-count" style="margin:0;font-weight:600;font-size:0.84rem;color:var(--text-dark);">عدد الأشخاص:</label>
                     <input type="number" id="ticket-split-count" min="2" max="100" value="6" class="form-control" style="width:82px;padding:0.3rem 0.5rem;text-align:center;font-weight:700;">
                 </div>
                 <div id="ticket-split-summary" style="margin-top:6px;font-size:0.84rem;color:#0D47A1;font-weight:600;"></div>
                 <a id="btn-share-split-wa" href="#" target="_blank" rel="noopener noreferrer" class="btn-wa-share" style="margin-top:8px;width:100%;justify-content:center;text-decoration:none;font-size:0.84rem;">💬 أرسل حصة كل شخص على قروب الواتساب</a>
-            </div>
+            </details>
             <div class="change-req-box" id="ticket-change-req-box">
                 <div style="font-size:0.86rem;font-weight:700;color:var(--primary-dark);margin-bottom:6px;">🛠️ هل تحتاج تعديل موعدك أو إلغاء الحجز؟</div>
                 <div id="ticket-change-req-status" style="font-size:0.82rem;color:#E65100;font-weight:600;margin-bottom:6px;display:none;"></div>
@@ -2904,7 +2906,6 @@
                 const total = promoInfo.netTotal;
                 const deposit = Number((total * 0.15).toFixed(2));
                 const remaining = Number((total - deposit).toFixed(2));
-                updateBookingSplitDisplay(total, deposit);
                 const tripTypeLabel = isRoundTrip ? 'ذهاب وإياب' : 'ذهاب فقط';
 
                 billEl.innerHTML = `
@@ -2917,6 +2918,7 @@
                     <div class="bill-row"><span>المبلغ الإجمالي:</span><span>${promoInfo.totalLabelHtml}</span></div>
                     <div class="bill-row highlight"><span>العربون المطلوب (15%):</span><span><strong>${deposit.toFixed(2)} JOD</strong></span></div>
                     <div class="bill-row total"><span>المتبقي عند الرحلة:</span><span>${remaining.toFixed(2)} JOD</span></div>`;
+                try { updateBookingSplitDisplay(total, deposit); } catch(e) {}
                 return;
             }
 
@@ -2945,7 +2947,6 @@
                 const total      = promoInfo.netTotal;
                 const deposit    = Math.min(5.0, total);
                 const remaining  = Math.max(0, Number((total - deposit).toFixed(2)));
-                updateBookingSplitDisplay(total, deposit);
                 const startLabel = startHour < 12 ? `${startHour}:00 ص` : (startHour === 12 ? '12:00 ظ' : `${startHour-12}:00 م`);
                 const endLabel   = endHour < 12 ? `${endHour}:00 ص` : (endHour === 12 ? '12:00 ظ' : endHour === 24 ? '12:00 ص (منتصف الليل)' : `${endHour-12}:00 م`);
 
@@ -2963,6 +2964,7 @@
                     <div class="bill-row highlight"><span>العربون المطلوب:</span><span><strong>${deposit.toFixed(2)} JOD</strong></span></div>
                     <div class="bill-row total"><span>المتبقي عند الملعب:</span><span>${remaining.toFixed(2)} JOD</span></div>
                     ${conflictWarning}`;
+                try { updateBookingSplitDisplay(total, deposit); } catch(e) {}
                 return;
             }
 
@@ -2977,7 +2979,6 @@
             const total     = promoInfo.netTotal;
             const deposit   = Number((total * 0.15).toFixed(2));
             const remaining = Number((total - deposit).toFixed(2));
-            updateBookingSplitDisplay(total, deposit);
 
             document.getElementById('price-day-label').textContent   = `${(Number(selectedItem.priceDay || 0) * multiplier).toFixed(1)} JOD`;
             document.getElementById('price-night-label').textContent = `${(Number(selectedItem.priceNight || 0) * multiplier).toFixed(1)} JOD`;
@@ -2989,6 +2990,7 @@
                 <div class="bill-row"><span>المبلغ الإجمالي:</span><span>${promoInfo.totalLabelHtml}</span></div>
                 <div class="bill-row highlight"><span>العربون المطلوب (15%):</span><span><strong>${deposit.toFixed(2)} JOD</strong></span></div>
                 <div class="bill-row total"><span>المتبقي عند الوصول:</span><span>${remaining.toFixed(2)} JOD</span></div>`;
+            try { updateBookingSplitDisplay(total, deposit); } catch(e) {}
         }
 
         async function handleReceiptFileChange(input) {
@@ -5966,102 +5968,6 @@ ${mapsHref}`
             }
         }, true);
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Setup direct listeners
-            document.getElementById('hamburger-btn')?.addEventListener('click', toggleMobileMenu);
-            document.getElementById('lang-toggle-btn')?.addEventListener('click', toggleLanguage);
-            document.getElementById('logout-admin-btn')?.addEventListener('click', logoutAdmin);
-            let searchDebounceTimer = null;
-            document.getElementById('search-location')?.addEventListener('input', () => {
-                clearTimeout(searchDebounceTimer);
-                searchDebounceTimer = setTimeout(liveSearch, 100);
-            });
-            document.getElementById('search-category')?.addEventListener('change', liveSearch);
-            document.getElementById('search-region')?.addEventListener('change', liveSearch);
-            initPwaManifestAndPrompt();
-            document.getElementById('sort-order-select')?.addEventListener('change', function() {
-                currentSortOrder = this.value || 'fair';
-                liveSearch();
-            });
-            document.getElementById('adm-v-type')?.addEventListener('change', toggleVenueTypePricing);
-            document.getElementById('adm-v-img-file')?.addEventListener('change', function() { handleAdminImageUpload(this, 'venue'); });
-            document.getElementById('adm-v-extra-files')?.addEventListener('change', function() { handleAdminExtraImagesUpload(this, 'venue'); });
-            document.getElementById('adm-v-video-file')?.addEventListener('change', function() { handleAdminVideoUpload(this, 'venue'); });
-            document.getElementById('adm-t-img-file')?.addEventListener('change', function() { handleAdminImageUpload(this, 'transport'); });
-            document.getElementById('adm-t-extra-files')?.addEventListener('change', function() { handleAdminExtraImagesUpload(this, 'transport'); });
-            document.getElementById('adm-t-video-file')?.addEventListener('change', function() { handleAdminVideoUpload(this, 'transport'); });
-            document.getElementById('add-venue-form')?.addEventListener('submit', e => addListing(e, 'venue'));
-            document.getElementById('add-transport-form')?.addEventListener('submit', e => addListing(e, 'transport'));
-            document.getElementById('review-form')?.addEventListener('submit', submitReview);
-            document.getElementById('booking-form')?.addEventListener('submit', processBooking);
-            document.getElementById('admin-login-form')?.addEventListener('submit', handleAdminLoginSubmit);
-            document.getElementById('booking-date')?.addEventListener('change', onBookingDateChange);
-            document.getElementById('pitch-start-hour')?.addEventListener('change', updateBookingCalculation);
-            document.getElementById('pitch-hours')?.addEventListener('input', updateBookingCalculation);
-            document.getElementById('trans-passengers')?.addEventListener('input', updateBookingCalculation);
-            document.getElementById('trans-distance')?.addEventListener('input', updateBookingCalculation);
-            document.getElementById('trans-round-trip')?.addEventListener('change', updateBookingCalculation);
-            document.getElementById('cliq-receipt')?.addEventListener('change', function() { handleReceiptFileChange(this); });
-            document.getElementById('chat-toggle-btn')?.addEventListener('click', toggleChat);
-            document.getElementById('chat-close-btn')?.addEventListener('click', toggleChat);
-            document.getElementById('btn-export-excel')?.addEventListener('click', exportBookingsToExcel);
-            document.getElementById('btn-export-pdf')?.addEventListener('click', exportBookingsToPDF);
-            document.getElementById('btn-export-backup')?.addEventListener('click', exportFullBackup);
-            document.getElementById('inp-restore-backup')?.addEventListener('change', function() { handleRestoreBackupFile(this); });
-            document.getElementById('btn-goto-add-pitch')?.addEventListener('click', () => {
-                switchAdminTab('dash-listings', document.querySelectorAll('.sidebar-item')[1]);
-                switchAdminForm('venue');
-                document.getElementById('adm-v-type').value = 'field';
-                toggleVenueTypePricing();
-            });
-            document.getElementById('det-book-btn')?.addEventListener('click', function() {
-                const id = this.dataset.id;
-                closeModal('details-modal');
-                if (id) openBookingModal(Number(id));
-            });
-            document.getElementById('det-wa-share-btn')?.addEventListener('click', function() {
-                const id = this.dataset.id;
-                if (id) sharePropertyWhatsApp(Number(id));
-            });
-            document.getElementById('det-copy-link-btn')?.addEventListener('click', function() {
-                const id = this.dataset.id;
-                if (id) copyPropertyDeepLink(Number(id));
-            });
-            document.getElementById('booking-date-transport')?.addEventListener('change', updateBookingCalculation);
-            document.getElementById('btn-apply-promo')?.addEventListener('click', applyBookingPromoCode);
-            document.getElementById('btn-clear-promo')?.addEventListener('click', clearBookingPromoCode);
-            document.getElementById('add-promo-form')?.addEventListener('submit', savePromoCode);
-            document.getElementById('quick-block-form')?.addEventListener('submit', submitQuickBlockForm);
-            document.getElementById('telegram-config-form')?.addEventListener('submit', saveTelegramConfig);
-            document.getElementById('adm-v-map-url')?.addEventListener('input', () => handleAdminMapUrlInput('venue'));
-            document.getElementById('adm-t-map-url')?.addEventListener('input', () => handleAdminMapUrlInput('transport'));
-            document.getElementById('adm-v-lat')?.addEventListener('change', initOrUpdateAdminMapPicker);
-            document.getElementById('adm-v-lng')?.addEventListener('change', initOrUpdateAdminMapPicker);
-            document.getElementById('btn-tg-detect-chat')?.addEventListener('click', detectTelegramChatIdAutomatically);
-            document.getElementById('tg-chat-id')?.addEventListener('input', function() {
-                const extracted = extractChatIdFromInput(this.value);
-                if (extracted && extracted !== this.value && /^-?[0-9]{5,20}$/.test(extracted)) {
-                    this.value = extracted;
-                    showToast('✅ تم استخراج رقم المحادثة بنجاح: ' + extracted);
-                }
-            });
-            document.getElementById('btn-tg-test')?.addEventListener('click', sendTestTelegramNotification);
-            document.getElementById('btn-tg-disable')?.addEventListener('click', disableTelegramNotifications);
-            document.getElementById('quick-block-facility')?.addEventListener('change', syncQuickBlockFormUI);
-            document.getElementById('quick-block-pitch-start')?.addEventListener('change', syncQuickBlockFormUI);
-            document.getElementById('btn-add-ex-date')?.addEventListener('click', addExcludedDateToInput);
-            document.getElementById('track-booking-form')?.addEventListener('submit', handleTrackBookingSubmit);
-            document.getElementById('btn-download-ticket-pdf')?.addEventListener('click', downloadTicketPDF);
-            document.getElementById('btn-copy-ticket-id')?.addEventListener('click', () => {
-                if (currentTicketBooking && navigator.clipboard) {
-                    const code = currentTicketBooking.ticketCode || ('WKND-' + currentTicketBooking.id);
-                    navigator.clipboard.writeText(code).then(() => showToast('✅ تم نسخ رقم التذكرة: ' + code)).catch(() => {});
-                }
-            });
-            document.getElementById('det-main-img')?.addEventListener('click', function() {
-                if (this.src) openImageModal(this.src, selectedItem ? localizedItemText(selectedItem, 'name') : 'معاينة الصورة');
-            });
-
             
         // =====================================================
         //  V2 CUSTOMER FEATURES: SPLIT COST, COMPARE, SELF-SERVICE CANCEL/RESCHEDULE, BUNDLE
@@ -6211,6 +6117,102 @@ ${mapsHref}`
             </table>`;
             openModalSafely('compare-modal');
         }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Setup direct listeners
+            document.getElementById('hamburger-btn')?.addEventListener('click', toggleMobileMenu);
+            document.getElementById('lang-toggle-btn')?.addEventListener('click', toggleLanguage);
+            document.getElementById('logout-admin-btn')?.addEventListener('click', logoutAdmin);
+            let searchDebounceTimer = null;
+            document.getElementById('search-location')?.addEventListener('input', () => {
+                clearTimeout(searchDebounceTimer);
+                searchDebounceTimer = setTimeout(liveSearch, 100);
+            });
+            document.getElementById('search-category')?.addEventListener('change', liveSearch);
+            document.getElementById('search-region')?.addEventListener('change', liveSearch);
+            initPwaManifestAndPrompt();
+            document.getElementById('sort-order-select')?.addEventListener('change', function() {
+                currentSortOrder = this.value || 'fair';
+                liveSearch();
+            });
+            document.getElementById('adm-v-type')?.addEventListener('change', toggleVenueTypePricing);
+            document.getElementById('adm-v-img-file')?.addEventListener('change', function() { handleAdminImageUpload(this, 'venue'); });
+            document.getElementById('adm-v-extra-files')?.addEventListener('change', function() { handleAdminExtraImagesUpload(this, 'venue'); });
+            document.getElementById('adm-v-video-file')?.addEventListener('change', function() { handleAdminVideoUpload(this, 'venue'); });
+            document.getElementById('adm-t-img-file')?.addEventListener('change', function() { handleAdminImageUpload(this, 'transport'); });
+            document.getElementById('adm-t-extra-files')?.addEventListener('change', function() { handleAdminExtraImagesUpload(this, 'transport'); });
+            document.getElementById('adm-t-video-file')?.addEventListener('change', function() { handleAdminVideoUpload(this, 'transport'); });
+            document.getElementById('add-venue-form')?.addEventListener('submit', e => addListing(e, 'venue'));
+            document.getElementById('add-transport-form')?.addEventListener('submit', e => addListing(e, 'transport'));
+            document.getElementById('review-form')?.addEventListener('submit', submitReview);
+            document.getElementById('booking-form')?.addEventListener('submit', processBooking);
+            document.getElementById('admin-login-form')?.addEventListener('submit', handleAdminLoginSubmit);
+            document.getElementById('booking-date')?.addEventListener('change', onBookingDateChange);
+            document.getElementById('pitch-start-hour')?.addEventListener('change', updateBookingCalculation);
+            document.getElementById('pitch-hours')?.addEventListener('input', updateBookingCalculation);
+            document.getElementById('trans-passengers')?.addEventListener('input', updateBookingCalculation);
+            document.getElementById('trans-distance')?.addEventListener('input', updateBookingCalculation);
+            document.getElementById('trans-round-trip')?.addEventListener('change', updateBookingCalculation);
+            document.getElementById('cliq-receipt')?.addEventListener('change', function() { handleReceiptFileChange(this); });
+            document.getElementById('chat-toggle-btn')?.addEventListener('click', toggleChat);
+            document.getElementById('chat-close-btn')?.addEventListener('click', toggleChat);
+            document.getElementById('btn-export-excel')?.addEventListener('click', exportBookingsToExcel);
+            document.getElementById('btn-export-pdf')?.addEventListener('click', exportBookingsToPDF);
+            document.getElementById('btn-export-backup')?.addEventListener('click', exportFullBackup);
+            document.getElementById('inp-restore-backup')?.addEventListener('change', function() { handleRestoreBackupFile(this); });
+            document.getElementById('btn-goto-add-pitch')?.addEventListener('click', () => {
+                switchAdminTab('dash-listings', document.querySelectorAll('.sidebar-item')[1]);
+                switchAdminForm('venue');
+                document.getElementById('adm-v-type').value = 'field';
+                toggleVenueTypePricing();
+            });
+            document.getElementById('det-book-btn')?.addEventListener('click', function() {
+                const id = this.dataset.id;
+                closeModal('details-modal');
+                if (id) openBookingModal(Number(id));
+            });
+            document.getElementById('det-wa-share-btn')?.addEventListener('click', function() {
+                const id = this.dataset.id;
+                if (id) sharePropertyWhatsApp(Number(id));
+            });
+            document.getElementById('det-copy-link-btn')?.addEventListener('click', function() {
+                const id = this.dataset.id;
+                if (id) copyPropertyDeepLink(Number(id));
+            });
+            document.getElementById('booking-date-transport')?.addEventListener('change', updateBookingCalculation);
+            document.getElementById('btn-apply-promo')?.addEventListener('click', applyBookingPromoCode);
+            document.getElementById('btn-clear-promo')?.addEventListener('click', clearBookingPromoCode);
+            document.getElementById('add-promo-form')?.addEventListener('submit', savePromoCode);
+            document.getElementById('quick-block-form')?.addEventListener('submit', submitQuickBlockForm);
+            document.getElementById('telegram-config-form')?.addEventListener('submit', saveTelegramConfig);
+            document.getElementById('adm-v-map-url')?.addEventListener('input', () => handleAdminMapUrlInput('venue'));
+            document.getElementById('adm-t-map-url')?.addEventListener('input', () => handleAdminMapUrlInput('transport'));
+            document.getElementById('adm-v-lat')?.addEventListener('change', initOrUpdateAdminMapPicker);
+            document.getElementById('adm-v-lng')?.addEventListener('change', initOrUpdateAdminMapPicker);
+            document.getElementById('btn-tg-detect-chat')?.addEventListener('click', detectTelegramChatIdAutomatically);
+            document.getElementById('tg-chat-id')?.addEventListener('input', function() {
+                const extracted = extractChatIdFromInput(this.value);
+                if (extracted && extracted !== this.value && /^-?[0-9]{5,20}$/.test(extracted)) {
+                    this.value = extracted;
+                    showToast('✅ تم استخراج رقم المحادثة بنجاح: ' + extracted);
+                }
+            });
+            document.getElementById('btn-tg-test')?.addEventListener('click', sendTestTelegramNotification);
+            document.getElementById('btn-tg-disable')?.addEventListener('click', disableTelegramNotifications);
+            document.getElementById('quick-block-facility')?.addEventListener('change', syncQuickBlockFormUI);
+            document.getElementById('quick-block-pitch-start')?.addEventListener('change', syncQuickBlockFormUI);
+            document.getElementById('btn-add-ex-date')?.addEventListener('click', addExcludedDateToInput);
+            document.getElementById('track-booking-form')?.addEventListener('submit', handleTrackBookingSubmit);
+            document.getElementById('btn-download-ticket-pdf')?.addEventListener('click', downloadTicketPDF);
+            document.getElementById('btn-copy-ticket-id')?.addEventListener('click', () => {
+                if (currentTicketBooking && navigator.clipboard) {
+                    const code = currentTicketBooking.ticketCode || ('WKND-' + currentTicketBooking.id);
+                    navigator.clipboard.writeText(code).then(() => showToast('✅ تم نسخ رقم التذكرة: ' + code)).catch(() => {});
+                }
+            });
+            document.getElementById('det-main-img')?.addEventListener('click', function() {
+                if (this.src) openImageModal(this.src, selectedItem ? localizedItemText(selectedItem, 'name') : 'معاينة الصورة');
+            });
 
             // Direct listeners for V2 customer features
             document.getElementById('split-people-count')?.addEventListener('input', () => updateBookingSplitDisplay(lastCalculatedBookingTotal, lastCalculatedBookingDeposit));
