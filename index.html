@@ -469,6 +469,8 @@
         .bundle-offer-box { background:linear-gradient(135deg,#F0F8F4,#E8F5E9); border:1.5px solid #66BB6A; border-radius:14px; padding:0.9rem 1.1rem; margin-bottom:1.1rem; display:none; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
         .sticky-mobile-cta { position:sticky; bottom:-1.2rem; background:rgba(255,255,255,0.97); backdrop-filter:blur(8px); border-top:1.5px solid #E0EAE4; margin:0 -2rem -2rem -2rem; padding:0.85rem 1.5rem; display:flex; justify-content:space-between; align-items:center; gap:12px; z-index:20; border-radius:0 0 20px 20px; box-shadow:0 -6px 20px rgba(13,40,24,0.08); }
         @media (max-width:768px) { .sticky-mobile-cta { margin:0 -1.2rem -1.2rem -1.2rem; padding:0.8rem 1rem; } }
+        .card-footer > div:last-child { display:flex; align-items:center; gap:6px; flex-wrap:nowrap; }
+        .card-footer .btn-details, .card-footer .btn-action { padding:0.45rem 0.78rem; font-size:0.84rem; margin:0 !important; white-space:nowrap; }
         .btn-compare-card { background:#F5F9F6; border:1.5px solid #C8E0D0; color:var(--primary-dark); padding:0.42rem 0.7rem; border-radius:10px; cursor:pointer; font-size:0.8rem; font-weight:600; transition:all 0.2s; min-height:40px; }
         .btn-compare-card.selected { background:var(--accent-gold); color:var(--primary-dark); border-color:var(--accent-gold); }
         .compare-float-bar { position:fixed; bottom:20px; right:50%; transform:translateX(50%); background:var(--primary-dark); color:white; padding:0.7rem 1.2rem; border-radius:30px; box-shadow:0 10px 30px rgba(0,0,0,0.28); display:none; align-items:center; gap:12px; z-index:1600; border:1.5px solid var(--accent-gold); max-width:calc(100vw - 32px); }
@@ -4579,6 +4581,19 @@
                             <div class="ticket-info-item"><strong>📞 رقم الهاتف</strong><span style="direction:ltr;display:inline-block;">${escapeHtml(b.phone || '')}</span></div>
                             <div class="ticket-info-item"><strong>🏡 المنشأة / الخدمة</strong><span>${escapeHtml(venueName)}</span></div>
                             <div class="ticket-info-item"><strong>📍 الموقع</strong><span>${escapeHtml(venueLoc)}</span></div>
+                            <div class="ticket-info-item" style="grid-column:1/-1;background:#FFF9EF;padding:9px 11px;border-radius:10px;border:1.5px solid #E5C384;">
+                                <strong style="color:var(--primary-dark);margin-bottom:4px;">📞 أرقام التواصل المباشر (صاحب المنشأة والحارس / السائق)</strong>
+                                ${status === 'confirmed'
+                                    ? ( (b.ownerPhone || b.guardPhone)
+                                        ? `<div style="display:flex;flex-direction:column;gap:6px;margin-top:4px;">
+                                            ${b.ownerPhone ? `<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;"><span>👤 صاحب المنشأة: <strong style="direction:ltr;display:inline-block;">${escapeHtml(b.ownerPhone)}</strong></span><span style="display:inline-flex;gap:6px;"><a href="tel:${escapeHtml(normalizePhone(b.ownerPhone))}" class="copy-chip-btn" style="text-decoration:none;">📞 اتصال</a><a href="https://wa.me/${escapeHtml(toWhatsAppPhone(b.ownerPhone))}" target="_blank" rel="noopener noreferrer" class="copy-chip-btn" style="text-decoration:none;background:#E8F5E9;border-color:#2E7D32;color:#1B5E20;">💬 واتساب</a></span></div>` : ''}
+                                            ${b.guardPhone ? `<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;"><span>🛡️ الحارس / السائق: <strong style="direction:ltr;display:inline-block;">${escapeHtml(b.guardPhone)}</strong></span><span style="display:inline-flex;gap:6px;"><a href="tel:${escapeHtml(normalizePhone(b.guardPhone))}" class="copy-chip-btn" style="text-decoration:none;">📞 اتصال</a><a href="https://wa.me/${escapeHtml(toWhatsAppPhone(b.guardPhone))}" target="_blank" rel="noopener noreferrer" class="copy-chip-btn" style="text-decoration:none;background:#E8F5E9;border-color:#2E7D32;color:#1B5E20;">💬 واتساب</a></span></div>` : ''}
+                                           </div>`
+                                        : `<span style="color:var(--text-muted);font-size:0.82rem;">للتواصل المباشر: 0781929509</span>`
+                                      )
+                                    : `<span style="color:#5A6960;font-size:0.82rem;font-weight:500;">🔒 سيظهر رقم صاحب المنشأة ورقم الحارس / السائق هنا تلقائياً فور تأكيد الحجز من الإدارة.</span>`
+                                }
+                            </div>
                             <div class="ticket-info-item" style="grid-column:1/-1;background:#EFF8FF;padding:8px 10px;border-radius:10px;border:1px solid #90CAF9;">
                                 <strong style="color:#0D47A1;">🗺️ موقع المنشأة على الخريطة (Google Maps)</strong>
                                 ${status === 'confirmed'
@@ -4623,8 +4638,9 @@
 ` +
                 `المتبقي عند الوصول: ${remaining.toFixed(2)} JOD
 ` +
-                `📍 رابط اللوكيشن على الخريطة:
-${mapsHref}`
+                (status === "confirmed" && b.ownerPhone ? `📞 رقم صاحب المنشأة: ${b.ownerPhone}\n` : "") +
+                (status === "confirmed" && b.guardPhone ? `🛡️ رقم الحارس / السائق: ${b.guardPhone}\n` : "") +
+                (status === "confirmed" ? `📍 رابط اللوكيشن على الخريطة:\n${mapsHref}` : "⏳ بانتظار تأكيد الإدارة لإظهار الموقع وأرقام التواصل")
             );
             const waBtn = document.getElementById('btn-share-ticket-wa');
             if (waBtn) waBtn.href = `https://wa.me/?text=${waText}`;
@@ -4866,6 +4882,8 @@ ${mapsHref}`
                             ticketCode: String(r.ticket_code || ('WKND-' + r.id)),
                             changeRequestType: r.change_request_type || null,
                             changeRequestStatus: r.change_request_status || null,
+                            ownerPhone: r.owner_phone || null,
+                            guardPhone: r.guard_phone || null,
                             facilityId: Number(r.facility_id),
                             itemNameAr: r.item_name_ar,
                             itemNameEn: r.item_name_en || r.item_name_ar,
@@ -4896,6 +4914,10 @@ ${mapsHref}`
                     const srv = serverResults.find(s => Number(s.id) === Number(localItem.id));
                     if (srv) {
                         localItem.status = srv.status;
+                        localItem.ownerPhone = srv.ownerPhone || null;
+                        localItem.guardPhone = srv.guardPhone || null;
+                        localItem.lat = srv.lat ?? localItem.lat;
+                        localItem.lng = srv.lng ?? localItem.lng;
                         activeLocalList.push(localItem);
                     }
                     // إذا لم يعد موجوداً في نتائج السيرفر لنفس الرقم، فهذا يعني أنه حُذف أو انتهى فلا نبقيه
