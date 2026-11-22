@@ -710,6 +710,16 @@
                                     <div class="form-group" style="flex:1;margin-bottom:0;"><label>خط الطول Longitude (يُملأ تلقائياً)</label><input type="number" step="any" min="-180" max="180" class="form-control" id="adm-v-lng" placeholder="35.8500"></div>
                                 </div>
                             </div>
+                            <div class="form-row" style="background:#FFF9EF;border:1.5px solid #E5C384;border-radius:12px;padding:0.85rem;margin-bottom:1rem;">
+                                <div class="form-group" style="flex:1;margin-bottom:0;">
+                                    <label for="adm-v-owner-phone" style="color:var(--primary-dark);">📞 رقم صاحب المنشأة / الملعب (إجباري — يظهر بعد تأكيد الحجز فقط)</label>
+                                    <input type="tel" class="form-control" id="adm-v-owner-phone" required maxlength="20" placeholder="مثال: 0791234567" style="direction:ltr;">
+                                </div>
+                                <div class="form-group" style="flex:1;margin-bottom:0;">
+                                    <label for="adm-v-guard-phone" style="color:var(--primary-dark);">🛡️ رقم الحارس / المسؤول (إجباري — يظهر بعد تأكيد الحجز فقط)</label>
+                                    <input type="tel" class="form-control" id="adm-v-guard-phone" required maxlength="20" placeholder="مثال: 0781234567" style="direction:ltr;">
+                                </div>
+                            </div>
                             <div class="form-row">
                                 <div class="form-group" style="flex:1;"><label>🛡️ مبلغ التأمين المسترد عند الوصول (د.أ — اتركه 0 إن لم يوجد)</label><input type="number" step="1" min="0" max="5000" value="0" class="form-control" id="adm-v-security-deposit" placeholder="مثال: 50"></div>
                                 <div class="form-group" style="flex:1;display:flex;align-items:flex-end;padding-bottom:8px;"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:700;color:var(--success);margin:0;"><input type="checkbox" id="adm-v-verified" checked style="width:18px;height:18px;accent-color:var(--primary-dark);"> ✅ منشأة موثّقة ومعايَنة من فريق Weekend</label></div>
@@ -813,6 +823,16 @@
                                 <div class="form-row" style="margin-bottom:0;">
                                     <div class="form-group" style="flex:1;margin-bottom:0;"><label>خط العرض Latitude</label><input type="number" step="any" min="-90" max="90" class="form-control" id="adm-t-lat" placeholder="31.9510"></div>
                                     <div class="form-group" style="flex:1;margin-bottom:0;"><label>خط الطول Longitude</label><input type="number" step="any" min="-180" max="180" class="form-control" id="adm-t-lng" placeholder="35.9270"></div>
+                                </div>
+                            </div>
+                            <div class="form-row" style="background:#FFF9EF;border:1.5px solid #E5C384;border-radius:12px;padding:0.85rem;margin-bottom:1rem;">
+                                <div class="form-group" style="flex:1;margin-bottom:0;">
+                                    <label for="adm-t-owner-phone" style="color:var(--primary-dark);">📞 رقم صاحب الباص / المكتب (إجباري — يظهر بعد تأكيد الحجز فقط)</label>
+                                    <input type="tel" class="form-control" id="adm-t-owner-phone" required maxlength="20" placeholder="مثال: 0791234567" style="direction:ltr;">
+                                </div>
+                                <div class="form-group" style="flex:1;margin-bottom:0;">
+                                    <label for="adm-t-guard-phone" style="color:var(--primary-dark);">🛡️ رقم السائق / المنسّق (إجباري — يظهر بعد تأكيد الحجز فقط)</label>
+                                    <input type="tel" class="form-control" id="adm-t-guard-phone" required maxlength="20" placeholder="مثال: 0781234567" style="direction:ltr;">
                                 </div>
                             </div>
                             <div class="form-row">
@@ -2071,6 +2091,21 @@
                         return it;
                     });
                     safeSetStorage('wknd_facilities_cache', JSON.stringify(items.filter(i => i.active)));
+                // جلب أرقام أصحاب المنشآت والحراس (محمية للأدمن فقط في جدول facility_contacts)
+                if (isAdminLoggedIn && Array.isArray(items) && items.length > 0) {
+                    try {
+                        const { data: contactsData } = await db.from('facility_contacts').select('facility_id,owner_phone,guard_phone');
+                        if (Array.isArray(contactsData)) {
+                            const cMap = new Map(contactsData.map(c => [Number(c.facility_id), c]));
+                            items.forEach(it => {
+                                const c = cMap.get(it.id);
+                                it.ownerPhone = c ? String(c.owner_phone || '') : '';
+                                it.guardPhone = c ? String(c.guard_phone || '') : '';
+                            });
+                        }
+                    } catch (e) {}
+                }
+
                 }
 
                 if (isAdminLoggedIn && !admBookRes.error && Array.isArray(admBookRes.data)) {
@@ -3755,6 +3790,9 @@
                 cancelEn      = document.getElementById('adm-v-cancel-en').value.trim();
                 var secDepVal = parseFloat(document.getElementById('adm-v-security-deposit')?.value) || 0;
                 var isVerVal  = document.getElementById('adm-v-verified')?.checked !== false;
+                var ownerPhoneVal = normalizePhone(document.getElementById('adm-v-owner-phone')?.value || '');
+                var guardPhoneVal = normalizePhone(document.getElementById('adm-v-guard-phone')?.value || '');
+                if (!isValidPhone(ownerPhoneVal) || !isValidPhone(guardPhoneVal)) { showToast('⚠️ يرجى إدخال رقم صاحب المنشأة ورقم الحارس بشكل صحيح (إجباري)'); return; }
                 amenities     = ['featured','private_screened','families_only','youth_allowed','events_allowed','pool','bbq','wifi','heating','outdoor'].filter(a => document.getElementById(`adm-v-am-${a}`)?.checked);
             } else {
                 category       = 'transport';
@@ -3781,6 +3819,9 @@
                 lng           = document.getElementById('adm-t-lng').value.trim();
                 cancelAr      = document.getElementById('adm-t-cancel').value.trim();
                 cancelEn      = document.getElementById('adm-t-cancel-en').value.trim();
+                var ownerPhoneVal = normalizePhone(document.getElementById('adm-t-owner-phone')?.value || '');
+                var guardPhoneVal = normalizePhone(document.getElementById('adm-t-guard-phone')?.value || '');
+                if (!isValidPhone(ownerPhoneVal) || !isValidPhone(guardPhoneVal)) { showToast('⚠️ يرجى إدخال رقم صاحب المركبة ورقم السائق بشكل صحيح (إجباري)'); return; }
                 amenities     = ['featured','wifi','heating','outdoor'].filter(a => document.getElementById(`adm-t-am-${a}`)?.checked);
             }
 
@@ -3854,8 +3895,11 @@
                     return;
                 }
                 if (idx !== -1 && data) {
+                    await db.from('facility_contacts').upsert({ facility_id: editingId, owner_phone: ownerPhoneVal, guard_phone: guardPhoneVal, updated_at: new Date().toISOString() });
                     const updated = rowToItem(data);
                     updated.reviews = items[idx].reviews || [];
+                    updated.ownerPhone = ownerPhoneVal;
+                    updated.guardPhone = guardPhoneVal;
                     items[idx] = updated;
                 }
                 editingItemId = null;
@@ -3869,7 +3913,13 @@
                     showToast('❌ تعذر إضافة المنشأة: ' + (error.message || ''));
                     return;
                 }
-                if (data) items.push(rowToItem(data));
+                if (data) {
+                    await db.from('facility_contacts').upsert({ facility_id: Number(data.id), owner_phone: ownerPhoneVal, guard_phone: guardPhoneVal, updated_at: new Date().toISOString() });
+                    const createdIt = rowToItem(data);
+                    createdIt.ownerPhone = ownerPhoneVal;
+                    createdIt.guardPhone = guardPhoneVal;
+                    items.push(createdIt);
+                }
                 showToast('✅ تم إضافة المنشأة بنجاح');
                 if (formType === 'venue') {
                     document.getElementById('add-venue-form').reset();
@@ -3930,6 +3980,8 @@
                 if (document.getElementById('adm-t-map-url')) {
                     document.getElementById('adm-t-map-url').value = item.mapUrl || ((item.lat !== null && item.lng !== null) ? `https://www.google.com/maps?q=${item.lat},${item.lng}` : '');
                 }
+                if (document.getElementById('adm-t-owner-phone')) document.getElementById('adm-t-owner-phone').value = item.ownerPhone || '';
+                if (document.getElementById('adm-t-guard-phone')) document.getElementById('adm-t-guard-phone').value = item.guardPhone || '';
                 document.getElementById('adm-t-cancel').value       = item.cancelPolicyAr || '';
                 document.getElementById('adm-t-cancel-en').value    = item.cancelPolicyEn || '';
                 ['featured','wifi','heating','outdoor'].forEach(a => {
@@ -3973,6 +4025,8 @@
                     document.getElementById('adm-v-map-url').value = item.mapUrl || ((item.lat !== null && item.lng !== null) ? `https://www.google.com/maps?q=${item.lat},${item.lng}` : '');
                 }
                 setTimeout(() => initOrUpdateAdminMapPicker(), 120);
+                if (document.getElementById('adm-v-owner-phone')) document.getElementById('adm-v-owner-phone').value = item.ownerPhone || '';
+                if (document.getElementById('adm-v-guard-phone')) document.getElementById('adm-v-guard-phone').value = item.guardPhone || '';
                 if (document.getElementById('adm-v-security-deposit')) document.getElementById('adm-v-security-deposit').value = item.securityDeposit ?? 0;
                 if (document.getElementById('adm-v-verified')) document.getElementById('adm-v-verified').checked = item.isVerified !== false;
                 document.getElementById('adm-v-cancel').value       = item.cancelPolicyAr || '';
