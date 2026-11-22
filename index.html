@@ -462,6 +462,23 @@
             .admin-box { padding: 1.2rem; border-radius: 14px; }
             .modal-content { padding: 1.2rem; margin: 0 0.5rem; }
         }
+    
+        /* V2 Customer Features: Compare, Sticky CTA, Split Cost, Verified Badge, Bundle */
+        .verified-pill { display:inline-flex; align-items:center; gap:4px; background:#E8F5E9; color:#1B5E20; border:1px solid #A5D6A7; padding:2px 9px; border-radius:14px; font-size:0.73rem; font-weight:700; margin-bottom:6px; }
+        .deposit-info-pill { background:#EFF8FF; border:1px solid #90CAF9; color:#0D47A1; border-radius:12px; padding:0.7rem 1rem; margin-bottom:1rem; font-size:0.86rem; font-weight:600; display:none; }
+        .bundle-offer-box { background:linear-gradient(135deg,#F0F8F4,#E8F5E9); border:1.5px solid #66BB6A; border-radius:14px; padding:0.9rem 1.1rem; margin-bottom:1.1rem; display:none; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+        .sticky-mobile-cta { position:sticky; bottom:-1.2rem; background:rgba(255,255,255,0.97); backdrop-filter:blur(8px); border-top:1.5px solid #E0EAE4; margin:0 -2rem -2rem -2rem; padding:0.85rem 1.5rem; display:flex; justify-content:space-between; align-items:center; gap:12px; z-index:20; border-radius:0 0 20px 20px; box-shadow:0 -6px 20px rgba(13,40,24,0.08); }
+        @media (max-width:768px) { .sticky-mobile-cta { margin:0 -1.2rem -1.2rem -1.2rem; padding:0.8rem 1rem; } }
+        .btn-compare-card { background:#F5F9F6; border:1.5px solid #C8E0D0; color:var(--primary-dark); padding:0.42rem 0.7rem; border-radius:10px; cursor:pointer; font-size:0.8rem; font-weight:600; transition:all 0.2s; min-height:40px; }
+        .btn-compare-card.selected { background:var(--accent-gold); color:var(--primary-dark); border-color:var(--accent-gold); }
+        .compare-float-bar { position:fixed; bottom:20px; right:50%; transform:translateX(50%); background:var(--primary-dark); color:white; padding:0.7rem 1.2rem; border-radius:30px; box-shadow:0 10px 30px rgba(0,0,0,0.28); display:none; align-items:center; gap:12px; z-index:1600; border:1.5px solid var(--accent-gold); max-width:calc(100vw - 32px); }
+        .compare-float-bar.active { display:flex; }
+        .compare-table { width:100%; border-collapse:collapse; font-size:0.86rem; margin-top:0.5rem; }
+        .compare-table th, .compare-table td { border:1px solid #EAEAEA; padding:0.7rem; text-align:right; vertical-align:top; }
+        .compare-table th { background:#F5F9F6; color:var(--primary-dark); font-weight:700; width:24%; }
+        .split-cost-box { background:#EFF8FF; border:1.5px dashed #1565C0; border-radius:14px; padding:0.95rem 1.1rem; margin:0.9rem 0; }
+        .change-req-box { background:#FFF9EF; border:1px solid #E5C384; border-radius:12px; padding:0.9rem; margin-top:0.8rem; }
+
     </style>
 </head>
 <body>
@@ -472,9 +489,9 @@
         <div class="nav-menu" id="nav-menu-container">
             <button type="button" class="lang-btn" id="lang-toggle-btn">English</button>
             <button type="button" class="nav-btn active" id="btn-customer" data-action="switch-view" data-view="customer-view" data-key="navHome">الواجهة الرئيسية</button>
-            <button type="button" class="nav-btn" id="btn-favorites" data-action="switch-view" data-view="favorites-view">❤️ <span data-key="navFav">المفضلة</span> <span class="fav-count-badge" id="fav-nav-badge" style="display:none;">0</span></button>
-            <button type="button" class="nav-btn" id="btn-track-booking" data-action="open-track-modal">🔍 <span data-key="navTrack">تتبّع حجزي</span></button>
-            <button type="button" class="nav-btn admin-login-btn" id="btn-admin" data-action="switch-view" data-view="admin-view" data-key="navAdmin">👑 لوحة الأدمن</button>
+            <button type="button" class="nav-btn" id="btn-favorites" data-action="switch-view" data-view="favorites-view" style="display:inline-flex;align-items:center;gap:6px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> <span data-key="navFav">المفضلة</span> <span class="fav-count-badge" id="fav-nav-badge" style="display:none;">0</span></button>
+            <button type="button" class="nav-btn" id="btn-track-booking" data-action="open-track-modal" style="display:inline-flex;align-items:center;gap:6px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> <span data-key="navTrack">تتبّع حجزي</span></button>
+            
         </div>
     </nav>
 
@@ -591,556 +608,6 @@
         <div class="cards-grid" id="favorites-container"></div>
     </div>
 
-    <!-- Admin View -->
-    <div id="admin-view" class="view-section">
-        <div class="admin-wrapper">
-            <div class="admin-sidebar">
-                <div>
-                    <div class="sidebar-brand"><span>👑</span><span data-key="sbTitle">لوحة التحكم</span></div>
-                    <ul class="sidebar-menu">
-                        <li class="sidebar-item active" data-action="admin-tab" data-tab="dash-overview"><span>📊</span> <span data-key="sbOverview">الرئيسية (الإحصائيات)</span></li>
-                        <li class="sidebar-item" data-action="admin-tab" data-tab="dash-listings"><span>🏡</span> <span data-key="sbListings">إدارة المنشآت</span></li>
-                        <li class="sidebar-item" data-action="admin-tab" data-tab="dash-pitches"><span>⚽</span> <span data-key="sbPitches">إدارة الملاعب</span></li>
-                        <li class="sidebar-item" data-action="admin-tab" data-tab="dash-bookings"><span>📅</span> <span data-key="sbBookings">الحجوزات والطلبات</span></li>
-                        <li class="sidebar-item" data-action="admin-tab" data-tab="dash-promos"><span>🎁</span> <span data-key="sbPromos">الخصومات والكوبونات</span></li>
-                        <li class="sidebar-item" data-action="admin-tab" data-tab="dash-reviews"><span>⭐</span> <span data-key="sbReviews">مراجعة التقييمات</span></li>
-                    </ul>
-                </div>
-                <div class="sidebar-footer">
-                    <button type="button" class="btn-action" style="width:100%;background:rgba(255,255,255,0.1);color:white;" id="logout-admin-btn" data-key="logoutBtn">تسجيل الخروج</button>
-                </div>
-            </div>
-            <div class="admin-content">
-                <!-- Dashboard Overview -->
-                <div id="dash-overview" class="admin-tab-page active">
-                    <h2 class="admin-section-title" data-key="dashTitle">📊 نظرة عامة والإحصائيات</h2>
-                    <div class="metrics-grid">
-                        <div class="metric-card"><div class="metric-info"><h4 data-key="statPending">طلبات بانتظار التأكيد</h4><div id="stat-pending-count">0</div></div><div class="metric-icon">⏳</div></div>
-                        <div class="metric-card"><div class="metric-info"><h4 data-key="statConfirmed">إجمالي الحجوزات المؤكدة</h4><div id="stat-approved-count">0</div></div><div class="metric-icon">✅</div></div>
-                        <div class="metric-card"><div class="metric-info"><h4 data-key="statRevenue">مجموع أرباح العربون</h4><div id="stat-total-revenue">0.0 JOD</div></div><div class="metric-icon">💰</div></div>
-                    </div>
-
-                    <!-- Feature 7: Instant Telegram Bot Notifications for Admin -->
-                    <div class="admin-box" id="telegram-settings-box" style="background:linear-gradient(135deg,#F0F8FF,#F8FBFF);border:1.5px solid #90CAF9;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:0.6rem;">
-                            <h3 class="admin-section-title" style="margin:0;font-size:1.15rem;color:#0D47A1;">📲 إشعارات الحجوزات الفورية على هاتفك (Telegram Bot مجاني)</h3>
-                            <span id="tg-status-badge" class="badge-status inactive">⚪ غير مفعّل</span>
-                        </div>
-                        <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:0.8rem;line-height:1.6;">
-                            اربط الموقع ببوت تيليجرام مجاني ليصلك إشعار فوري على هاتفك في اللحظة التي يرسل فيها أي زبون طلب حجز جديد (مع تفاصيل الحجز، رابط الوصل، ورابط واتساب الزبون) حتى لو لم تكن فاتحاً للموقع:
-                        </p>
-                        <details style="background:#FFFFFF;border:1px dashed #90CAF9;border-radius:12px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.84rem;line-height:1.75;color:var(--text-dark);" open>
-                            <summary style="cursor:pointer;font-weight:700;color:#1565C0;">📖 خطوات تفعيل البوت ومعرفة رقم المحادثة (Chat ID) بسهولة:</summary>
-                            <div style="margin-top:0.5rem;">
-                                <div><strong>1️⃣</strong> الصق <strong>كود البوت (Bot Token)</strong> الذي نسخته من <strong><a href="https://t.me/BotFather" target="_blank" rel="noopener noreferrer" style="color:#1565C0;">@BotFather</a></strong> في الخانة الأولى بالأسفل.</div>
-                                <div><strong>2️⃣ مهم جداً:</strong> افتح محادثة مع بوتك أنت (<strong><a href="https://t.me/weekend_jobot" target="_blank" rel="noopener noreferrer" style="color:#1565C0;">@weekend_jobot</a></strong>) واضغط <strong>Start</strong> أو أرسل له كلمة <strong>مرحبا</strong>.</div>
-                                <div><strong>3️⃣ كيف تعرف رقم محادثتك (Chat ID)؟</strong> لديك طريقتان:
-                                    <br>• إما بالضغط على زر <strong>«🔍 جلب تلقائي»</strong> بالأسفل (وإذا فتح لك صفحة تيليجرام، انسخ السطر الظاهر فيها والصقه في خانة Chat ID وسيستخرج الموقع الرقم تلقائياً!).
-                                    <br>• أو افتح في تيليجرام البوت الرسمي <strong><a href="https://t.me/userinfobot" target="_blank" rel="noopener noreferrer" style="color:#1565C0;">@userinfobot</a></strong> واضغط <strong>Start</strong>، سيرد عليك فوراً برقم <strong>Id</strong> الخاص بك (مثال: <code>123456789</code>) — انسخه وضعه في الخانة الثانية!
-                                </div>
-                            </div>
-                        </details>
-                        <form id="telegram-config-form">
-                            <div class="form-row">
-                                <div class="form-group" style="flex:1.4;min-width:220px;">
-                                    <label for="tg-bot-token">1. كود البوت (Bot Token من @BotFather)</label>
-                                    <input type="text" class="form-control" id="tg-bot-token" placeholder="مثال: 7123456789:AAH_xyz123456..." style="direction:ltr;font-family:monospace;font-size:0.86rem;" autocomplete="off">
-                                </div>
-                                <div class="form-group" style="flex:1.2;min-width:210px;">
-                                    <label for="tg-chat-id">2. رقم محادثتك (Chat ID)</label>
-                                    <div style="display:flex;gap:6px;">
-                                        <input type="text" class="form-control" id="tg-chat-id" placeholder="مثال: 987654321" style="direction:ltr;font-family:monospace;font-size:0.88rem;flex:1;" autocomplete="off">
-                                        <button type="button" class="btn-details" id="btn-tg-detect-chat" style="margin:0;white-space:nowrap;font-size:0.8rem;padding:0 0.8rem;border-color:#1565C0;color:#1565C0;" title="أرسل رسالة لبوتك في تيليجرام ثم اضغط هنا لاكتشاف الرقم تلقائياً">🔍 جلب تلقائي</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:0.3rem;">
-                                <button type="submit" class="btn-action" id="btn-tg-save" style="background:#0D47A1;flex:1;min-width:170px;">💾 حفظ وتفعيل الإشعارات</button>
-                                <button type="button" class="btn-action" id="btn-tg-test" style="background:#2E7D32;flex:1;min-width:170px;">🔔 إرسال إشعار تجريبي لهاتفي</button>
-                                <button type="button" class="btn-details" id="btn-tg-disable" style="margin:0;border-color:var(--danger);color:var(--danger);">⏸️ إيقاف</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Listings Tab -->
-                <div id="dash-listings" class="admin-tab-page">
-                    <div class="admin-box">
-                        <h3 class="admin-section-title" data-key="manageListingsTitle">قائمة المنشآت الحالية (المزارع والشاليهات ووسائل النقل)</h3>
-                        <div class="table-card" style="margin-bottom:0;">
-                            <table class="admin-table">
-                                <thead><tr><th>اسم المنشأة</th><th>النوع</th><th>الموقع</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
-                                <tbody id="admin-listings-table"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="admin-box">
-                        <h3 class="admin-section-title" id="add-form-title">إضافة منشأة أو وسيلة نقل جديدة</h3>
-                        <div class="edit-mode-banner" id="edit-mode-banner">
-                            ✏️ أنت الآن في وضع تعديل المنشأة. المنشأة تظل ظاهرة للزوار وتتحدث بياناتها فوراً عند الضغط على «حفظ التعديلات».
-                        </div>
-                        <div class="form-tabs">
-                            <button type="button" class="tab-btn active" id="tab-venue-btn" data-action="switch-admin-form" data-form="venue">🏡 إضافة (مزرعة / شاليه / ملعب)</button>
-                            <button type="button" class="tab-btn" id="tab-trans-btn" data-action="switch-admin-form" data-form="transport">🚌 إضافة (وسيلة نقل / باص)</button>
-                        </div>
-
-                        <!-- Venue Form -->
-                        <form id="add-venue-form">
-                            <input type="hidden" id="adm-v-editing-id" value="">
-                            <div class="form-row">
-                                <div class="form-group" style="flex:1;"><label>الاسم (عربي)</label><input type="text" class="form-control" id="adm-v-name" required maxlength="120" placeholder="مثال: مزرعة الفخامة الهادئة"></div>
-                                <div class="form-group" style="flex:1;"><label>Name (English - اختياري)</label><input type="text" class="form-control" id="adm-v-name-en" maxlength="120" placeholder="Quiet Luxury Farm"></div>
-                                <div class="form-group" style="flex:1;"><label>النوع</label>
-                                    <select class="form-control" id="adm-v-type" required>
-                                        <option value="farm">مزرعة / شاليه (عربون 15%)</option>
-                                        <option value="field">ملعب (عربون 5 دنانير ثابت)</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group" style="flex:1;"><label>الموقع (عربي)</label><input type="text" class="form-control" id="adm-v-location" required maxlength="160" placeholder="عمّان - طريق المطار"></div>
-                                <div class="form-group" style="flex:1;"><label>Location (English - اختياري)</label><input type="text" class="form-control" id="adm-v-location-en" maxlength="160" placeholder="Amman - Airport Road"></div>
-                            </div>
-                            <div class="form-group">
-                                <label>الموسم (يمكن اختيار الاثنين معاً)</label>
-                                <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:5px;">
-                                    <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="adm-v-season-winter" value="winter" checked> ❄️ شتوية</label>
-                                    <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="adm-v-season-summer" value="summer" checked> ☀️ صيفية</label>
-                                </div>
-                            </div>
-
-                            <!-- Shift-based pricing for farms/chalets -->
-                            <div id="adm-v-shifts-section">
-                                <h4 style="margin:1rem 0 0.5rem 0;color:var(--primary-dark);">أسعار الشفتات (د.أ):</h4>
-                                <div class="form-row">
-                                    <div class="form-group" style="flex:1;"><label>سعر الصباح (النهار)</label><input type="number" step="0.5" min="1" max="10000" class="form-control" id="adm-v-price-day" placeholder="40" required></div>
-                                    <div class="form-group" style="flex:1;"><label>سعر المساء (الليل)</label><input type="number" step="0.5" min="1" max="10000" class="form-control" id="adm-v-price-night" placeholder="55" required></div>
-                                    <div class="form-group" style="flex:1;"><label>سعر اليوم الكامل</label><input type="number" step="0.5" min="1" max="20000" class="form-control" id="adm-v-price-full" placeholder="85" required></div>
-                                </div>
-                            </div>
-
-                            <!-- Hourly rate for sports pitches -->
-                            <div id="adm-v-hourly-section" style="display:none;">
-                                <h4 style="margin:1rem 0 0.5rem 0;color:var(--primary-dark);">سعر الساعة (د.أ):</h4>
-                                <div class="form-row">
-                                    <div class="form-group" style="flex:1;">
-                                        <label>سعر الساعة (الحد الأدنى للحجز ساعتان)</label>
-                                        <input type="number" step="0.5" min="0.5" max="1000" class="form-control" id="adm-v-hourly-rate" placeholder="5">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group" style="flex:1;"><label>الوصف والمواصفات (عربي)</label><textarea class="form-control" id="adm-v-specs" rows="3" required maxlength="2500" placeholder="مسبح مفلتر، 3 غرف نوم..."></textarea></div>
-                                <div class="form-group" style="flex:1;"><label>Description (English - اختياري)</label><textarea class="form-control" id="adm-v-specs-en" rows="3" maxlength="2500" placeholder="Filtered pool, 3 bedrooms..."></textarea></div>
-                            </div>
-                            <div class="media-upload-box">
-                                <div class="media-upload-box-title">📸 صور وفيديو المنشأة (تُحفظ في ملف تخزين مستقل لتخفيف الموقع)</div>
-                                <div class="media-upload-box-sub">ارفع الصورة الرئيسية، وعدة صور إضافية للألبوم، وفيديو للمنشأة مباشرة من جهازك أو هاتفك:</div>
-                                <div class="media-buttons-grid">
-                                    <label class="media-upload-btn">
-                                        <span>📸 اختيار الصورة الرئيسية</span>
-                                        <input type="file" id="adm-v-img-file" accept="image/jpeg,image/png,image/webp">
-                                    </label>
-                                    <label class="media-upload-btn extra-btn">
-                                        <span>🖼️ إضافة صور إضافية (أكثر من صورة)</span>
-                                        <input type="file" id="adm-v-extra-files" accept="image/jpeg,image/png,image/webp" multiple>
-                                    </label>
-                                    <label class="media-upload-btn video-btn">
-                                        <span>🎥 إضافة فيديو للمنشأة</span>
-                                        <input type="file" id="adm-v-video-file" accept="video/mp4,video/webm,video/quicktime">
-                                    </label>
-                                </div>
-                                <small id="adm-v-media-status" class="media-status-note"></small>
-                                <div id="adm-v-media-previews" class="media-preview-strip"></div>
-                                <div id="adm-v-video-preview-box" class="media-video-preview">
-                                    <span id="adm-v-video-label" style="font-size:0.84rem;font-weight:600;color:var(--primary-dark);">🎬 تم إرفاق فيديو للمنشأة</span>
-                                    <button type="button" class="icon-btn danger" data-action="remove-admin-video" data-form="venue" title="حذف الفيديو">✕</button>
-                                </div>
-                                <input type="hidden" id="venue-img-store">
-                                <input type="hidden" id="venue-video-store">
-                                <details style="margin-top:0.7rem;font-size:0.82rem;color:var(--text-muted);">
-                                    <summary style="cursor:pointer;font-weight:600;">🔗 أو إضافة روابط خارجية يدوياً (اختياري)</summary>
-                                    <div style="margin-top:0.5rem;">
-                                        <input type="url" class="form-control" id="adm-v-img-url" placeholder="رابط صورة رئيسية مباشر https://..." style="margin-bottom:6px;">
-                                        <textarea class="form-control" id="adm-v-extra-imgs" rows="2" placeholder="روابط صور إضافية (كل رابط في سطر) https://..." style="margin-bottom:6px;"></textarea>
-                                        <input type="url" class="form-control" id="adm-v-video-url" placeholder="رابط فيديو مباشر أو يوتيوب https://...">
-                                    </div>
-                                </details>
-                            </div>
-                            <div class="media-upload-box" style="background:#EFF8FF;border-color:#90CAF9;">
-                                <div class="media-upload-box-title" style="color:#0D47A1;">📍 موقع المنشأة على الخريطة التفاعلية والتذكرة (Google Maps)</div>
-                                <div class="media-upload-box-sub">الصق رابط اللوكيشن من خرائط Google (أو اضغط مباشرة على الخريطة بالأسفل لتثبيت الدبوس على موقع المزرعة)، وسيظهر الموقع على الخريطة التفاعلية وداخل تذكرة الحجز تلقائياً:</div>
-                                <div class="form-group" style="margin-bottom:0.7rem;">
-                                    <label for="adm-v-map-url" style="color:#0D47A1;">🔗 رابط اللوكيشن من خرائط Google (أو الإحداثيات)</label>
-                                    <input type="text" class="form-control" id="adm-v-map-url" placeholder="الصق رابط Google Maps هنا (مثال: https://www.google.com/maps?... أو https://maps.app.goo.gl/...)" style="direction:ltr;">
-                                    <small id="adm-v-map-status" style="display:block;margin-top:4px;font-size:0.8rem;font-weight:600;color:var(--text-muted);"></small>
-                                </div>
-                                <div id="adm-v-map-picker" style="height:210px;border-radius:12px;border:1.5px solid #90CAF9;margin-bottom:0.7rem;background:#E3F2FD;"></div>
-                                <div class="form-row" style="margin-bottom:0;">
-                                    <div class="form-group" style="flex:1;margin-bottom:0;"><label>خط العرض Latitude (يُملأ تلقائياً)</label><input type="number" step="any" min="-90" max="90" class="form-control" id="adm-v-lat" placeholder="31.9000"></div>
-                                    <div class="form-group" style="flex:1;margin-bottom:0;"><label>خط الطول Longitude (يُملأ تلقائياً)</label><input type="number" step="any" min="-180" max="180" class="form-control" id="adm-v-lng" placeholder="35.8500"></div>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group" style="flex:1;"><label>سياسة الإلغاء والاسترداد (عربي)</label><textarea class="form-control" id="adm-v-cancel" rows="2" maxlength="1200" placeholder="إلغاء مجاني قبل 48 ساعة..."></textarea></div>
-                                <div class="form-group" style="flex:1;"><label>Cancellation Policy (English - اختياري)</label><textarea class="form-control" id="adm-v-cancel-en" rows="2" maxlength="1200" placeholder="Free cancellation 48h before..."></textarea></div>
-                            </div>
-                            <div class="form-group">
-                                <label>المرافق، الخصوصية، وتصنيف الجمهور (اختر ما ينطبق):</label>
-                                <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:5px;padding:0.75rem;background:#F5F9F6;border-radius:12px;border:1px solid #C8E0D0;">
-                                    <label style="display:flex;align-items:center;gap:6px;font-weight:700;color:#B27517;background:#FFF9EF;padding:3px 10px;border-radius:8px;border:1px solid #E5C384;"><input type="checkbox" id="adm-v-am-featured"> ⭐ تثبيت كمنشأة مميزة في المقدمة</label>
-                                    <label style="display:flex;align-items:center;gap:6px;font-weight:700;color:#1B5E20;"><input type="checkbox" id="adm-v-am-private_screened"> 🔒 مسبح مستور (خصوصية تامة للعائلات)</label>
-                                    <label style="display:flex;align-items:center;gap:6px;font-weight:700;color:#0D47A1;"><input type="checkbox" id="adm-v-am-families_only"> 👨‍👩‍👧‍👦 عائلات فقط</label>
-                                    <label style="display:flex;align-items:center;gap:6px;font-weight:600;"><input type="checkbox" id="adm-v-am-youth_allowed"> 👥 عائلات وشباب</label>
-                                    <label style="display:flex;align-items:center;gap:6px;font-weight:600;"><input type="checkbox" id="adm-v-am-events_allowed"> 🎉 مناسبات وحفلات</label>
-                                    <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="adm-v-am-pool"> 🏊 مسبح خاص</label>
-                                    <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="adm-v-am-bbq"> 🔥 باربيكيو</label>
-                                    <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="adm-v-am-wifi"> 📶 واي فاي</label>
-                                    <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="adm-v-am-heating"> 🌡️ تدفئة</label>
-                                    <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="adm-v-am-outdoor"> 🌿 جلسة خارجية</label>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn-action" style="width:100%;padding:0.8rem;" id="adm-v-submit-btn">نشر المنشأة</button>
-                            <button type="button" class="btn-details" style="width:100%;padding:0.8rem;margin-top:0.5rem;display:none;" id="adm-v-cancel-edit-btn" data-action="cancel-edit" data-form="venue">إلغاء التعديل</button>
-                        </form>
-
-                        <!-- TRANSPORT FORM -->
-                        <form id="add-transport-form" style="display:none;">
-                            <input type="hidden" id="adm-t-editing-id" value="">
-                            <div class="form-row">
-                                <div class="form-group" style="flex:1;"><label>نوع المركبة (عربي)</label><input type="text" class="form-control" id="adm-t-name" required maxlength="120" placeholder="باص تويوتا كوستر 23 راكب"></div>
-                                <div class="form-group" style="flex:1;"><label>Vehicle Name (English - اختياري)</label><input type="text" class="form-control" id="adm-t-name-en" maxlength="120" placeholder="Toyota Coaster Bus 23 Seats"></div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group" style="flex:1;"><label>نطاق التوصيل (عربي)</label><input type="text" class="form-control" id="adm-t-location" required maxlength="160" placeholder="عمّان - كافة المحافظات"></div>
-                                <div class="form-group" style="flex:1;"><label>Coverage Area (English - اختياري)</label><input type="text" class="form-control" id="adm-t-location-en" maxlength="160" placeholder="Amman - All Governorates"></div>
-                            </div>
-
-                            <h4 style="margin:1rem 0 0.5rem 0;color:var(--primary-dark);">التسعير والسعة القصوى (د.أ):</h4>
-                            <div class="form-row">
-                                <div class="form-group" style="flex:1;">
-                                    <label>سعر الكيلومتر (سعر الكيلو)</label>
-                                    <input type="number" step="0.01" min="0" max="500" class="form-control" id="adm-t-price-km" required placeholder="0.50">
-                                </div>
-                                <div class="form-group" style="flex:1;">
-                                    <label>سعر الراكب (سعر الشخص)</label>
-                                    <input type="number" step="0.01" min="0" max="500" class="form-control" id="adm-t-price-person" required placeholder="2.00">
-                                </div>
-                                <div class="form-group" style="flex:1;">
-                                    <label>السعة القصوى للركاب (مقاعد)</label>
-                                    <input type="number" step="1" min="1" max="200" value="23" class="form-control" id="adm-t-capacity" required placeholder="23">
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group" style="flex:1;"><label>وصف الحافلة (عربي)</label><textarea class="form-control" id="adm-t-specs" rows="3" required maxlength="2500" placeholder="تكييف ممتاز، شاشات عرض..."></textarea></div>
-                                <div class="form-group" style="flex:1;"><label>Description (English - اختياري)</label><textarea class="form-control" id="adm-t-specs-en" rows="3" maxlength="2500" placeholder="Excellent AC, display screens..."></textarea></div>
-                            </div>
-                            <div class="media-upload-box">
-                                <div class="media-upload-box-title">📸 صور وفيديو الحافلة (تُحفظ في ملف تخزين مستقل لتخفيف الموقع)</div>
-                                <div class="media-upload-box-sub">ارفع الصورة الرئيسية، وعدة صور إضافية للحافلة، وفيديو اختياري مباشرة من جهازك:</div>
-                                <div class="media-buttons-grid">
-                                    <label class="media-upload-btn">
-                                        <span>📸 اختيار الصورة الرئيسية</span>
-                                        <input type="file" id="adm-t-img-file" accept="image/jpeg,image/png,image/webp">
-                                    </label>
-                                    <label class="media-upload-btn extra-btn">
-                                        <span>🖼️ إضافة صور إضافية (أكثر من صورة)</span>
-                                        <input type="file" id="adm-t-extra-files" accept="image/jpeg,image/png,image/webp" multiple>
-                                    </label>
-                                    <label class="media-upload-btn video-btn">
-                                        <span>🎥 إضافة فيديو للحافلة</span>
-                                        <input type="file" id="adm-t-video-file" accept="video/mp4,video/webm,video/quicktime">
-                                    </label>
-                                </div>
-                                <small id="adm-t-media-status" class="media-status-note"></small>
-                                <div id="adm-t-media-previews" class="media-preview-strip"></div>
-                                <div id="adm-t-video-preview-box" class="media-video-preview">
-                                    <span id="adm-t-video-label" style="font-size:0.84rem;font-weight:600;color:var(--primary-dark);">🎬 تم إرفاق فيديو للحافلة</span>
-                                    <button type="button" class="icon-btn danger" data-action="remove-admin-video" data-form="transport" title="حذف الفيديو">✕</button>
-                                </div>
-                                <input type="hidden" id="transport-img-store">
-                                <input type="hidden" id="transport-video-store">
-                                <details style="margin-top:0.7rem;font-size:0.82rem;color:var(--text-muted);">
-                                    <summary style="cursor:pointer;font-weight:600;">🔗 أو إضافة روابط خارجية يدوياً (اختياري)</summary>
-                                    <div style="margin-top:0.5rem;">
-                                        <input type="url" class="form-control" id="adm-t-img-url" placeholder="رابط صورة رئيسية مباشر https://..." style="margin-bottom:6px;">
-                                        <textarea class="form-control" id="adm-t-extra-imgs" rows="2" placeholder="روابط صور إضافية (كل رابط في سطر) https://..." style="margin-bottom:6px;"></textarea>
-                                        <input type="url" class="form-control" id="adm-t-video-url" placeholder="رابط فيديو مباشر أو يوتيوب https://...">
-                                    </div>
-                                </details>
-                            </div>
-                            <div class="media-upload-box" style="background:#EFF8FF;border-color:#90CAF9;">
-                                <div class="media-upload-box-title" style="color:#0D47A1;">📍 رابط موقع التجمع / المكتب على الخريطة (اختياري)</div>
-                                <div class="form-group" style="margin-bottom:0.7rem;">
-                                    <label for="adm-t-map-url" style="color:#0D47A1;">🔗 رابط اللوكيشن من خرائط Google</label>
-                                    <input type="text" class="form-control" id="adm-t-map-url" placeholder="الصق رابط Google Maps هنا..." style="direction:ltr;">
-                                    <small id="adm-t-map-status" style="display:block;margin-top:4px;font-size:0.8rem;font-weight:600;color:var(--text-muted);"></small>
-                                </div>
-                                <div class="form-row" style="margin-bottom:0;">
-                                    <div class="form-group" style="flex:1;margin-bottom:0;"><label>خط العرض Latitude</label><input type="number" step="any" min="-90" max="90" class="form-control" id="adm-t-lat" placeholder="31.9510"></div>
-                                    <div class="form-group" style="flex:1;margin-bottom:0;"><label>خط الطول Longitude</label><input type="number" step="any" min="-180" max="180" class="form-control" id="adm-t-lng" placeholder="35.9270"></div>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group" style="flex:1;"><label>سياسة الإلغاء والاسترداد (عربي)</label><textarea class="form-control" id="adm-t-cancel" rows="2" maxlength="1200" placeholder="إلغاء مجاني قبل 48 ساعة..."></textarea></div>
-                                <div class="form-group" style="flex:1;"><label>Cancellation Policy (English - اختياري)</label><textarea class="form-control" id="adm-t-cancel-en" rows="2" maxlength="1200" placeholder="Free cancellation 48h before..."></textarea></div>
-                            </div>
-                            <div class="form-group">
-                                <label>المرافق والمميزات:</label>
-                                <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:5px;">
-                                    <label style="display:flex;align-items:center;gap:6px;font-weight:700;color:#B27517;background:#FFF9EF;padding:3px 10px;border-radius:8px;border:1px solid #E5C384;"><input type="checkbox" id="adm-t-am-featured"> ⭐ تثبيت كمركبة مميزة في المقدمة</label>
-                                    <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="adm-t-am-wifi"> 📶 واي فاي</label>
-                                    <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="adm-t-am-heating"> 🌡️ تكييف / تدفئة</label>
-                                    <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="adm-t-am-outdoor"> 🎵 نظام صوت</label>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn-action" style="width:100%;padding:0.8rem;" id="adm-t-submit-btn">نشر وسيلة النقل</button>
-                            <button type="button" class="btn-details" style="width:100%;padding:0.8rem;margin-top:0.5rem;display:none;" id="adm-t-cancel-edit-btn" data-action="cancel-edit" data-form="transport">إلغاء التعديل</button>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- PITCHES TAB -->
-                <div id="dash-pitches" class="admin-tab-page">
-                    <div class="admin-box">
-                        <h3 class="admin-section-title">⚽ إدارة الملاعب الرياضية</h3>
-                        <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1.2rem;">قسم مخصص لإدارة الملاعب الرياضية فقط. التسعير بالساعة والعربون 5 دنانير (أو إجمالي الحجز أيهما أقل).</p>
-                        <div class="table-card" style="margin-bottom:0;">
-                            <table class="admin-table">
-                                <thead><tr><th>اسم الملعب</th><th>الموقع</th><th>سعر الساعة</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
-                                <tbody id="admin-pitches-table"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="admin-box">
-                        <h3 class="admin-section-title">إضافة ملعب رياضي جديد</h3>
-                        <button type="button" class="btn-action" id="btn-goto-add-pitch">
-                            ➕ إضافة ملعب جديد
-                        </button>
-                    </div>
-                    <div class="admin-box">
-                        <h3 class="admin-section-title">📅 حجوزات الملاعب</h3>
-                        <div class="table-card" style="margin-bottom:0;">
-                            <table class="admin-table">
-                                <thead><tr><th>العميل</th><th>الهاتف</th><th>الملعب</th><th>التاريخ والساعات</th><th>الإجمالي / العربون</th><th>الوصل</th><th>الحالة والإجراء</th></tr></thead>
-                                <tbody id="admin-pitches-bookings-table"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bookings Tab -->
-                <div id="dash-bookings" class="admin-tab-page">
-                    <div class="admin-box" id="quick-block-box" style="background:linear-gradient(135deg,#FFF9EF,#FFFDF9);border:1.5px solid var(--accent-gold);">
-                        <h3 class="admin-section-title" style="margin-bottom:0.4rem;font-size:1.12rem;">🔒 قفل تاريخ / حجز خارجي سريع (بدون وصل أو عربون)</h3>
-                        <p style="color:var(--text-muted);font-size:0.84rem;margin-bottom:1rem;">أغلق أي يوم أو شفت أو ساعات ملعب فوراً إذا انحجزت المنشأة هاتفياً عند صاحبها أو ليوم صيانة، دون أن يؤثر ذلك على حسابات أرباح العربون:</p>
-                        <form id="quick-block-form">
-                            <div class="form-row">
-                                <div class="form-group" style="flex:1.4;min-width:180px;">
-                                    <label for="quick-block-facility">1. اختر المنشأة</label>
-                                    <select class="form-control" id="quick-block-facility" required></select>
-                                </div>
-                                <div class="form-group" style="flex:1;min-width:145px;">
-                                    <label for="quick-block-date">2. التاريخ المراد قفله</label>
-                                    <input type="date" class="form-control" id="quick-block-date" required>
-                                </div>
-                                <div class="form-group" style="flex:1.2;min-width:165px;" id="quick-block-shift-wrap">
-                                    <label for="quick-block-shift">3. الفترة / الشفت</label>
-                                    <select class="form-control" id="quick-block-shift">
-                                        <option value="fullday">🔒 يوم كامل (صباحي + مسائي)</option>
-                                        <option value="morning">☀️ شفت صباحي فقط</option>
-                                        <option value="evening">🌙 شفت مسائي فقط</option>
-                                    </select>
-                                </div>
-                                <div class="form-group" style="flex:1.3;min-width:180px;display:none;" id="quick-block-pitch-wrap">
-                                    <label for="quick-block-pitch-mode">3. ساعات قفل الملعب</label>
-                                    <div style="display:flex;gap:6px;">
-                                        <select class="form-control" id="quick-block-pitch-start" title="ساعة البدء">
-                                            <option value="all">🔒 اليوم بالكامل</option>
-                                            <option value="6">من 06:00 ص</option>
-                                            <option value="8">من 08:00 ص</option>
-                                            <option value="10">من 10:00 ص</option>
-                                            <option value="12">من 12:00 ظ</option>
-                                            <option value="14">من 02:00 م</option>
-                                            <option value="16">من 04:00 م</option>
-                                            <option value="17">من 05:00 م</option>
-                                            <option value="18">من 06:00 م</option>
-                                            <option value="19">من 07:00 م</option>
-                                            <option value="20">من 08:00 م</option>
-                                            <option value="21">من 09:00 م</option>
-                                            <option value="22">من 10:00 م</option>
-                                        </select>
-                                        <input type="number" class="form-control" id="quick-block-pitch-hours" min="2" max="18" value="2" style="width:78px;display:none;" title="عدد الساعات" placeholder="ساعات">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-row" style="align-items:flex-end;">
-                                <div class="form-group" style="flex:2;margin-bottom:0;">
-                                    <label for="quick-block-note">4. ملاحظة للإدارة (اختياري)</label>
-                                    <input type="text" class="form-control" id="quick-block-note" maxlength="80" placeholder="مثال: محجوز عند صاحب المزرعة / يوم صيانة المسبح">
-                                </div>
-                                <div class="form-group" style="flex:1;margin-bottom:0;">
-                                    <button type="submit" class="btn-action" id="btn-quick-block-submit" style="width:100%;padding:0.7rem 1rem;background:var(--primary-dark);color:var(--accent-gold);border:1.5px solid var(--accent-gold);">🔒 قفل الموعد فوراً</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="admin-box">
-                        <div id="custom-admin-tools">
-                            <span class="export-label">📤 تصدير ونسخ احتياطي:</span>
-                            <button type="button" class="export-btn excel" id="btn-export-excel">📊 Excel</button>
-                            <button type="button" class="export-btn pdf" id="btn-export-pdf">📄 PDF</button>
-                            <button type="button" class="export-btn" style="background:#0D2818;color:#D4A359;" id="btn-export-backup">💾 نسخة احتياطية (Backup)</button>
-                            <label class="export-btn" style="background:#37474F;color:white;position:relative;overflow:hidden;margin:0;">
-                                📥 استعادة من نسخة
-                                <input type="file" id="inp-restore-backup" accept="application/json,.json" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
-                            </label>
-                        </div>
-                        <h3 class="admin-section-title">⏳ طلبات بانتظار التأكيد</h3>
-                        <div class="table-card">
-                            <table class="admin-table">
-                                <thead><tr><th>العميل</th><th>الهاتف</th><th>الخدمة</th><th>التفاصيل</th><th>المبلغ / العربون</th><th>الوصل</th><th>الإجراء</th></tr></thead>
-                                <tbody id="admin-pending-bookings"></tbody>
-                            </table>
-                        </div>
-                        <h3 class="admin-section-title" style="margin-top:1.5rem;">✅ الحجوزات المؤكدة</h3>
-                        <div class="table-card">
-                            <table class="admin-table">
-                                <thead><tr><th>العميل</th><th>الهاتف</th><th>الخدمة</th><th>التفاصيل</th><th>المبلغ / العربون</th><th>الوصل</th><th>الإجراء</th></tr></thead>
-                                <tbody id="admin-confirmed-bookings"></tbody>
-                            </table>
-                        </div>
-                        <h3 class="admin-section-title" style="margin-top:1.5rem;">📋 سجل الطلبات المرفوضة والمنتهية</h3>
-                        <div class="table-card">
-                            <table class="admin-table">
-                                <thead><tr><th>العميل</th><th>الهاتف</th><th>الخدمة</th><th>التفاصيل</th><th>المبلغ / العربون</th><th>الحالة</th><th>الإجراء</th></tr></thead>
-                                <tbody id="admin-archived-bookings"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Promos & Discounts Tab -->
-                <div id="dash-promos" class="admin-tab-page">
-                    <div class="admin-box">
-                        <h3 class="admin-section-title">🎁 إدارة كوبونات الخصم وعروض الأيام والأعياد</h3>
-                        <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:1rem;">تحكم كامل بالخصومات: حدد أي يوم من الأسبوع وكم قيمة الخصم، أنشئ أكواد خصم للأعياد والمناسبات، أوقف أو فعّل أي عرض بضغطة زر، واعمل استثناء لأي تاريخ أو أي منشأة.</p>
-                        <div class="table-card" style="margin-bottom:0;">
-                            <table class="admin-table">
-                                <thead><tr><th>الكود / النوع</th><th>المناسبة / الوصف</th><th>قيمة الخصم</th><th>الأيام والفترة</th><th>الاستثناءات</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
-                                <tbody id="admin-promos-table"></tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="admin-box">
-                        <h3 class="admin-section-title" id="promo-form-title">➕ إضافة كود خصم أو عرض يومي جديد</h3>
-                        <form id="add-promo-form">
-                            <input type="hidden" id="adm-p-editing-id" value="">
-                            <div class="form-row">
-                                <div class="form-group" style="flex:1;">
-                                    <label>كود الخصم (مثال: EID20 أو SUNDAY15)</label>
-                                    <input type="text" class="form-control" id="adm-p-code" required maxlength="40" placeholder="EID20" style="text-transform:uppercase;font-weight:700;">
-                                </div>
-                                <div class="form-group" style="flex:1.5;">
-                                    <label>اسم العرض / المناسبة (يظهر للزبون في الفاتورة)</label>
-                                    <input type="text" class="form-control" id="adm-p-title" required maxlength="120" placeholder="مثال: خصم عيد الفطر السعيد / خصم أيام وسط الأسبوع">
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group" style="flex:1;">
-                                    <label>نوع الخصم</label>
-                                    <select class="form-control" id="adm-p-type">
-                                        <option value="percent">نسبة مئوية (%)</option>
-                                        <option value="fixed">مبلغ ثابت بالدينار (JOD)</option>
-                                    </select>
-                                </div>
-                                <div class="form-group" style="flex:1;">
-                                    <label>قيمة الخصم (كم القيمة؟)</label>
-                                    <input type="number" step="0.5" min="1" max="5000" class="form-control" id="adm-p-value" required placeholder="15">
-                                </div>
-                                <div class="form-group" style="flex:1.2;">
-                                    <label>طريقة تطبيق الخصم</label>
-                                    <select class="form-control" id="adm-p-auto">
-                                        <option value="false">🔑 كود خصم يدخله الزبون (مثل كود الأعياد)</option>
-                                        <option value="true">✨ خصم تلقائي مباشر في الأيام المحددة بدون كود</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                                    <label style="margin:0;">📅 حدد الأيام المسموحة التي يعمل فيها الخصم:</label>
-                                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                                        <button type="button" class="copy-chip-btn" data-action="promo-days-preset" data-preset="all">كل الأيام</button>
-                                        <button type="button" class="copy-chip-btn" data-action="promo-days-preset" data-preset="weekdays">وسط الأسبوع (أحد–أربعاء)</button>
-                                        <button type="button" class="copy-chip-btn" data-action="promo-days-preset" data-preset="weekend">نهاية الأسبوع (خميس–سبت)</button>
-                                    </div>
-                                </div>
-                                <div class="days-pills-wrap">
-                                    <label class="day-check-pill"><input type="checkbox" class="adm-p-day-cb" value="0" checked> الأحد</label>
-                                    <label class="day-check-pill"><input type="checkbox" class="adm-p-day-cb" value="1" checked> الاثنين</label>
-                                    <label class="day-check-pill"><input type="checkbox" class="adm-p-day-cb" value="2" checked> الثلاثاء</label>
-                                    <label class="day-check-pill"><input type="checkbox" class="adm-p-day-cb" value="3" checked> الأربعاء</label>
-                                    <label class="day-check-pill"><input type="checkbox" class="adm-p-day-cb" value="4" checked> الخميس</label>
-                                    <label class="day-check-pill"><input type="checkbox" class="adm-p-day-cb" value="5" checked> الجمعة</label>
-                                    <label class="day-check-pill"><input type="checkbox" class="adm-p-day-cb" value="6" checked> السبت</label>
-                                </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group" style="flex:1;">
-                                    <label>تاريخ بداية العرض (اختياري — للأعياد والمواسم)</label>
-                                    <input type="date" class="form-control" id="adm-p-from">
-                                </div>
-                                <div class="form-group" style="flex:1;">
-                                    <label>تاريخ انتهاء العرض (اختياري)</label>
-                                    <input type="date" class="form-control" id="adm-p-until">
-                                </div>
-                            </div>
-
-                            <div style="background:#FFF9EF;border:1.5px dashed #E5C384;border-radius:14px;padding:1rem;margin-bottom:1rem;">
-                                <strong style="display:block;color:var(--primary-dark);margin-bottom:0.6rem;font-size:0.92rem;">🚫 قسم الاستثناءات (حدد أي تاريخ أو منشأة تريد استثناءها من الخصم):</strong>
-                                <div class="form-group">
-                                    <label>1. تواريخ مستثناة لا يعمل فيها الخصم (مثلاً أيام عطل أو ذروة محددة):</label>
-                                    <div style="display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
-                                        <input type="date" class="form-control" id="adm-p-ex-date-picker" style="max-width:220px;">
-                                        <button type="button" class="btn-details" id="btn-add-ex-date" style="margin:0;">➕ استثناء هذا التاريخ</button>
-                                    </div>
-                                    <input type="text" class="form-control" id="adm-p-excluded-dates" placeholder="التواريخ المستثناة مفصولة بفاصلة مثال: 2026-12-31, 2026-11-15">
-                                </div>
-                                <div class="form-group" style="margin-bottom:0;">
-                                    <label>2. منشآت مستثناة من هذا الخصم (ضع علامة ✓ على أي منشأة تريد استثناءها):</label>
-                                    <div id="adm-p-excluded-facilities-list" class="excluded-facs-grid"></div>
-                                </div>
-                            </div>
-
-                            <button type="submit" class="btn-action" style="width:100%;padding:0.85rem;" id="adm-p-submit-btn">💾 حفظ وتفعيل العرض / الكود</button>
-                            <button type="button" class="btn-details" style="width:100%;padding:0.8rem;margin-top:0.5rem;display:none;" id="adm-p-cancel-btn" data-action="cancel-promo-edit">إلغاء التعديل</button>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Reviews Moderation Tab -->
-                <div id="dash-reviews" class="admin-tab-page">
-                    <div class="admin-box">
-                        <h3 class="admin-section-title">⭐ مراجعة واعتماد تقييمات الزوار</h3>
-                        <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1.2rem;">التقييمات الجديدة تدخل بانتظار المراجعة ولا تؤثر على تقييم المنشأة إلا بعد اعتمادها من هنا لمنع التقييمات الوهمية.</p>
-                        <div class="table-card">
-                            <table class="admin-table">
-                                <thead><tr><th>المنشأة</th><th>الزائر</th><th>التقييم</th><th>التعليق</th><th>الحالة</th><th>الإجراء</th></tr></thead>
-                                <tbody id="admin-reviews-table"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Details Modal -->
     <div id="details-modal" class="modal" role="dialog" aria-modal="true">
         <div class="modal-content details-modal-content">
@@ -1161,8 +628,19 @@
                 </div>
             </div>
 
+            <!-- Verified & Security Deposit -->
+            <div id="det-verified-badge" class="verified-pill" style="display:none;">✅ منشأة موثّقة ومعتمدة من فريق Weekend</div>
             <!-- Specs -->
             <p id="det-specs"></p>
+            <div id="det-security-deposit" class="deposit-info-pill"></div>
+            <!-- Smart Weekend Bundle (Farm/Pitch + Bus) -->
+            <div id="det-bundle-box" class="bundle-offer-box">
+                <div style="flex:1;min-width:190px;">
+                    <div style="font-size:0.9rem;font-weight:700;color:#1B5E20;">🚌 أضف حافلة توصيل لهذه المنشأة (باقة عطلتك كاملة)</div>
+                    <div id="det-bundle-sub" style="font-size:0.8rem;color:#2E7D32;">احجز المنشأة وحافلة النقل معاً بسهولة وتعبئة تلقائية للوجهة</div>
+                </div>
+                <button type="button" class="btn-action" id="det-bundle-bus-btn" style="background:#1B5E20;font-size:0.82rem;padding:0.45rem 0.9rem;">🚌 أضف حافلة</button>
+            </div>
 
             <!-- Cancel Policy -->
             <div id="det-cancel-policy" class="cancel-policy-box" style="display:none;">
@@ -1176,11 +654,13 @@
                 <div id="det-amenities-strip" class="amenities-strip"></div>
             </div>
 
-            <!-- Map -->
+            <!-- Map (Approximate Region Only Before Booking Confirmation) -->
             <div id="det-map-section" class="map-section" style="display:none;">
-                <h5>📍 الموقع على الخريطة</h5>
-                <div id="det-map" class="map-container"></div>
-                <a id="det-map-link" href="#" target="_blank" rel="noopener noreferrer" class="map-link">🗺️ فتح في خرائط Google</a>
+                <h5>📍 المنطقة التقريبية للمنشأة</h5>
+                <div style="background:#F5F9F6;border:1px solid #C8E0D0;border-radius:12px;padding:0.85rem 1rem;font-size:0.86rem;color:#1B5E20;">
+                    <strong id="det-approx-loc-label" style="display:block;margin-bottom:4px;color:var(--primary-dark);"></strong>
+                    <span>🔒 حفاظاً على خصوصية المنشأة، يُرسل رابط الموقع الدقيق (Google Maps) تلقائياً داخل تذكرة الحجز فور تأكيد الحجز.</span>
+                </div>
             </div>
 
             <!-- Availability Calendar -->
@@ -1216,6 +696,13 @@
                         <button type="submit" class="btn-action" id="rev-submit-btn" style="width:100%;margin-top:0.5rem;padding:0.5rem;">إرسال التقييم</button>
                     </form>
                 </div>
+            </div>
+            <div class="sticky-mobile-cta" id="det-sticky-cta">
+                <div>
+                    <div style="font-size:0.75rem;color:var(--text-muted);">السعر يبدأ من</div>
+                    <strong id="det-sticky-price" style="color:var(--primary-dark);font-size:1rem;">--</strong>
+                </div>
+                <button type="button" class="btn-action" id="det-sticky-book-btn" style="padding:0.65rem 1.4rem;">ابدأ الحجز الآن</button>
             </div>
         </div>
     </div>
@@ -1385,6 +872,13 @@
                 </div>
 
                 <div class="bill-box" id="bill-details"></div>
+                <div class="split-cost-box" id="booking-split-box">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                        <label for="split-people-count" style="margin:0;font-weight:700;font-size:0.86rem;color:#0D47A1;">👥 تقسيم الفاتورة بين الأصدقاء / اللاعبين (كم عددكم؟)</label>
+                        <input type="number" id="split-people-count" min="1" max="100" value="1" class="form-control" style="width:90px;padding:0.35rem 0.6rem;text-align:center;font-weight:700;">
+                    </div>
+                    <div id="split-cost-result" style="margin-top:6px;font-size:0.85rem;color:#0D47A1;font-weight:600;"></div>
+                </div>
 
                 <div class="form-group" style="display:flex;align-items:flex-start;gap:10px;margin-top:1rem;background:#FAFBFB;padding:0.8rem;border-radius:10px;border:1px solid #EAEAEA;">
                     <input type="checkbox" id="accept-terms-checkbox" required style="margin-top:4px;width:18px;height:18px;accent-color:var(--primary-dark);cursor:pointer;">
@@ -1394,25 +888,6 @@
                 </div>
 
                 <button type="submit" class="btn-action" id="booking-submit-btn" style="width:100%;padding:0.9rem;margin-top:0.5rem;">تأكيد وإرسال طلب الحجز</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Admin Login Modal (Replaces prompt() and keeps admin email private) -->
-    <div id="admin-login-modal" class="modal" role="dialog" aria-modal="true">
-        <div class="modal-content" style="max-width:420px;">
-            <button type="button" class="close-modal" data-action="close-modal" data-modal="admin-login-modal" aria-label="إغلاق">&times;</button>
-            <h3 style="color:var(--primary-dark);margin-bottom:1rem;">🔐 تسجيل دخول الإدارة</h3>
-            <form id="admin-login-form">
-                <div class="form-group">
-                    <label for="admin-email-input">البريد الإلكتروني للإدارة</label>
-                    <input type="email" class="form-control" id="admin-email-input" required autocomplete="username" placeholder="email@example.com">
-                </div>
-                <div class="form-group">
-                    <label for="admin-pass-input">كلمة المرور</label>
-                    <input type="password" class="form-control" id="admin-pass-input" required autocomplete="current-password" placeholder="••••••••">
-                </div>
-                <button type="submit" class="btn-action" id="admin-login-submit-btn" style="width:100%;padding:0.8rem;">تسجيل الدخول</button>
             </form>
         </div>
     </div>
@@ -1460,6 +935,25 @@
                 <a id="btn-share-ticket-wa" href="#" target="_blank" rel="noopener noreferrer" class="btn-wa-share" style="flex:1;justify-content:center;text-decoration:none;">💬 إرسال عبر واتساب</a>
                 <button type="button" class="btn-details" id="btn-copy-ticket-id" style="margin:0;">📋 نسخ رقم التذكرة</button>
             </div>
+            <div id="ticket-split-share-wrap" class="split-cost-box" style="margin-top:0.9rem;">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                    <label for="ticket-split-count" style="margin:0;font-weight:700;font-size:0.85rem;color:#0D47A1;">👥 قسّم مبلغ الحجز على مجموعتك:</label>
+                    <input type="number" id="ticket-split-count" min="2" max="100" value="6" class="form-control" style="width:82px;padding:0.3rem 0.5rem;text-align:center;font-weight:700;">
+                </div>
+                <div id="ticket-split-summary" style="margin-top:6px;font-size:0.84rem;color:#0D47A1;font-weight:600;"></div>
+                <a id="btn-share-split-wa" href="#" target="_blank" rel="noopener noreferrer" class="btn-wa-share" style="margin-top:8px;width:100%;justify-content:center;text-decoration:none;font-size:0.84rem;">💬 أرسل حصة كل شخص على قروب الواتساب</a>
+            </div>
+            <div class="change-req-box" id="ticket-change-req-box">
+                <div style="font-size:0.86rem;font-weight:700;color:var(--primary-dark);margin-bottom:6px;">🛠️ هل تحتاج تعديل موعدك أو إلغاء الحجز؟</div>
+                <div id="ticket-change-req-status" style="font-size:0.82rem;color:#E65100;font-weight:600;margin-bottom:6px;display:none;"></div>
+                <div id="ticket-change-req-controls">
+                    <textarea id="ticket-change-note" class="form-control" rows="2" maxlength="400" placeholder="اكتب التاريخ الجديد المطلوب أو سبب الإلغاء (اختياري)..." style="margin-bottom:8px;font-size:0.84rem;"></textarea>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <button type="button" class="btn-details" id="btn-req-reschedule" style="flex:1;margin:0;border-color:#1565C0;color:#1565C0;">📅 طلب تغيير الموعد</button>
+                        <button type="button" class="btn-details" id="btn-req-cancel" style="flex:1;margin:0;border-color:var(--danger);color:var(--danger);">❌ طلب إلغاء الحجز</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1473,6 +967,23 @@
             <div id="pwa-install-steps-body" style="text-align:right;background:#F5F9F6;border:1.5px solid #C8E0D0;border-radius:14px;padding:1rem 1.1rem;margin-bottom:1rem;font-size:0.88rem;line-height:1.7;color:var(--text-dark);"></div>
             <button type="button" class="btn-action" data-action="close-modal" data-modal="pwa-install-modal" style="width:100%;padding:0.75rem;">حسناً، فهمت الطريقة</button>
         </div>
+    </div>
+
+    <!-- Compare Modal -->
+    <div id="compare-modal" class="modal" role="dialog" aria-modal="true">
+        <div class="modal-content" style="max-width:760px;">
+            <button type="button" class="close-modal" data-action="close-modal" data-modal="compare-modal" aria-label="إغلاق">&times;</button>
+            <h3 style="color:var(--primary-dark);margin-bottom:0.4rem;">⚖️ مقارنة سريعة بين المنشآت المختارة</h3>
+            <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">قارن الأسعار والخصوصية والتأمين والتقييم جنبًا إلى جنب لاتخاذ قرارك بثقة:</p>
+            <div id="compare-table-container" style="overflow-x:auto;"></div>
+        </div>
+    </div>
+
+    <!-- Floating Compare Bar -->
+    <div id="compare-float-bar" class="compare-float-bar">
+        <span id="compare-float-label" style="font-size:0.86rem;font-weight:600;">تم اختيار 0 للمقارنة</span>
+        <button type="button" class="btn-action" id="btn-open-compare" style="background:var(--accent-gold);color:var(--primary-dark);padding:0.4rem 1rem;min-height:36px;">⚖️ قارن الآن</button>
+        <button type="button" class="icon-btn danger" id="btn-clear-compare" title="مسح المقارنة" style="width:30px;height:30px;">✕</button>
     </div>
 
     <!-- Chat / FAQ Widget -->
@@ -1744,6 +1255,33 @@
         }
 
         // ─── رفع الصور إلى مجلد التخزين المستقل (weekend-media) لتخفيف ملف الموقع وقاعدة البيانات ───
+        
+        // رفع وصل تحويل CliQ إلى المجلد الخاص المحمي (Private Bucket: cliq-receipts)
+        async function uploadReceiptToPrivateBucket(file) {
+            const compressedDataUrl = await compressImageFileToJpeg(file, 1200, 0.78);
+            const sizeKb = Math.round((compressedDataUrl.length * 3) / 4 / 1024);
+            if (db && db.storage) {
+                try {
+                    const blob = dataUrlToBlob(compressedDataUrl);
+                    if (blob.size > 2 * 1024 * 1024) {
+                        throw new Error('حجم صورة الوصل يتجاوز الحد المسموح (2MB).');
+                    }
+                    const fileName = `${Date.now()}_${Math.random().toString(36).slice(2, 9)}.jpg`;
+                    const { error: upErr } = await db.storage.from('cliq-receipts').upload(fileName, blob, {
+                        contentType: 'image/jpeg',
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+                    if (!upErr) {
+                        return { url: `cliq-receipts/${fileName}`, sizeKb, storedSeparately: true };
+                    }
+                } catch (e) {
+                    console.warn('Private receipt bucket fallback to compressed Base64');
+                }
+            }
+            return { url: compressedDataUrl, sizeKb, storedSeparately: false };
+        }
+
         async function uploadImageToSeparateStorage(file, folder = 'facilities/images', maxDim = 1200, quality = 0.80) {
             const compressedDataUrl = await compressImageFileToJpeg(file, maxDim, quality);
             const sizeKb = Math.round((compressedDataUrl.length * 3) / 4 / 1024);
@@ -1848,6 +1386,8 @@
                 pricePerKm: Number(r.price_per_km) || 0,
                 pricePerPerson: Number(r.price_per_person) || 0,
                 capacity: Number(r.capacity) || (r.category === 'transport' ? 23 : null),
+                securityDeposit: Number(r.security_deposit) || 0,
+                isVerified: r.is_verified !== false,
                 specsAr: r.specs_ar || '',
                 specsEn: r.specs_en || '',
                 images: safeImgs.length ? safeImgs : ['https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80'],
@@ -2000,6 +1540,9 @@
         let currentTicketBooking = null;
         let pageShuffleSeed = Math.floor(Math.random() * 1000000) + 1;
         let currentSortOrder = 'fair';
+        const compareIds = new Set();
+        let lastCalculatedBookingTotal = 0;
+        let lastCalculatedBookingDeposit = 0;
 
         function getFairShuffleScore(itemId) {
             let h = (Number(itemId) * 2654435761) ^ pageShuffleSeed;
@@ -2759,6 +2302,7 @@
                 <div class="card-footer">
                     <div class="price-tag">${priceTagHtml}</div>
                     <div>
+                        <button type="button" class="btn-compare-card ${compareIds.has(item.id)?'selected':''}" data-action="toggle-compare" data-id="${item.id}" title="قارن بين المنشآت">⚖️</button>
                         <button type="button" class="btn-details" data-action="open-details" data-id="${item.id}">${currentLang==='ar'?'التفاصيل':'Details'}</button>
                         <button type="button" class="btn-action" data-action="open-booking" data-id="${item.id}">${currentLang==='ar'?'ابدأ الحجز':'Book Now'}</button>
                     </div>
@@ -2837,35 +2381,47 @@
                 policyBox.style.display = 'none';
             }
 
-            // Map (Safe DOM Node in bindPopup to prevent XSS + supports direct Google Maps link & interactive map)
-            const mapSec = document.getElementById('det-map-section');
-            let effLat = (selectedItem.lat !== null && selectedItem.lat !== undefined && Number.isFinite(Number(selectedItem.lat))) ? Number(selectedItem.lat) : null;
-            let effLng = (selectedItem.lng !== null && selectedItem.lng !== undefined && Number.isFinite(Number(selectedItem.lng))) ? Number(selectedItem.lng) : null;
-            if ((effLat === null || effLng === null) && selectedItem.mapUrl) {
-                const parsed = parseCoordsFromGoogleMapsInput(selectedItem.mapUrl);
-                if (parsed) {
-                    effLat = parsed.lat;
-                    effLng = parsed.lng;
+            // Verified Badge & Security Deposit
+            const verEl = document.getElementById('det-verified-badge');
+            if (verEl) verEl.style.display = selectedItem.isVerified !== false ? 'inline-flex' : 'none';
+            const depEl = document.getElementById('det-security-deposit');
+            if (depEl) {
+                if (Number(selectedItem.securityDeposit || 0) > 0) {
+                    depEl.style.display = 'block';
+                    depEl.textContent = `🛡️ التأمين المسترد عند الوصول: ${Number(selectedItem.securityDeposit).toFixed(0)} JOD (يُعاد بالكامل عند المغادرة)`;
                 } else {
-                    const reg = inferRegionCoords(selectedItem.locationAr);
-                    effLat = reg.lat;
-                    effLng = reg.lng;
+                    depEl.style.display = 'none';
                 }
             }
-            if (effLat !== null && effLng !== null) {
+
+            // Smart Weekend Bundle Banner (Farm/Pitch + Available Bus)
+            const bundleBox = document.getElementById('det-bundle-box');
+            const bundleBtn = document.getElementById('det-bundle-bus-btn');
+            const activeBuses = items.filter(i => i.category === 'transport' && i.active);
+            if (bundleBox && bundleBtn && selectedItem.category !== 'transport' && activeBuses.length > 0) {
+                bundleBox.style.display = 'flex';
+                bundleBtn.dataset.busId = activeBuses[0].id;
+                bundleBtn.dataset.dest = `${selectedItem.nameAr} — ${selectedItem.locationAr}`;
+            } else if (bundleBox) {
+                bundleBox.style.display = 'none';
+            }
+
+            // Sticky Mobile CTA Price & Action
+            const stickyPrice = document.getElementById('det-sticky-price');
+            const stickyBtn = document.getElementById('det-sticky-book-btn');
+            if (stickyPrice) {
+                if (selectedItem.category === 'transport') stickyPrice.textContent = `${Number(selectedItem.pricePerKm || 0)} JOD/كم`;
+                else if (selectedItem.category === 'field') stickyPrice.textContent = `${Number(selectedItem.hourlyRate || 0)} JOD/ساعة`;
+                else stickyPrice.textContent = `${Number(selectedItem.priceDay || selectedItem.priceNight || 0)} JOD`;
+            }
+            if (stickyBtn) stickyBtn.dataset.id = selectedItem.id;
+
+            // Approximate Location Notice (Exact Google Maps link revealed only on confirmed ticket)
+            const mapSec = document.getElementById('det-map-section');
+            const approxLabel = document.getElementById('det-approx-loc-label');
+            if (mapSec && approxLabel) {
                 mapSec.style.display = 'block';
-                const directMapLink = (selectedItem.mapUrl && /^https:\/\//i.test(selectedItem.mapUrl))
-                    ? selectedItem.mapUrl
-                    : `https://www.google.com/maps?q=${encodeURIComponent(effLat)},${encodeURIComponent(effLng)}`;
-                document.getElementById('det-map-link').href = directMapLink;
-                const mapContainer = document.getElementById('det-map');
-                if (detailsMap) { try { detailsMap.remove(); } catch(e) {} detailsMap = null; }
-                if (mapContainer) {
-                    const gmapEmbedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(effLat + ',' + effLng)}&hl=${currentLang === 'ar' ? 'ar' : 'en'}&z=15&output=embed`;
-                    mapContainer.innerHTML = `<iframe src="${gmapEmbedUrl}" width="100%" height="100%" style="border:0;border-radius:12px;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="${escapeHtml(name)}"></iframe>`;
-                }
-            } else {
-                mapSec.style.display = 'none';
+                approxLabel.textContent = '📍 المنطقة: ' + localizedItemText(selectedItem, 'location');
             }
 
             // Amenities
@@ -2933,7 +2489,7 @@
                 document.getElementById('rev-user-name').value = '';
                 document.getElementById('rev-comment').value = '';
                 showToast('✅ تم استلام تقييمك وبانتظار اعتماد الإدارة');
-                sendTelegramReviewNotification(selectedItem, name, rating, comment);
+                // إشعار التقييم يُرسل تلقائياً من السيرفر داخل submit_review RPC
                 if (isAdminLoggedIn) {
                     await loadFromDatabase();
                     renderAdminPanel();
@@ -3348,6 +2904,7 @@
                 const total = promoInfo.netTotal;
                 const deposit = Number((total * 0.15).toFixed(2));
                 const remaining = Number((total - deposit).toFixed(2));
+                updateBookingSplitDisplay(total, deposit);
                 const tripTypeLabel = isRoundTrip ? 'ذهاب وإياب' : 'ذهاب فقط';
 
                 billEl.innerHTML = `
@@ -3388,6 +2945,7 @@
                 const total      = promoInfo.netTotal;
                 const deposit    = Math.min(5.0, total);
                 const remaining  = Math.max(0, Number((total - deposit).toFixed(2)));
+                updateBookingSplitDisplay(total, deposit);
                 const startLabel = startHour < 12 ? `${startHour}:00 ص` : (startHour === 12 ? '12:00 ظ' : `${startHour-12}:00 م`);
                 const endLabel   = endHour < 12 ? `${endHour}:00 ص` : (endHour === 12 ? '12:00 ظ' : endHour === 24 ? '12:00 ص (منتصف الليل)' : `${endHour-12}:00 م`);
 
@@ -3419,6 +2977,7 @@
             const total     = promoInfo.netTotal;
             const deposit   = Number((total * 0.15).toFixed(2));
             const remaining = Number((total - deposit).toFixed(2));
+            updateBookingSplitDisplay(total, deposit);
 
             document.getElementById('price-day-label').textContent   = `${(Number(selectedItem.priceDay || 0) * multiplier).toFixed(1)} JOD`;
             document.getElementById('price-night-label').textContent = `${(Number(selectedItem.priceNight || 0) * multiplier).toFixed(1)} JOD`;
@@ -3445,7 +3004,7 @@
                 msgEl.textContent = '⏳ جاري ضغط وحفظ صورة الوصل في ملف الوصولات المستقل...';
             }
             try {
-                const uploaded = await uploadImageToSeparateStorage(input.files[0], 'cliq-receipts', 1200, 0.78);
+                const uploaded = await uploadReceiptToPrivateBucket(input.files[0]);
                 currentUploadedReceiptBase64 = uploaded.url;
                 if (msgEl) {
                     msgEl.style.color = 'var(--success)';
@@ -3637,6 +3196,7 @@
 
                 const ticketObj = {
                     id: Number(result?.id || Date.now().toString().slice(-5)),
+                    ticketCode: String(result?.ticket_code || ('WKND-' + (result?.id || ''))),
                     facilityId: bookedItem.id,
                     itemNameAr: bookedItem.nameAr,
                     itemNameEn: bookedItem.nameEn || bookedItem.nameAr,
@@ -3665,7 +3225,7 @@
                 safeSetStorage('wknd_my_bookings', JSON.stringify(myLocalBookings.slice(0, 20)));
 
                 // إرسال إشعار فوري لهاتف الأدمن عبر Telegram Bot (Feature 7)
-                sendTelegramBookingNotification(ticketObj, currentUploadedReceiptBase64, rpcParams.p_pickup_location, rpcParams.p_dropoff_location);
+                // الإشعار يُرسل تلقائياً من داخل السيرفر (create_booking RPC) لحماية التوكن ومنع الإغراق
 
                 // فتح تذكرة الحجز الإلكترونية فوراً (Feature 3)
                 setTimeout(() => openBookingTicketModal(ticketObj), 250);
@@ -4974,7 +4534,7 @@
 
             currentTicketBooking = b;
             const fac = items.find(i => i.id === Number(b.facilityId || b.itemId));
-            const ticketCode = `WKND-${b.id}`;
+            const ticketCode = String(b.ticketCode || b.ticket_code || `WKND-${b.id}`);
             const venueName = (currentLang === 'ar' ? b.itemNameAr : b.itemNameEn) || (fac ? localizedItemText(fac, 'name') : 'منشأة Weekend');
             const venueLoc  = b.locationAr || (fac ? localizedItemText(fac, 'location') : 'الأردن');
             const lat = b.lat ?? (fac ? fac.lat : null);
@@ -5018,8 +4578,11 @@
                             <div class="ticket-info-item"><strong>🏡 المنشأة / الخدمة</strong><span>${escapeHtml(venueName)}</span></div>
                             <div class="ticket-info-item"><strong>📍 الموقع</strong><span>${escapeHtml(venueLoc)}</span></div>
                             <div class="ticket-info-item" style="grid-column:1/-1;background:#EFF8FF;padding:8px 10px;border-radius:10px;border:1px solid #90CAF9;">
-                                <strong style="color:#0D47A1;">🗺️ رابط اللوكيشن على الخريطة (Google Maps)</strong>
-                                <a href="${escapeHtml(mapsHref)}" target="_blank" rel="noopener noreferrer" style="color:#1565C0;font-weight:700;text-decoration:underline;word-break:break-all;font-size:0.84rem;display:inline-block;margin-top:2px;">📍 اضغط هنا لفتح موقع المنشأة على Google Maps</a>
+                                <strong style="color:#0D47A1;">🗺️ موقع المنشأة على الخريطة (Google Maps)</strong>
+                                ${status === 'confirmed'
+                                    ? `<a href="${escapeHtml(mapsHref)}" target="_blank" rel="noopener noreferrer" style="color:#1565C0;font-weight:700;text-decoration:underline;word-break:break-all;font-size:0.84rem;display:inline-block;margin-top:2px;">📍 اضغط هنا لفتح الموقع الدقيق على Google Maps</a>`
+                                    : `<span style="color:#5A6960;font-size:0.82rem;font-weight:500;">🔒 سيظهر رابط اللوكيشن الدقيق هنا تلقائياً فور تأكيد الحجز من الإدارة.</span>`
+                                }
                             </div>
                             <div class="ticket-info-item" style="grid-column:1/-1;"><strong>📅 تفاصيل الموعد والحجز</strong><span>${escapeHtml(b.details || b.bookingDate || '')}</span></div>
                             ${discount > 0 ? `<div class="ticket-info-item" style="grid-column:1/-1;"><strong>🎁 الخصم المطبق (${escapeHtml(b.promoCode || 'عرض')})</strong><span style="color:var(--success);">-${discount.toFixed(2)} JOD</span></div>` : ''}
@@ -5065,6 +4628,8 @@ ${mapsHref}`
             if (waBtn) waBtn.href = `https://wa.me/?text=${waText}`;
 
             renderRandomBusUpsellInTicket(b, fac, venueName, venueLoc);
+            updateTicketSplitShareUI(b, venueName, ticketCode);
+            renderTicketChangeRequestUI(b);
             openModalSafely('ticket-modal');
         }
 
@@ -5288,13 +4853,17 @@ ${mapsHref}`
             let serverResults = null;
             if (db && targetPhone && isValidPhone(targetPhone) && targetBookingId) {
                 try {
+                    const targetCode = typeof idFilter === 'string' && idFilter ? idFilter : (savedList[0]?.ticketCode || (targetBookingId ? String(targetBookingId) : null));
                     const { data, error } = await db.rpc('track_my_bookings', {
                         p_phone: targetPhone,
-                        p_booking_id: targetBookingId
+                        p_ticket_code: targetCode
                     });
                     if (!error && Array.isArray(data)) {
                         serverResults = data.map(r => ({
                             id: Number(r.id),
+                            ticketCode: String(r.ticket_code || ('WKND-' + r.id)),
+                            changeRequestType: r.change_request_type || null,
+                            changeRequestStatus: r.change_request_status || null,
                             facilityId: Number(r.facility_id),
                             itemNameAr: r.item_name_ar,
                             itemNameEn: r.item_name_en || r.item_name_ar,
@@ -5342,7 +4911,7 @@ ${mapsHref}`
 
             return activeLocalList.filter(b => {
                 const pMatch = !targetPhone || normalizePhone(b.phone).slice(-9) === targetPhone.slice(-9);
-                const idMatch = !idFilter || Number(b.id) === Number(idFilter);
+                const idMatch = !idFilter || String(b.ticketCode || ('WKND-' + b.id)).toUpperCase() === String(idFilter).toUpperCase() || String(b.id) === String(idFilter).replace(/^WKND-/i, '');
                 return pMatch && idMatch;
             });
         }
@@ -5354,11 +4923,10 @@ ${mapsHref}`
             const idInp = document.getElementById('track-id-input');
             if (savedList.length > 0) {
                 if (phoneInp && !phoneInp.value) phoneInp.value = savedList[0].phone || '';
-                if (idInp && !idInp.value && savedList[0].id) idInp.value = 'WKND-' + savedList[0].id;
+                if (idInp && !idInp.value) idInp.value = savedList[0].ticketCode || ('WKND-' + savedList[0].id);
             }
             const currentPhone = phoneInp ? phoneInp.value.trim() : '';
-            const rawId = idInp ? idInp.value.trim().replace(/^#?WKND-/i, '') : '';
-            const parsedId = rawId && !isNaN(Number(rawId)) ? Number(rawId) : null;
+            const parsedId = idInp ? idInp.value.trim().replace(/^#/, '').toUpperCase() : null;
             const synced = await syncLocalBookingsWithDatabase(currentPhone, parsedId);
             renderTrackBookingResults(synced);
         }
@@ -5400,17 +4968,17 @@ ${mapsHref}`
         async function handleTrackBookingSubmit(e) {
             e.preventDefault();
             const rawPhone = document.getElementById('track-phone-input').value;
-            const rawId = document.getElementById('track-id-input').value.trim().replace(/^#?WKND-/i, '');
+            const rawCodeInput = document.getElementById('track-id-input').value.trim().replace(/^#/, '').toUpperCase();
             const cleanPhone = normalizePhone(rawPhone);
             if (!isValidPhone(cleanPhone)) {
                 showToast('⚠️ يرجى إدخال رقم هاتف صحيح');
                 return;
             }
-            const parsedId = rawId && !isNaN(Number(rawId)) ? Number(rawId) : null;
-            if (!parsedId || parsedId <= 0) {
-                showToast('⚠️ يرجى إدخال رقم التذكرة (مثال: 15 أو WKND-15) مع رقم الهاتف للتحقق الآمن');
+            if (!rawCodeInput || rawCodeInput.length < 1) {
+                showToast('⚠️ يرجى إدخال رمز التذكرة (مثال: WKND-7F3A9C) مع رقم الهاتف للتحقق الآمن');
                 return;
             }
+            const parsedId = rawCodeInput;
             const btn = document.getElementById('track-submit-btn');
             if (btn) btn.disabled = true;
 
@@ -6400,99 +5968,259 @@ ${mapsHref}`
 
         document.addEventListener('DOMContentLoaded', async () => {
             // Setup direct listeners
-            document.getElementById('hamburger-btn').addEventListener('click', toggleMobileMenu);
-            document.getElementById('lang-toggle-btn').addEventListener('click', toggleLanguage);
-            document.getElementById('logout-admin-btn').addEventListener('click', logoutAdmin);
+            document.getElementById('hamburger-btn')?.addEventListener('click', toggleMobileMenu);
+            document.getElementById('lang-toggle-btn')?.addEventListener('click', toggleLanguage);
+            document.getElementById('logout-admin-btn')?.addEventListener('click', logoutAdmin);
             let searchDebounceTimer = null;
-            document.getElementById('search-location').addEventListener('input', () => {
+            document.getElementById('search-location')?.addEventListener('input', () => {
                 clearTimeout(searchDebounceTimer);
                 searchDebounceTimer = setTimeout(liveSearch, 100);
             });
-            document.getElementById('search-category').addEventListener('change', liveSearch);
-            document.getElementById('search-region').addEventListener('change', liveSearch);
+            document.getElementById('search-category')?.addEventListener('change', liveSearch);
+            document.getElementById('search-region')?.addEventListener('change', liveSearch);
             initPwaManifestAndPrompt();
-            document.getElementById('sort-order-select').addEventListener('change', function() {
+            document.getElementById('sort-order-select')?.addEventListener('change', function() {
                 currentSortOrder = this.value || 'fair';
                 liveSearch();
             });
-            document.getElementById('adm-v-type').addEventListener('change', toggleVenueTypePricing);
-            document.getElementById('adm-v-img-file').addEventListener('change', function() { handleAdminImageUpload(this, 'venue'); });
-            document.getElementById('adm-v-extra-files').addEventListener('change', function() { handleAdminExtraImagesUpload(this, 'venue'); });
-            document.getElementById('adm-v-video-file').addEventListener('change', function() { handleAdminVideoUpload(this, 'venue'); });
-            document.getElementById('adm-t-img-file').addEventListener('change', function() { handleAdminImageUpload(this, 'transport'); });
-            document.getElementById('adm-t-extra-files').addEventListener('change', function() { handleAdminExtraImagesUpload(this, 'transport'); });
-            document.getElementById('adm-t-video-file').addEventListener('change', function() { handleAdminVideoUpload(this, 'transport'); });
-            document.getElementById('add-venue-form').addEventListener('submit', e => addListing(e, 'venue'));
-            document.getElementById('add-transport-form').addEventListener('submit', e => addListing(e, 'transport'));
-            document.getElementById('review-form').addEventListener('submit', submitReview);
-            document.getElementById('booking-form').addEventListener('submit', processBooking);
-            document.getElementById('admin-login-form').addEventListener('submit', handleAdminLoginSubmit);
-            document.getElementById('booking-date').addEventListener('change', onBookingDateChange);
-            document.getElementById('pitch-start-hour').addEventListener('change', updateBookingCalculation);
-            document.getElementById('pitch-hours').addEventListener('input', updateBookingCalculation);
-            document.getElementById('trans-passengers').addEventListener('input', updateBookingCalculation);
-            document.getElementById('trans-distance').addEventListener('input', updateBookingCalculation);
-            document.getElementById('trans-round-trip').addEventListener('change', updateBookingCalculation);
-            document.getElementById('cliq-receipt').addEventListener('change', function() { handleReceiptFileChange(this); });
-            document.getElementById('chat-toggle-btn').addEventListener('click', toggleChat);
-            document.getElementById('chat-close-btn').addEventListener('click', toggleChat);
-            document.getElementById('btn-export-excel').addEventListener('click', exportBookingsToExcel);
-            document.getElementById('btn-export-pdf').addEventListener('click', exportBookingsToPDF);
-            document.getElementById('btn-export-backup').addEventListener('click', exportFullBackup);
-            document.getElementById('inp-restore-backup').addEventListener('change', function() { handleRestoreBackupFile(this); });
-            document.getElementById('btn-goto-add-pitch').addEventListener('click', () => {
+            document.getElementById('adm-v-type')?.addEventListener('change', toggleVenueTypePricing);
+            document.getElementById('adm-v-img-file')?.addEventListener('change', function() { handleAdminImageUpload(this, 'venue'); });
+            document.getElementById('adm-v-extra-files')?.addEventListener('change', function() { handleAdminExtraImagesUpload(this, 'venue'); });
+            document.getElementById('adm-v-video-file')?.addEventListener('change', function() { handleAdminVideoUpload(this, 'venue'); });
+            document.getElementById('adm-t-img-file')?.addEventListener('change', function() { handleAdminImageUpload(this, 'transport'); });
+            document.getElementById('adm-t-extra-files')?.addEventListener('change', function() { handleAdminExtraImagesUpload(this, 'transport'); });
+            document.getElementById('adm-t-video-file')?.addEventListener('change', function() { handleAdminVideoUpload(this, 'transport'); });
+            document.getElementById('add-venue-form')?.addEventListener('submit', e => addListing(e, 'venue'));
+            document.getElementById('add-transport-form')?.addEventListener('submit', e => addListing(e, 'transport'));
+            document.getElementById('review-form')?.addEventListener('submit', submitReview);
+            document.getElementById('booking-form')?.addEventListener('submit', processBooking);
+            document.getElementById('admin-login-form')?.addEventListener('submit', handleAdminLoginSubmit);
+            document.getElementById('booking-date')?.addEventListener('change', onBookingDateChange);
+            document.getElementById('pitch-start-hour')?.addEventListener('change', updateBookingCalculation);
+            document.getElementById('pitch-hours')?.addEventListener('input', updateBookingCalculation);
+            document.getElementById('trans-passengers')?.addEventListener('input', updateBookingCalculation);
+            document.getElementById('trans-distance')?.addEventListener('input', updateBookingCalculation);
+            document.getElementById('trans-round-trip')?.addEventListener('change', updateBookingCalculation);
+            document.getElementById('cliq-receipt')?.addEventListener('change', function() { handleReceiptFileChange(this); });
+            document.getElementById('chat-toggle-btn')?.addEventListener('click', toggleChat);
+            document.getElementById('chat-close-btn')?.addEventListener('click', toggleChat);
+            document.getElementById('btn-export-excel')?.addEventListener('click', exportBookingsToExcel);
+            document.getElementById('btn-export-pdf')?.addEventListener('click', exportBookingsToPDF);
+            document.getElementById('btn-export-backup')?.addEventListener('click', exportFullBackup);
+            document.getElementById('inp-restore-backup')?.addEventListener('change', function() { handleRestoreBackupFile(this); });
+            document.getElementById('btn-goto-add-pitch')?.addEventListener('click', () => {
                 switchAdminTab('dash-listings', document.querySelectorAll('.sidebar-item')[1]);
                 switchAdminForm('venue');
                 document.getElementById('adm-v-type').value = 'field';
                 toggleVenueTypePricing();
             });
-            document.getElementById('det-book-btn').addEventListener('click', function() {
+            document.getElementById('det-book-btn')?.addEventListener('click', function() {
                 const id = this.dataset.id;
                 closeModal('details-modal');
                 if (id) openBookingModal(Number(id));
             });
-            document.getElementById('det-wa-share-btn').addEventListener('click', function() {
+            document.getElementById('det-wa-share-btn')?.addEventListener('click', function() {
                 const id = this.dataset.id;
                 if (id) sharePropertyWhatsApp(Number(id));
             });
-            document.getElementById('det-copy-link-btn').addEventListener('click', function() {
+            document.getElementById('det-copy-link-btn')?.addEventListener('click', function() {
                 const id = this.dataset.id;
                 if (id) copyPropertyDeepLink(Number(id));
             });
-            document.getElementById('booking-date-transport').addEventListener('change', updateBookingCalculation);
-            document.getElementById('btn-apply-promo').addEventListener('click', applyBookingPromoCode);
-            document.getElementById('btn-clear-promo').addEventListener('click', clearBookingPromoCode);
-            document.getElementById('add-promo-form').addEventListener('submit', savePromoCode);
-            document.getElementById('quick-block-form').addEventListener('submit', submitQuickBlockForm);
-            document.getElementById('telegram-config-form').addEventListener('submit', saveTelegramConfig);
-            document.getElementById('adm-v-map-url').addEventListener('input', () => handleAdminMapUrlInput('venue'));
-            document.getElementById('adm-t-map-url').addEventListener('input', () => handleAdminMapUrlInput('transport'));
-            document.getElementById('adm-v-lat').addEventListener('change', initOrUpdateAdminMapPicker);
-            document.getElementById('adm-v-lng').addEventListener('change', initOrUpdateAdminMapPicker);
-            document.getElementById('btn-tg-detect-chat').addEventListener('click', detectTelegramChatIdAutomatically);
-            document.getElementById('tg-chat-id').addEventListener('input', function() {
+            document.getElementById('booking-date-transport')?.addEventListener('change', updateBookingCalculation);
+            document.getElementById('btn-apply-promo')?.addEventListener('click', applyBookingPromoCode);
+            document.getElementById('btn-clear-promo')?.addEventListener('click', clearBookingPromoCode);
+            document.getElementById('add-promo-form')?.addEventListener('submit', savePromoCode);
+            document.getElementById('quick-block-form')?.addEventListener('submit', submitQuickBlockForm);
+            document.getElementById('telegram-config-form')?.addEventListener('submit', saveTelegramConfig);
+            document.getElementById('adm-v-map-url')?.addEventListener('input', () => handleAdminMapUrlInput('venue'));
+            document.getElementById('adm-t-map-url')?.addEventListener('input', () => handleAdminMapUrlInput('transport'));
+            document.getElementById('adm-v-lat')?.addEventListener('change', initOrUpdateAdminMapPicker);
+            document.getElementById('adm-v-lng')?.addEventListener('change', initOrUpdateAdminMapPicker);
+            document.getElementById('btn-tg-detect-chat')?.addEventListener('click', detectTelegramChatIdAutomatically);
+            document.getElementById('tg-chat-id')?.addEventListener('input', function() {
                 const extracted = extractChatIdFromInput(this.value);
                 if (extracted && extracted !== this.value && /^-?[0-9]{5,20}$/.test(extracted)) {
                     this.value = extracted;
                     showToast('✅ تم استخراج رقم المحادثة بنجاح: ' + extracted);
                 }
             });
-            document.getElementById('btn-tg-test').addEventListener('click', sendTestTelegramNotification);
-            document.getElementById('btn-tg-disable').addEventListener('click', disableTelegramNotifications);
-            document.getElementById('quick-block-facility').addEventListener('change', syncQuickBlockFormUI);
-            document.getElementById('quick-block-pitch-start').addEventListener('change', syncQuickBlockFormUI);
-            document.getElementById('btn-add-ex-date').addEventListener('click', addExcludedDateToInput);
-            document.getElementById('track-booking-form').addEventListener('submit', handleTrackBookingSubmit);
-            document.getElementById('btn-download-ticket-pdf').addEventListener('click', downloadTicketPDF);
-            document.getElementById('btn-copy-ticket-id').addEventListener('click', () => {
+            document.getElementById('btn-tg-test')?.addEventListener('click', sendTestTelegramNotification);
+            document.getElementById('btn-tg-disable')?.addEventListener('click', disableTelegramNotifications);
+            document.getElementById('quick-block-facility')?.addEventListener('change', syncQuickBlockFormUI);
+            document.getElementById('quick-block-pitch-start')?.addEventListener('change', syncQuickBlockFormUI);
+            document.getElementById('btn-add-ex-date')?.addEventListener('click', addExcludedDateToInput);
+            document.getElementById('track-booking-form')?.addEventListener('submit', handleTrackBookingSubmit);
+            document.getElementById('btn-download-ticket-pdf')?.addEventListener('click', downloadTicketPDF);
+            document.getElementById('btn-copy-ticket-id')?.addEventListener('click', () => {
                 if (currentTicketBooking && navigator.clipboard) {
-                    const code = 'WKND-' + currentTicketBooking.id;
+                    const code = currentTicketBooking.ticketCode || ('WKND-' + currentTicketBooking.id);
                     navigator.clipboard.writeText(code).then(() => showToast('✅ تم نسخ رقم التذكرة: ' + code)).catch(() => {});
                 }
             });
-            document.getElementById('det-main-img').addEventListener('click', function() {
+            document.getElementById('det-main-img')?.addEventListener('click', function() {
                 if (this.src) openImageModal(this.src, selectedItem ? localizedItemText(selectedItem, 'name') : 'معاينة الصورة');
             });
+
+            
+        // =====================================================
+        //  V2 CUSTOMER FEATURES: SPLIT COST, COMPARE, SELF-SERVICE CANCEL/RESCHEDULE, BUNDLE
+        // =====================================================
+        function updateBookingSplitDisplay(total, deposit) {
+            lastCalculatedBookingTotal = Number(total) || 0;
+            lastCalculatedBookingDeposit = Number(deposit) || 0;
+            const cnt = Math.max(1, parseInt(document.getElementById('split-people-count')?.value, 10) || 1);
+            const resEl = document.getElementById('split-cost-result');
+            if (!resEl) return;
+            if (lastCalculatedBookingTotal <= 0) {
+                resEl.textContent = '';
+                return;
+            }
+            const perTotal = (lastCalculatedBookingTotal / cnt).toFixed(2);
+            const perDep = (lastCalculatedBookingDeposit / cnt).toFixed(2);
+            resEl.textContent = cnt > 1
+                ? `حصة كل شخص (${cnt} أشخاص): ${perTotal} JOD إجمالي (منها ${perDep} JOD عربون)`
+                : `أدخل عدد الأشخاص (مثلاً 8 أو 10) لحساب نصيب كل شخص فوراً.`;
+        }
+
+        function updateTicketSplitShareUI(b, venueName, ticketCode) {
+            const cnt = Math.max(2, parseInt(document.getElementById('ticket-split-count')?.value, 10) || 6);
+            const total = Number(b.total || 0);
+            const dep = Number(b.deposit || 0);
+            const perTotal = (total / cnt).toFixed(2);
+            const perDep = (dep / cnt).toFixed(2);
+            const sumEl = document.getElementById('ticket-split-summary');
+            const waBtn = document.getElementById('btn-share-split-wa');
+            if (sumEl) {
+                sumEl.textContent = `لكل شخص (${cnt} أشخاص): ${perTotal} JOD إجمالي | العربون للفرد: ${perDep} JOD`;
+            }
+            if (waBtn) {
+                const msg = encodeURIComponent(
+                    `🌴 حجزنا في *${venueName}* عبر منصة Weekend!\n` +
+                    `🎫 رقم التذكرة: #${ticketCode}\n` +
+                    `📅 ${b.details || b.bookingDate || ''}\n` +
+                    `💰 الإجمالي: ${total.toFixed(2)} JOD (مقسّم على ${cnt} أشخاص)\n` +
+                    `👤 حصة كل شخص: *${perTotal} JOD* (العربون للفرد: ${perDep} JOD)`
+                );
+                waBtn.href = `https://wa.me/?text=${msg}`;
+            }
+        }
+
+        function renderTicketChangeRequestUI(b) {
+            const stEl = document.getElementById('ticket-change-req-status');
+            const ctrlEl = document.getElementById('ticket-change-req-controls');
+            const noteEl = document.getElementById('ticket-change-note');
+            if (!stEl || !ctrlEl) return;
+            if (noteEl) noteEl.value = '';
+            if (b.changeRequestStatus === 'pending') {
+                const lbl = b.changeRequestType === 'cancel' ? 'طلب إلغاء الحجز' : 'طلب تغيير الموعد';
+                stEl.style.display = 'block';
+                stEl.textContent = `⏳ لديك (${lbl}) قيد المراجعة من الإدارة حالياً — سيتم التواصل معك قريباً.`;
+                ctrlEl.style.display = 'none';
+            } else {
+                stEl.style.display = 'none';
+                ctrlEl.style.display = 'block';
+            }
+        }
+
+        async function submitBookingChangeRequest(reqType) {
+            if (!currentTicketBooking || !db) return;
+            const note = (document.getElementById('ticket-change-note')?.value || '').trim();
+            const label = reqType === 'cancel' ? 'إلغاء الحجز' : 'تغيير الموعد';
+            if (!confirm(`هل تريد إرسال طلب (${label}) للإدارة الآن؟`)) return;
+            const code = String(currentTicketBooking.ticketCode || currentTicketBooking.ticket_code || `WKND-${currentTicketBooking.id}`);
+            const { data, error } = await db.rpc('request_booking_change', {
+                p_phone: currentTicketBooking.phone,
+                p_ticket_code: code,
+                p_request_type: reqType,
+                p_note: note
+            });
+            if (error) {
+                showToast('⚠️ ' + (error.message || 'تعذر إرسال الطلب حالياً'));
+                return;
+            }
+            currentTicketBooking.changeRequestType = reqType;
+            currentTicketBooking.changeRequestStatus = 'pending';
+            renderTicketChangeRequestUI(currentTicketBooking);
+            showToast('✅ تم إرسال طلبك للإدارة بنجاح وسيصلك الرد قريباً!');
+        }
+
+        function toggleCompareItem(id, btnEl) {
+            const numId = Number(id);
+            if (compareIds.has(numId)) {
+                compareIds.delete(numId);
+                if (btnEl) btnEl.classList.remove('selected');
+            } else {
+                if (compareIds.size >= 3) {
+                    showToast('⚖️ يمكنك مقارنة 3 منشآت كحد أقصى في نفس الوقت');
+                    return;
+                }
+                compareIds.add(numId);
+                if (btnEl) btnEl.classList.add('selected');
+            }
+            updateCompareFloatBar();
+        }
+
+        function updateCompareFloatBar() {
+            const bar = document.getElementById('compare-float-bar');
+            const lbl = document.getElementById('compare-float-label');
+            if (!bar || !lbl) return;
+            if (compareIds.size > 0) {
+                bar.classList.add('active');
+                lbl.textContent = `تم اختيار ${compareIds.size} للمقارنة (من 3)`;
+            } else {
+                bar.classList.remove('active');
+            }
+        }
+
+        function openCompareModal() {
+            const selected = items.filter(i => compareIds.has(i.id));
+            if (selected.length < 2) {
+                showToast('⚖️ اختر منشأتين على الأقل للمقارنة بينهما');
+                return;
+            }
+            const container = document.getElementById('compare-table-container');
+            if (!container) return;
+            const headerCells = selected.map(i => `<th style="background:var(--primary-dark);color:var(--accent-gold);">${escapeHtml(localizedItemText(i, 'name'))}</th>`).join('');
+            const priceCells = selected.map(i => {
+                if (i.category === 'transport') return `<td>${i.pricePerKm} JOD/كم | ${i.pricePerPerson} JOD/شخص</td>`;
+                if (i.category === 'field') return `<td>${i.hourlyRate} JOD/ساعة (عربون 5 JOD)</td>`;
+                return `<td>صباحي: ${i.priceDay} | مسائي: ${i.priceNight} | كامل: ${i.priceFull} JOD</td>`;
+            }).join('');
+            const locCells = selected.map(i => `<td>📍 ${escapeHtml(localizedItemText(i, 'location'))}</td>`).join('');
+            const ratingCells = selected.map(i => `<td>⭐ ${Number(i.rating || 5).toFixed(1)} / 5</td>`).join('');
+            const depCells = selected.map(i => `<td>${Number(i.securityDeposit || 0) > 0 ? Number(i.securityDeposit) + ' JOD مسترد' : 'لا يوجد تأمين'}</td>`).join('');
+            const amCells = selected.map(i => {
+                const list = (i.amenities || []).map(a => AMENITIES_MAP[a] ? `${AMENITIES_MAP[a].icon} ${AMENITIES_MAP[a].labelAr}` : '').filter(Boolean);
+                return `<td>${list.length ? escapeHtml(list.join(' • ')) : '—'}</td>`;
+            }).join('');
+            const policyCells = selected.map(i => `<td><small>${escapeHtml(localizedPolicyText(i) || 'حسب سياسة المنصة')}</small></td>`).join('');
+            const actionCells = selected.map(i => `<td><button type="button" class="btn-action" style="width:100%;" data-action="book-from-compare" data-id="${i.id}">ابدأ الحجز</button></td>`).join('');
+
+            container.innerHTML = `<table class="compare-table">
+                <thead><tr><th>المعيار</th>${headerCells}</tr></thead>
+                <tbody>
+                    <tr><th>الموقع</th>${locCells}</tr>
+                    <tr><th>الأسعار</th>${priceCells}</tr>
+                    <tr><th>التقييم</th>${ratingCells}</tr>
+                    <tr><th>التأمين المسترد</th>${depCells}</tr>
+                    <tr><th>الخصوصية والمرافق</th>${amCells}</tr>
+                    <tr><th>سياسة الإلغاء</th>${policyCells}</tr>
+                    <tr><th>الإجراء</th>${actionCells}</tr>
+                </tbody>
+            </table>`;
+            openModalSafely('compare-modal');
+        }
+
+            // Direct listeners for V2 customer features
+            document.getElementById('split-people-count')?.addEventListener('input', () => updateBookingSplitDisplay(lastCalculatedBookingTotal, lastCalculatedBookingDeposit));
+            document.getElementById('ticket-split-count')?.addEventListener('input', () => { if (currentTicketBooking) updateTicketSplitShareUI(currentTicketBooking, currentTicketBooking.itemNameAr || 'المنشأة', currentTicketBooking.ticketCode || ('WKND-' + currentTicketBooking.id)); });
+            document.getElementById('btn-req-reschedule')?.addEventListener('click', () => submitBookingChangeRequest('reschedule'));
+            document.getElementById('btn-req-cancel')?.addEventListener('click', () => submitBookingChangeRequest('cancel'));
+            document.getElementById('btn-open-compare')?.addEventListener('click', openCompareModal);
+            document.getElementById('btn-clear-compare')?.addEventListener('click', () => { compareIds.clear(); updateCompareFloatBar(); liveSearch(); });
+            document.getElementById('det-sticky-book-btn')?.addEventListener('click', function() { const id = this.dataset.id; closeModal('details-modal'); if (id) openBookingModal(Number(id)); });
+            document.getElementById('det-bundle-bus-btn')?.addEventListener('click', async function() { const busId = this.dataset.busId; const dest = this.dataset.dest; closeModal('details-modal'); if (busId) { await openBookingModal(Number(busId)); const drop = document.getElementById('trans-dropoff-location'); if (drop && dest) drop.value = dest; } });
 
             // Global click delegation for dynamic elements
             document.addEventListener('click', (e) => {
@@ -6517,6 +6245,11 @@ ${mapsHref}`
                     openBookingModal(Number(el.dataset.id));
                 } else if (action === 'toggle-fav') {
                     toggleFavorite(Number(el.dataset.id), el, e);
+                } else if (action === 'toggle-compare') {
+                    toggleCompareItem(Number(el.dataset.id), el);
+                } else if (action === 'book-from-compare') {
+                    closeModal('compare-modal');
+                    openBookingModal(Number(el.dataset.id));
                 } else if (action === 'close-modal') {
                     closeModal(el.dataset.modal);
                 } else if (action === 'select-shift') {
@@ -6622,20 +6355,14 @@ ${mapsHref}`
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     document.querySelectorAll('.modal.active').forEach(m => closeModal(m.id));
-                } else if (e.ctrlKey && e.shiftKey && (e.key === 'l' || e.key === 'L')) {
-                    e.preventDefault();
-                    promptAdminLogin();
+                
                 } else if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"][data-action="open-details"]')) {
                     e.preventDefault();
                     openDetailsModal(Number(e.target.dataset.id));
                 }
             });
 
-            // الدخول للوحة الأدمن حصراً عبر اختصار الكيبورد (Ctrl+Shift+L) أو الرابط السري (?adm=wknd7k9) مع طلب الإيميل وكلمة السر دائماً
             const params = new URLSearchParams(window.location.search);
-            if (params.get('adm') === 'wknd7k9') {
-                setTimeout(() => promptAdminLogin(), 300);
-            }
 
             // Initialize dates and load public data from Supabase (admin must log in explicitly with email & password)
             const { dateStr: today } = getAmmanNow();
