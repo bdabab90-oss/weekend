@@ -4812,13 +4812,17 @@
                 return 'expired';
             }
 
+            // 2) إذا جاءت التذكرة الآن مباشرة من قاعدة البيانات (track_my_bookings)، نعتمد حالتها الحقيقية مباشرة دون تضارب مع الكاش
+            if (b._fromServer) {
+                return b.status || 'pending';
+            }
+
             const numId = Number(b.id);
             const facId = Number(b.facilityId || b.itemId || b.facility_id);
             const bDate = String(b.bookingDate || b.booking_date || '').trim() ||
                           ((String(b.details || '').match(/(\d{4}-\d{2}-\d{2})/) || [])[1] || '');
             const bDetails = String(b.details || '').trim();
 
-            // 2) إذا كان الأدمن مسجلاً الدخول على نفس المتصفح، نتحقق مباشرةً من قوائم الأدمن
             if (isAdminLoggedIn) {
                 if (confirmedBookings.some(x => Number(x.id) === numId || (facId && Number(x.itemId) === facId && x.bookingDate === bDate && x.details === bDetails))) {
                     return 'confirmed';
@@ -4828,11 +4832,9 @@
                 }
                 const archMatch = archivedBookings.find(x => Number(x.id) === numId);
                 if (archMatch) return archMatch.status || 'rejected';
-                // إذا لم يكن في المؤكدة ولا المعلقة ولا الأرشيف، فهذا يعني أن الأدمن حذفه نهائياً
                 return 'deleted';
             }
 
-            // 3) للزبون العام: التحقق الدقيق بمطابقة رقم المنشأة والتاريخ ونفس الساعات/الشفت (منع تداخل شفتين بنفس اليوم)
             if (facId && bDate && busyIntervalsLoaded) {
                 let bFrom = (b.hourFrom !== null && b.hourFrom !== undefined) ? Number(b.hourFrom) : null;
                 let bTo   = (b.hourTo !== null && b.hourTo !== undefined) ? Number(b.hourTo) : null;
@@ -4846,13 +4848,8 @@
                     String(s.date) === bDate &&
                     s.hourFrom < bTo && bFrom < s.hourTo
                 );
-                if (slotMatches.some(s => s.status === 'confirmed')) {
-                    return 'confirmed';
-                }
-                if (slotMatches.some(s => s.status === 'pending')) {
-                    return 'pending';
-                }
-                // إذا تم تحميل المواعيد من السيرفر ولم يعد هذا الموعد بالذات موجوداً، فهذا يعني أن الأدمن حذفه أو ألغاه
+                if (slotMatches.some(s => s.status === 'confirmed')) return 'confirmed';
+                if (slotMatches.some(s => s.status === 'pending')) return 'pending';
                 const createdMs = b.createdAt ? new Date(b.createdAt).getTime() : 0;
                 if (slotMatches.length === 0 && (!createdMs || (Date.now() - createdMs > 10000))) {
                     return 'deleted';
@@ -4862,16 +4859,17 @@
             return b.status || 'pending';
         }
 
-        async function syncLocalBookingsWithDatabase(phoneFilter = '', idFilter = null) {
-            if (!busyIntervalsLoaded) await loadPublicConfirmedSlots();
+        async function syncLocalBookingsWithDatabase(phoneFilter = '', codeFilter = null) {
             const savedList = JSON.parse(safeGetStorage('wknd_my_bookings', '[]'));
             const targetPhone = normalizePhone(phoneFilter || (savedList[0] ? savedList[0].phone : ''));
-            const targetBookingId = idFilter ? Number(idFilter) : (savedList[0] && savedList[0].id ? Number(savedList[0].id) : null);
+            const targetCode = (codeFilter !== null && codeFilter !== undefined && String(codeFilter).trim() !== '')
+                ? String(codeFilter).trim().replace(/^#/, '').toUpperCase()
+                : (savedList[0] ? String(savedList[0].ticketCode || ('WKND-' + savedList[0].id)).toUpperCase() : '');
 
             let serverResults = null;
-            if (db && targetPhone && isValidPhone(targetPhone) && targetBookingId) {
+            if (db && targetPhone && isValidPhone(targetPhone) && targetCode) {
                 try {
-                    const targetCode = typeof idFilter === 'string' && idFilter ? idFilter : (savedList[0]?.ticketCode || (targetBookingId ? String(targetBookingId) : null));
+                    // استدعاء قاعدة البيانات دائماً برقم الهاتف ورمز التذكرة (النصي العشوائي أو الرقمي)
                     const { data, error } = await db.rpc('track_my_bookings', {
                         p_phone: targetPhone,
                         p_ticket_code: targetCode
@@ -4901,42 +4899,53 @@
                             discountAmount: Number(r.discount_amount || 0),
                             total: Number(r.total || 0),
                             deposit: Number(r.deposit || 0),
-                            status: r.status || 'pending'
+                            status: r.status || 'pending',
+                            _fromServer: true
                         })).filter(item => !isTicketExpiredByTime(item) && (item.status === 'pending' || item.status === 'confirmed'));
                     }
                 } catch (e) {}
             }
 
-            // تنظيف الذاكرة المحلية: حذف أي تذكرة انتهى وقت حجزها أو تم حذفها/إلغاؤها من الموقع
-            const activeLocalList = [];
-            savedList.forEach(localItem => {
-                if (serverResults !== null && (!targetPhone || normalizePhone(localItem.phone).slice(-9) === targetPhone.slice(-9))) {
-                    const srv = serverResults.find(s => Number(s.id) === Number(localItem.id));
-                    if (srv) {
-                        localItem.status = srv.status;
-                        localItem.ownerPhone = srv.ownerPhone || null;
-                        localItem.guardPhone = srv.guardPhone || null;
-                        localItem.lat = srv.lat ?? localItem.lat;
-                        localItem.lng = srv.lng ?? localItem.lng;
-                        activeLocalList.push(localItem);
+            // تحديث ودمج نتائج السيرفر مع الذاكرة المحلية دون مسح بقية التذاكر الموجودة على نفس الرقم
+            const updatedLocal = [...savedList];
+            if (Array.isArray(serverResults)) {
+                serverResults.forEach(srv => {
+                    const cleanSrv = { ...srv };
+                    delete cleanSrv._fromServer;
+                    const idx = updatedLocal.findIndex(x => Number(x.id) === Number(srv.id));
+                    if (idx !== -1) {
+                        updatedLocal[idx] = { ...updatedLocal[idx], ...cleanSrv };
+                    } else {
+                        updatedLocal.unshift(cleanSrv);
                     }
-                    // إذا لم يعد موجوداً في نتائج السيرفر لنفس الرقم، فهذا يعني أنه حُذف أو انتهى فلا نبقيه
-                } else {
-                    const liveSt = resolveLiveBookingStatus(localItem);
-                    if (liveSt === 'confirmed' || liveSt === 'pending') {
-                        localItem.status = liveSt;
-                        activeLocalList.push(localItem);
+                });
+                // إذا أرجع السيرفر نتيجة فارغة للرمز المبحوث عنه تحديداً، نحذف فقط ذلك الرمز من الكاش المحلي إن كان موجوداً
+                if (serverResults.length === 0 && targetCode) {
+                    const cleanNum = targetCode.replace(/^WKND-/i, '');
+                    for (let i = updatedLocal.length - 1; i >= 0; i--) {
+                        const x = updatedLocal[i];
+                        const samePhone = normalizePhone(x.phone).slice(-9) === targetPhone.slice(-9);
+                        const sameCode = String(x.ticketCode || ('WKND-' + x.id)).toUpperCase() === targetCode || String(x.id) === cleanNum;
+                        if (samePhone && sameCode) {
+                            updatedLocal.splice(i, 1);
+                        }
                     }
                 }
-            });
-            safeSetStorage('wknd_my_bookings', JSON.stringify(activeLocalList));
+            }
+            const prunedLocal = updatedLocal.filter(x => !isTicketExpiredByTime(x)).slice(0, 20);
+            safeSetStorage('wknd_my_bookings', JSON.stringify(prunedLocal));
 
-            if (serverResults !== null && serverResults.length > 0) return serverResults;
+            // عند البحث الصريح من السيرفر، نعيد نتائج السيرفر الحية مباشرة (تشمل أي تعديلات أجراها الأدمن على الموعد أو الاسم أو السعر)
+            if (serverResults !== null) {
+                return serverResults;
+            }
 
-            return activeLocalList.filter(b => {
+            // وضع احتياطي فقط في حال تعذر الاتصال بالسيرفر
+            return prunedLocal.filter(b => {
                 const pMatch = !targetPhone || normalizePhone(b.phone).slice(-9) === targetPhone.slice(-9);
-                const idMatch = !idFilter || String(b.ticketCode || ('WKND-' + b.id)).toUpperCase() === String(idFilter).toUpperCase() || String(b.id) === String(idFilter).replace(/^WKND-/i, '');
-                return pMatch && idMatch;
+                const cleanNum = targetCode.replace(/^WKND-/i, '');
+                const cMatch = !targetCode || String(b.ticketCode || ('WKND-' + b.id)).toUpperCase() === targetCode || String(b.id) === cleanNum;
+                return pMatch && cMatch;
             });
         }
 
@@ -4950,9 +4959,13 @@
                 if (idInp && !idInp.value) idInp.value = savedList[0].ticketCode || ('WKND-' + savedList[0].id);
             }
             const currentPhone = phoneInp ? phoneInp.value.trim() : '';
-            const parsedId = idInp ? idInp.value.trim().replace(/^#/, '').toUpperCase() : null;
-            const synced = await syncLocalBookingsWithDatabase(currentPhone, parsedId);
-            renderTrackBookingResults(synced);
+            const currentCode = idInp ? idInp.value.trim().replace(/^#/, '').toUpperCase() : '';
+            if (currentPhone && currentCode) {
+                const synced = await syncLocalBookingsWithDatabase(currentPhone, currentCode);
+                renderTrackBookingResults(synced);
+            } else {
+                renderTrackBookingResults([]);
+            }
         }
 
         function renderTrackBookingResults(list) {
@@ -4964,7 +4977,7 @@
                 return st === 'confirmed' || st === 'pending';
             });
             if (validList.length === 0) {
-                container.innerHTML = `<div style="text-align:center;padding:1.5rem;color:var(--text-muted);background:#FAFBFB;border-radius:12px;">لا توجد تذاكر حجز نشطة حالياً لهذا الرقم.<br><small style="color:#888;">(ملاحظة: تنتهي صلاحية التذكرة تلقائياً فور انتهاء موعد الحجز أو في حال إلغاء/حذف الحجز من الإدارة)</small></div>`;
+                container.innerHTML = `<div style="text-align:center;padding:1.5rem;color:var(--text-muted);background:#FAFBFB;border-radius:12px;">لا توجد تذكرة حجز نشطة مطابقة لرقم الهاتف ورمز التذكرة المدخل.<br><small style="color:#888;">(تأكد من كتابة رمز التذكرة الصحيح مثل WKND-7F3A9C، وتنتهي التذكرة تلقائياً بعد انتهاء موعد الحجز أو إلغائه)</small></div>`;
                 container._lastResults = [];
                 return;
             }
@@ -4973,11 +4986,12 @@
                     ? '<span class="badge-status active">✅ مؤكد رسمياً</span>'
                     : '<span class="badge-status editing">⏳ قيد المراجعة</span>';
                 const vName = (currentLang === 'ar' ? b.itemNameAr : b.itemNameEn) || b.item_name_ar || 'منشأة';
+                const displayCode = b.ticketCode || ('WKND-' + b.id);
                 return `
                     <div class="track-result-card">
                         <div style="flex:1;min-width:200px;">
                             <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                                <strong style="color:var(--primary-dark);font-size:0.95rem;">#${escapeHtml('WKND-' + b.id)} — ${escapeHtml(vName)}</strong>
+                                <strong style="color:var(--primary-dark);font-size:0.95rem;">#${escapeHtml(displayCode)} — ${escapeHtml(vName)}</strong>
                                 ${badge}
                             </div>
                             <div style="font-size:0.83rem;color:#555;margin-bottom:3px;">📅 ${escapeHtml(b.details || b.bookingDate || b.booking_date || '')}</div>
@@ -5002,12 +5016,11 @@
                 showToast('⚠️ يرجى إدخال رمز التذكرة (مثال: WKND-7F3A9C) مع رقم الهاتف للتحقق الآمن');
                 return;
             }
-            const parsedId = rawCodeInput;
             const btn = document.getElementById('track-submit-btn');
             if (btn) btn.disabled = true;
 
             try {
-                const results = await syncLocalBookingsWithDatabase(cleanPhone, parsedId);
+                const results = await syncLocalBookingsWithDatabase(cleanPhone, rawCodeInput);
                 renderTrackBookingResults(results);
             } finally {
                 if (btn) btn.disabled = false;
