@@ -1290,6 +1290,82 @@
         </div>
     </div>
 
+    <!-- Edit Booking Modal (Admin can edit any booking at any time) -->
+    <div id="edit-booking-modal" class="modal" role="dialog" aria-modal="true">
+        <div class="modal-content" style="max-width:560px;">
+            <button type="button" class="close-modal" data-action="close-modal" data-modal="edit-booking-modal" aria-label="إغلاق">&times;</button>
+            <h3 style="color:var(--primary-dark);margin-bottom:0.35rem;">✏️ تعديل بيانات وموعد الحجز</h3>
+            <p id="edit-b-subtitle" style="color:var(--text-muted);font-size:0.84rem;margin-bottom:1rem;"></p>
+            <form id="edit-booking-form">
+                <input type="hidden" id="edit-b-id" value="">
+                <input type="hidden" id="edit-b-category" value="farm">
+                <div class="form-row">
+                    <div class="form-group" style="flex:1;">
+                        <label for="edit-b-name">👤 اسم العميل</label>
+                        <input type="text" class="form-control" id="edit-b-name" required minlength="2" maxlength="100">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label for="edit-b-phone">📞 رقم هاتف العميل</label>
+                        <input type="tel" class="form-control" id="edit-b-phone" required maxlength="20" style="direction:ltr;">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="flex:1;">
+                        <label for="edit-b-date">📅 تاريخ الحجز</label>
+                        <input type="date" class="form-control" id="edit-b-date" required>
+                    </div>
+                    <div class="form-group" style="flex:1;" id="edit-b-shift-group">
+                        <label for="edit-b-shift">🕒 الشفت / الفترة</label>
+                        <select class="form-control" id="edit-b-shift">
+                            <option value="morning">☀️ صباحي (00:00 - 12:00)</option>
+                            <option value="evening">🌙 مسائي (12:00 - 24:00)</option>
+                            <option value="fullday">🗓️ يوم كامل (00:00 - 24:00)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row" id="edit-b-hours-group" style="display:none;">
+                    <div class="form-group" style="flex:1;">
+                        <label for="edit-b-hour-from">⏰ ساعة البدء (من 6 إلى 22)</label>
+                        <input type="number" class="form-control" id="edit-b-hour-from" min="0" max="23">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label for="edit-b-hour-to">⏰ ساعة الانتهاء (حتى 24)</label>
+                        <input type="number" class="form-control" id="edit-b-hour-to" min="1" max="24">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="flex:1;">
+                        <label for="edit-b-total">💰 المبلغ الإجمالي (JOD)</label>
+                        <input type="number" step="0.01" min="1" max="100000" class="form-control" id="edit-b-total" required>
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label for="edit-b-deposit">💳 العربون (JOD)</label>
+                        <input type="number" step="0.01" min="0.5" max="100000" class="form-control" id="edit-b-deposit" required>
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label for="edit-b-status">📌 حالة الحجز</label>
+                        <select class="form-control" id="edit-b-status">
+                            <option value="pending">⏳ بانتظار التأكيد</option>
+                            <option value="confirmed">✅ مؤكد</option>
+                            <option value="rejected">❌ ملغى / مرفوض</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-b-details">📝 تفاصيل الحجز (تظهر في تذكرة العميل)</label>
+                    <input type="text" class="form-control" id="edit-b-details" required maxlength="490">
+                </div>
+                <div id="edit-b-resolve-req-wrap" style="display:none;background:#E8F5E9;border:1px solid #A5D6A7;border-radius:10px;padding:0.7rem 0.9rem;margin-bottom:1rem;">
+                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.85rem;font-weight:700;color:#1B5E20;margin:0;">
+                        <input type="checkbox" id="edit-b-resolve-req" checked style="width:17px;height:17px;accent-color:var(--primary-dark);">
+                        ✅ اعتماد وإغلاق طلب تعديل الموعد المرسل من العميل تلقائياً
+                    </label>
+                </div>
+                <button type="submit" class="btn-action" id="edit-b-submit-btn" style="width:100%;padding:0.85rem;">💾 حفظ التعديلات وتحديث التذكرة</button>
+            </form>
+        </div>
+    </div>
+
     <!-- Image Preview Modal -->
     <div id="image-modal" class="modal" role="dialog" aria-modal="true">
         <div class="modal-content" style="max-width:450px;text-align:center;">
@@ -4154,6 +4230,7 @@
                         <td>
                             <div class="action-menu-inline">
                                 <button type="button" class="icon-btn approve" title="تأكيد الحجز" data-action="approve-booking" data-id="${b.id}">✓</button>
+                                <button type="button" class="icon-btn edit-btn" title="تعديل بيانات وموعد الحجز" data-action="edit-booking" data-id="${b.id}">✏️</button>
                                 <button type="button" class="icon-btn edit-btn" title="عرض تذكرة الحجز" data-action="open-admin-ticket" data-id="${b.id}">🎫</button>
                                 <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="icon-btn whatsapp" title="واتساب">💬</a>
                                 <button type="button" class="icon-btn danger" title="رفض الطلب (حفظ بالسجل)" data-action="reject-booking" data-id="${b.id}">✕</button>
@@ -4191,6 +4268,7 @@
                                 <button type="button" class="icon-btn danger" title="إلغاء القفل وفتح الموعد في التقويم فوراً" data-action="delete-booking" data-id="${b.id}">🔓</button>
                            </div>`
                         : `<div class="action-menu-inline">
+                                <button type="button" class="icon-btn edit-btn" title="تعديل بيانات وموعد الحجز" data-action="edit-booking" data-id="${b.id}">✏️</button>
                                 <button type="button" class="icon-btn edit-btn" title="عرض تذكرة الحجز" data-action="open-admin-ticket" data-id="${b.id}">🎫</button>
                                 <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="icon-btn whatsapp" title="واتساب">💬</a>
                                 <button type="button" class="icon-btn danger" title="إلغاء الحجز وتحرير الموعد" data-action="reject-booking" data-id="${b.id}">✕</button>
@@ -4339,6 +4417,7 @@
                             <td>
                                 <div class="action-menu-inline" style="align-items:center;">
                                     ${isConfirmed ? '<span class="badge-status active">✅ مؤكد</span>' : `<button type="button" class="icon-btn approve" title="تأكيد" data-action="approve-booking" data-id="${b.id}">✓</button>`}
+                                    <button type="button" class="icon-btn edit-btn" title="تعديل بيانات وموعد الحجز" data-action="edit-booking" data-id="${b.id}">✏️</button>
                                     <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="icon-btn whatsapp" title="واتساب">💬</a>
                                     <button type="button" class="icon-btn danger" title="رفض / إلغاء" data-action="reject-booking" data-id="${b.id}">✕</button>
                                     <button type="button" class="icon-btn danger" title="حذف نهائي" data-action="delete-booking" data-id="${b.id}">🗑️</button>
@@ -4573,6 +4652,150 @@
             openImageModal(raw, 'صورة وصل تحويل CliQ');
         }
 
+        
+        function openEditBookingModal(bookingId) {
+            const numId = Number(bookingId);
+            const b = [...pendingBookings, ...confirmedBookings, ...archivedBookings].find(x => x.id === numId);
+            if (!b) { showToast('⚠️ لم يتم العثور على الحجز'); return; }
+            const fac = items.find(i => i.id === Number(b.itemId));
+            const cat = fac ? fac.category : (b.shiftType ? 'farm' : (b.hourFrom > 0 || b.hourTo < 24 ? 'field' : 'transport'));
+
+            document.getElementById('edit-b-id').value = b.id;
+            document.getElementById('edit-b-category').value = cat;
+            document.getElementById('edit-b-subtitle').textContent = `التذكرة #${b.ticketCode || ('WKND-' + b.id)} — ${b.itemNameAr || 'منشأة'}`;
+            document.getElementById('edit-b-name').value = b.clientName || '';
+            document.getElementById('edit-b-phone').value = b.phone || '';
+            document.getElementById('edit-b-date').value = b.bookingDate || '';
+            document.getElementById('edit-b-total').value = Number(b.total || 1).toFixed(2);
+            document.getElementById('edit-b-deposit').value = Number(b.deposit || 1).toFixed(2);
+            document.getElementById('edit-b-status').value = ['pending', 'confirmed', 'rejected'].includes(b.status) ? b.status : 'pending';
+            document.getElementById('edit-b-details').value = b.details || '';
+
+            const shiftGrp = document.getElementById('edit-b-shift-group');
+            const hoursGrp = document.getElementById('edit-b-hours-group');
+            if (cat === 'farm') {
+                shiftGrp.style.display = 'block';
+                hoursGrp.style.display = 'none';
+                document.getElementById('edit-b-shift').value = b.shiftType || (b.hourFrom === 12 ? 'evening' : (b.hourTo === 12 ? 'morning' : 'fullday'));
+            } else if (cat === 'field') {
+                shiftGrp.style.display = 'none';
+                hoursGrp.style.display = 'flex';
+                document.getElementById('edit-b-hour-from').value = b.hourFrom ?? 18;
+                document.getElementById('edit-b-hour-to').value = b.hourTo ?? 20;
+            } else {
+                shiftGrp.style.display = 'none';
+                hoursGrp.style.display = 'none';
+            }
+
+            const reqWrap = document.getElementById('edit-b-resolve-req-wrap');
+            if (reqWrap) {
+                reqWrap.style.display = b.changeRequestStatus === 'pending' ? 'block' : 'none';
+                const cb = document.getElementById('edit-b-resolve-req');
+                if (cb) cb.checked = true;
+            }
+            openModalSafely('edit-booking-modal');
+        }
+
+        function syncEditBookingDetailsPreview() {
+            const cat = document.getElementById('edit-b-category')?.value || 'farm';
+            const dt  = document.getElementById('edit-b-date')?.value || '';
+            const detInp = document.getElementById('edit-b-details');
+            if (!dt || !detInp) return;
+            if (cat === 'farm') {
+                const sh = document.getElementById('edit-b-shift')?.value || 'fullday';
+                detInp.value = `${dt} (${sh})`;
+            } else if (cat === 'field') {
+                const hf = parseInt(document.getElementById('edit-b-hour-from')?.value, 10) || 18;
+                const ht = parseInt(document.getElementById('edit-b-hour-to')?.value, 10) || (hf + 2);
+                const hrs = Math.max(1, ht - hf);
+                const lbl = hf < 12 ? `${hf}:00ص` : (hf === 12 ? '12:00ظ' : `${hf - 12}:00م`);
+                detInp.value = `${dt} — ${hrs} ساعة بدءاً من ${lbl}`;
+            } else {
+                // Replace leading YYYY-MM-DD in transport details while keeping passengers/km
+                const cur = detInp.value || '';
+                if (/^\d{4}-\d{2}-\d{2}/.test(cur)) {
+                    detInp.value = cur.replace(/^\d{4}-\d{2}-\d{2}/, dt);
+                } else {
+                    detInp.value = `${dt} — ${cur}`;
+                }
+            }
+        }
+
+        async function saveAdminBookingEdit(e) {
+            e.preventDefault();
+            if (!db || !isAdminLoggedIn) return;
+            const numId = Number(document.getElementById('edit-b-id').value);
+            const cat   = document.getElementById('edit-b-category').value;
+            const name  = document.getElementById('edit-b-name').value.trim();
+            const phone = normalizePhone(document.getElementById('edit-b-phone').value);
+            const bDate = document.getElementById('edit-b-date').value;
+            const total = parseFloat(document.getElementById('edit-b-total').value);
+            const dep   = parseFloat(document.getElementById('edit-b-deposit').value);
+            const status = document.getElementById('edit-b-status').value;
+            const details = document.getElementById('edit-b-details').value.trim();
+
+            if (name.length < 2 || !isValidPhone(phone) || !bDate || !details) {
+                showToast('⚠️ يرجى التأكد من صحة الاسم والهاتف والتاريخ والتفاصيل');
+                return;
+            }
+            if (!Number.isFinite(total) || total <= 0 || !Number.isFinite(dep) || dep <= 0 || dep > total) {
+                showToast('⚠️ يرجى التأكد أن العربون أكبر من 0 ولا يتجاوز المبلغ الإجمالي');
+                return;
+            }
+
+            let hourFrom = 0, hourTo = 24, shiftType = null;
+            if (cat === 'farm') {
+                shiftType = document.getElementById('edit-b-shift').value || 'fullday';
+                hourFrom = shiftType === 'evening' ? 12 : 0;
+                hourTo   = shiftType === 'morning' ? 12 : 24;
+            } else if (cat === 'field') {
+                hourFrom = parseInt(document.getElementById('edit-b-hour-from').value, 10);
+                hourTo   = parseInt(document.getElementById('edit-b-hour-to').value, 10);
+                if (!Number.isFinite(hourFrom) || !Number.isFinite(hourTo) || hourFrom < 0 || hourFrom >= 24 || hourTo <= hourFrom || hourTo > 24) {
+                    showToast('⚠️ ساعات الملعب غير صحيحة (ساعة الانتهاء يجب أن تكون بعد ساعة البدء وحتى 24)');
+                    return;
+                }
+            }
+
+            const payload = {
+                client_name: name,
+                phone: phone,
+                booking_date: bDate,
+                hour_from: hourFrom,
+                hour_to: hourTo,
+                shift_type: shiftType,
+                total: Number(total.toFixed(2)),
+                deposit: Number(dep.toFixed(2)),
+                status: status,
+                details: details
+            };
+
+            const reqWrap = document.getElementById('edit-b-resolve-req-wrap');
+            if (reqWrap && reqWrap.style.display !== 'none' && document.getElementById('edit-b-resolve-req')?.checked) {
+                payload.change_request_status = 'approved';
+            }
+
+            const btn = document.getElementById('edit-b-submit-btn');
+            if (btn) btn.disabled = true;
+            try {
+                const { error } = await db.from('bookings').update(payload).eq('id', numId);
+                if (error) {
+                    if (error.code === '23P01') {
+                        showToast('⛔ الموعد الجديد متعارض مع حجز آخر مؤكد أو قيد المراجعة في نفس التوقيت');
+                    } else {
+                        showToast('❌ تعذر حفظ التعديلات: ' + (error.message || ''));
+                    }
+                    return;
+                }
+                closeModal('edit-booking-modal');
+                await loadFromDatabase();
+                renderAdminPanel();
+                showToast('✅ تم تعديل بيانات وموعد الحجز وتحديث التذكرة بنجاح');
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
         async function resolveChangeRequest(bookingId, decision) {
             if (!db || !isAdminLoggedIn) return;
             const numId = Number(bookingId);
@@ -4600,7 +4823,7 @@
             const bg = b.changeRequestStatus === 'pending' ? '#FFF3E0' : '#F5F5F5';
             const border = b.changeRequestStatus === 'pending' ? '#FF9800' : '#DDD';
             const actions = b.changeRequestStatus === 'pending'
-                ? `<div style="margin-top:5px;display:flex;gap:6px;"><button type="button" class="copy-chip-btn" style="background:#E8F5E9;border-color:#2E7D32;color:#1B5E20;" data-action="resolve-change-req" data-decision="approved" data-id="${b.id}">✓ اعتماد الطلب</button><button type="button" class="copy-chip-btn" style="background:#FFEBEE;border-color:#D32F2F;color:#B71C1C;" data-action="resolve-change-req" data-decision="rejected" data-id="${b.id}">✕ رفض</button></div>`
+                ? `<div style="margin-top:5px;display:flex;gap:6px;"><button type="button" class="copy-chip-btn" style="background:#E3F2FD;border-color:#1565C0;color:#0D47A1;" data-action="edit-booking" data-id="${b.id}">✏️ تعديل الحجز</button><button type="button" class="copy-chip-btn" style="background:#E8F5E9;border-color:#2E7D32;color:#1B5E20;" data-action="resolve-change-req" data-decision="approved" data-id="${b.id}">✓ اعتماد</button><button type="button" class="copy-chip-btn" style="background:#FFEBEE;border-color:#D32F2F;color:#B71C1C;" data-action="resolve-change-req" data-decision="rejected" data-id="${b.id}">✕ رفض</button></div>`
                 : '';
             return `<div style="margin-top:6px;background:${bg};border:1px solid ${border};border-radius:8px;padding:6px 8px;font-size:0.78rem;"><strong>${label} (${st})</strong>${b.changeRequestNote ? `<div>📝 ${escapeHtml(b.changeRequestNote)}</div>` : ''}${actions}</div>`;
         }
@@ -6394,6 +6617,11 @@ ${mapsHref}`
             document.getElementById('btn-clear-promo')?.addEventListener('click', clearBookingPromoCode);
             document.getElementById('add-promo-form')?.addEventListener('submit', savePromoCode);
             document.getElementById('quick-block-form')?.addEventListener('submit', submitQuickBlockForm);
+            document.getElementById('edit-booking-form')?.addEventListener('submit', saveAdminBookingEdit);
+            document.getElementById('edit-b-date')?.addEventListener('change', syncEditBookingDetailsPreview);
+            document.getElementById('edit-b-shift')?.addEventListener('change', syncEditBookingDetailsPreview);
+            document.getElementById('edit-b-hour-from')?.addEventListener('input', syncEditBookingDetailsPreview);
+            document.getElementById('edit-b-hour-to')?.addEventListener('input', syncEditBookingDetailsPreview);
             document.getElementById('telegram-config-form')?.addEventListener('submit', saveTelegramConfig);
             document.getElementById('adm-v-map-url')?.addEventListener('input', () => handleAdminMapUrlInput('venue'));
             document.getElementById('adm-t-map-url')?.addEventListener('input', () => handleAdminMapUrlInput('transport'));
@@ -6485,6 +6713,8 @@ ${mapsHref}`
                     deleteReview(Number(el.dataset.id));
                 } else if (action === 'preview-receipt') {
                     openPrivateReceiptModal(el.dataset.receipt);
+                } else if (action === 'edit-booking') {
+                    openEditBookingModal(Number(el.dataset.id));
                 } else if (action === 'resolve-change-req') {
                     resolveChangeRequest(Number(el.dataset.id), el.dataset.decision);
                 } else if (action === 'cal-nav') {
