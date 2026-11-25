@@ -719,6 +719,10 @@
                                     <label for="adm-v-guard-phone" style="color:var(--primary-dark);">🛡️ رقم الحارس / المسؤول (إجباري — يظهر بعد تأكيد الحجز فقط)</label>
                                     <input type="tel" class="form-control" id="adm-v-guard-phone" required maxlength="20" placeholder="مثال: 0781234567" style="direction:ltr;">
                                 </div>
+                                <div class="form-group" style="flex:1;margin-bottom:0;">
+                                    <label for="adm-v-owner-pin" style="color:#0D47A1;">🔑 رمز دخول بوابة الملّاك /owner (4–10 أرقام)</label>
+                                    <input type="text" class="form-control" id="adm-v-owner-pin" maxlength="20" placeholder="مثال: 482910 (اختياري)" style="direction:ltr;">
+                                </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group" style="flex:1;"><label>🛡️ مبلغ التأمين المسترد عند الوصول (د.أ — اتركه 0 إن لم يوجد)</label><input type="number" step="1" min="0" max="5000" value="0" class="form-control" id="adm-v-security-deposit" placeholder="مثال: 50"></div>
@@ -833,6 +837,10 @@
                                 <div class="form-group" style="flex:1;margin-bottom:0;">
                                     <label for="adm-t-guard-phone" style="color:var(--primary-dark);">🛡️ رقم السائق / المنسّق (إجباري — يظهر بعد تأكيد الحجز فقط)</label>
                                     <input type="tel" class="form-control" id="adm-t-guard-phone" required maxlength="20" placeholder="مثال: 0781234567" style="direction:ltr;">
+                                </div>
+                                <div class="form-group" style="flex:1;margin-bottom:0;">
+                                    <label for="adm-t-owner-pin" style="color:#0D47A1;">🔑 رمز دخول بوابة الملّاك /owner (4–10 أرقام)</label>
+                                    <input type="text" class="form-control" id="adm-t-owner-pin" maxlength="20" placeholder="مثال: 482910 (اختياري)" style="direction:ltr;">
                                 </div>
                             </div>
                             <div class="form-row">
@@ -3868,6 +3876,7 @@
                 var isVerVal  = document.getElementById('adm-v-verified')?.checked !== false;
                 var ownerPhoneVal = normalizePhone(document.getElementById('adm-v-owner-phone')?.value || '');
                 var guardPhoneVal = normalizePhone(document.getElementById('adm-v-guard-phone')?.value || '');
+                var ownerPinVal   = (document.getElementById('adm-v-owner-pin')?.value || '').trim();
                 if (!isValidPhone(ownerPhoneVal) || !isValidPhone(guardPhoneVal)) { showToast('⚠️ يرجى إدخال رقم صاحب المنشأة ورقم الحارس بشكل صحيح (إجباري)'); return; }
                 amenities     = ['featured','private_screened','families_only','youth_allowed','events_allowed','pool','bbq','wifi','heating','outdoor'].filter(a => document.getElementById(`adm-v-am-${a}`)?.checked);
             } else {
@@ -3897,6 +3906,7 @@
                 cancelEn      = document.getElementById('adm-t-cancel-en').value.trim();
                 var ownerPhoneVal = normalizePhone(document.getElementById('adm-t-owner-phone')?.value || '');
                 var guardPhoneVal = normalizePhone(document.getElementById('adm-t-guard-phone')?.value || '');
+                var ownerPinVal   = (document.getElementById('adm-t-owner-pin')?.value || '').trim();
                 if (!isValidPhone(ownerPhoneVal) || !isValidPhone(guardPhoneVal)) { showToast('⚠️ يرجى إدخال رقم صاحب المركبة ورقم السائق بشكل صحيح (إجباري)'); return; }
                 amenities     = ['featured','wifi','heating','outdoor'].filter(a => document.getElementById(`adm-t-am-${a}`)?.checked);
             }
@@ -3972,6 +3982,7 @@
                 }
                 if (idx !== -1 && data) {
                     await db.from('facility_contacts').upsert({ facility_id: editingId, owner_phone: ownerPhoneVal, guard_phone: guardPhoneVal, updated_at: new Date().toISOString() });
+                    if (typeof ownerPinVal !== 'undefined' && ownerPinVal.length >= 4) { await db.rpc('admin_set_owner_access', { p_facility_id: editingId, p_owner_phone: ownerPhoneVal, p_owner_name: nameAr, p_pin: ownerPinVal }); }
                     const updated = rowToItem(data);
                     updated.reviews = items[idx].reviews || [];
                     updated.ownerPhone = ownerPhoneVal;
@@ -3991,6 +4002,7 @@
                 }
                 if (data) {
                     await db.from('facility_contacts').upsert({ facility_id: Number(data.id), owner_phone: ownerPhoneVal, guard_phone: guardPhoneVal, updated_at: new Date().toISOString() });
+                    if (typeof ownerPinVal !== 'undefined' && ownerPinVal.length >= 4) { await db.rpc('admin_set_owner_access', { p_facility_id: Number(data.id), p_owner_phone: ownerPhoneVal, p_owner_name: nameAr, p_pin: ownerPinVal }); }
                     const createdIt = rowToItem(data);
                     createdIt.ownerPhone = ownerPhoneVal;
                     createdIt.guardPhone = guardPhoneVal;
