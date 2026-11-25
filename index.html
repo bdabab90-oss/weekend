@@ -682,9 +682,14 @@
                 <h4 id="det-reviews-heading" style="color:var(--primary-dark);margin-bottom:0.8rem;">⭐ تقييمات وآراء العملاء</h4>
                 <div id="reviews-list"></div>
                 <div class="add-review-box">
-                    <h5 style="margin-bottom:0.5rem;color:var(--primary-dark);">أضف تقييمك للمكان</h5>
+                    <h5 style="margin-bottom:0.25rem;color:var(--primary-dark);">✅ أضف تقييمك الموثّق (للحاجزين الفعليين فقط)</h5>
+                    <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.6rem;">ضماناً لمصداقية التقييمات، يُشترط إدخال رقم الهاتف ورمز التذكرة المؤكدة لهذه المنشأة:</p>
                     <form id="review-form">
                         <div class="form-row">
+                            <input type="tel" class="form-control" id="rev-phone" placeholder="رقم هاتف الحجز (مثال: 079...)" required maxlength="20" style="flex:1;direction:ltr;">
+                            <input type="text" class="form-control" id="rev-ticket-code" placeholder="رمز التذكرة المؤكدة (مثال: WKND-7F3A9C)" required maxlength="24" style="flex:1;direction:ltr;text-transform:uppercase;">
+                        </div>
+                        <div class="form-row" style="margin-top:0.5rem;">
                             <input type="text" class="form-control" id="rev-user-name" placeholder="اسمك الكريم" required minlength="2" maxlength="80" style="flex:2;">
                             <select class="form-control" id="rev-rating-val" aria-label="التقييم بالنجوم" required style="flex:1;">
                                 <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
@@ -694,8 +699,8 @@
                                 <option value="1">⭐ (1/5)</option>
                             </select>
                         </div>
-                        <textarea class="form-control" id="rev-comment" rows="2" placeholder="رأيك بالتجربة..." required minlength="2" maxlength="1000" style="margin-top:0.5rem;"></textarea>
-                        <button type="submit" class="btn-action" id="rev-submit-btn" style="width:100%;margin-top:0.5rem;padding:0.5rem;">إرسال التقييم</button>
+                        <textarea class="form-control" id="rev-comment" rows="2" placeholder="شاركنا تجربتك الحقيقية في المكان..." required minlength="2" maxlength="1000" style="margin-top:0.5rem;"></textarea>
+                        <button type="submit" class="btn-action" id="rev-submit-btn" style="width:100%;margin-top:0.5rem;padding:0.55rem;">✅ نشر التقييم الموثّق</button>
                     </form>
                 </div>
             </div>
@@ -1751,7 +1756,7 @@
                 // جلب جميع البيانات الأساسية بالتوازي (Parallel Fetch) مع إخفاء إعدادات الأدمن السرية عن الزوار
                 const [facRes, revRes, , favRpcRes, admBookRes, promoRes] = await Promise.all([
                     db.from('facilities').select('*').order('id'),
-                    db.from('reviews').select('id,facility_id,user_name,rating,comment,status,created_at').order('id', { ascending: false }),
+                    db.from('reviews').select('id,facility_id,user_name,rating,comment,status,verified_booking,created_at').order('id', { ascending: false }),
                     loadPublicConfirmedSlots(),
                     db.rpc('get_my_favorites', { p_device_id: DEVICE_ID }),
                     isAdminLoggedIn ? (async () => {
@@ -1794,7 +1799,7 @@
                         const it = rowToItem(r);
                         it.reviews = allReviews
                             .filter(rv => Number(rv.facility_id) === it.id && (rv.status === 'approved' || !rv.status))
-                            .map(rv => ({ id: rv.id, user: rv.user_name, rating: Number(rv.rating) || 5, comment: rv.comment }));
+                            .map(rv => ({ id: rv.id, user: rv.user_name, rating: Number(rv.rating) || 5, comment: rv.comment, verified: Boolean(rv.verified_booking) }));
                         return it;
                     });
                     safeSetStorage('wknd_facilities_cache', JSON.stringify(items.filter(i => i.active)));
@@ -2462,7 +2467,7 @@
             selectedItem.reviews.forEach(r => {
                 const div = document.createElement('div');
                 div.className = 'review-card';
-                div.innerHTML = `<div class="review-card-stars">${renderStars(r.rating)}</div><div class="review-header"><span>👤 ${escapeHtml(r.user)}</span><span style="font-size:0.8rem;color:#999;">${Number(r.rating).toFixed(1)} / 5</span></div><div class="review-comment">${escapeHtml(r.comment)}</div>`;
+                div.innerHTML = `<div class="review-card-stars" style="display:flex;align-items:center;justify-content:space-between;gap:6px;">${renderStars(r.rating)}${r.verified ? '<span style="background:#E8F5E9;color:#1B5E20;border:1px solid #A5D6A7;padding:1px 8px;border-radius:12px;font-size:0.72rem;font-weight:700;">✅ حاجز فعلي موثّق</span>' : ''}</div><div class="review-header"><span>👤 ${escapeHtml(r.user)}</span><span style="font-size:0.8rem;color:#999;">${Number(r.rating).toFixed(1)} / 5</span></div><div class="review-comment">${escapeHtml(r.comment)}</div>`;
                 container.appendChild(div);
             });
         }
@@ -2471,11 +2476,13 @@
             e.preventDefault();
             if (!selectedItem || !db) return;
             const name = document.getElementById('rev-user-name').value.trim();
+            const phone = normalizePhone(document.getElementById('rev-phone')?.value || '');
+            const ticketCode = (document.getElementById('rev-ticket-code')?.value || '').trim().replace(/^#/, '').toUpperCase();
             const rating = parseFloat(document.getElementById('rev-rating-val').value);
             const comment = document.getElementById('rev-comment').value.trim();
             const btn = document.getElementById('rev-submit-btn');
-            if (name.length < 2 || comment.length < 2) {
-                showToast('⚠️ يرجى كتابة الاسم والتعليق بشكل صحيح');
+            if (name.length < 2 || comment.length < 2 || !isValidPhone(phone) || !ticketCode) {
+                showToast('⚠️ يرجى إدخال رقم الهاتف ورمز التذكرة المؤكدة والاسم والتعليق بشكل صحيح');
                 return;
             }
             btn.disabled = true;
@@ -2484,15 +2491,20 @@
                     p_facility_id: selectedItem.id,
                     p_user_name: name,
                     p_rating: rating,
-                    p_comment: comment
+                    p_comment: comment,
+                    p_phone: phone,
+                    p_ticket_code: ticketCode
                 });
                 if (error) {
                     showToast('⚠️ ' + (error.message || 'تعذر إرسال التقييم حالياً'));
                     return;
                 }
-                document.getElementById('rev-user-name').value = '';
                 document.getElementById('rev-comment').value = '';
-                showToast('✅ تم استلام تقييمك وبانتظار اعتماد الإدارة');
+                showToast('✅ تم نشر تقييمك الموثّق بنجاح! شكراً لمشاركتك.');
+                await loadFromDatabase();
+                selectedItem = items.find(i => i.id === selectedItem.id) || selectedItem;
+                renderReviewsList();
+                liveSearch();
                 // إشعار التقييم يُرسل تلقائياً من السيرفر داخل submit_review RPC
                 if (isAdminLoggedIn) {
                     await loadFromDatabase();
