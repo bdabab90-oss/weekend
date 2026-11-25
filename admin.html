@@ -532,6 +532,7 @@
                         <li class="sidebar-item" data-action="admin-tab" data-tab="dash-bookings"><span>📅</span> <span data-key="sbBookings">الحجوزات والطلبات</span></li>
                         <li class="sidebar-item" data-action="admin-tab" data-tab="dash-promos"><span>🎁</span> <span data-key="sbPromos">الخصومات والكوبونات</span></li>
                         <li class="sidebar-item" data-action="admin-tab" data-tab="dash-reviews"><span>⭐</span> <span data-key="sbReviews">مراجعة التقييمات</span></li>
+                        <li class="sidebar-item" data-action="admin-tab" data-tab="dash-owners"><span>🔑</span> <span>بوابة الملّاك والطلبات</span></li>
                     </ul>
                 </div>
                 <div class="sidebar-footer">
@@ -1097,6 +1098,67 @@
                         </div>
                     </div>
                 </div>
+                <!-- Owner Portal & Approvals Tab -->
+                <div id="dash-owners" class="admin-tab-page">
+                    <div class="admin-box" style="background:linear-gradient(135deg,#FFF9EF,#FFFDF9);border:1.5px solid var(--accent-gold);">
+                        <h3 class="admin-section-title" style="margin-bottom:0.4rem;">📬 طلبات تعديل وقفل المواعيد من الملّاك (بانتظار موافقتك)</h3>
+                        <p style="color:var(--text-muted);font-size:0.86rem;margin-bottom:1rem;">لا يُنشر أي تعديل سعر أو صورة أو قفل موعد من المالك على الموقع إلا بعد ضغطك على «موافقة وتطبيق» من هنا:</p>
+                        <div class="table-card" style="margin-bottom:0;">
+                            <table class="admin-table">
+                                <thead><tr><th>المنشأة</th><th>المالك</th><th>تفاصيل الطلب</th><th>الحالة</th><th>قرار الإدارة</th></tr></thead>
+                                <tbody id="admin-owner-requests-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="admin-box">
+                        <h3 class="admin-section-title" style="margin-bottom:0.4rem;">🔑 إنشاء / تحديث حساب دخول لمالك منشأة (إعطاء الرقم والرمز)</h3>
+                        <p style="color:var(--text-muted);font-size:0.86rem;margin-bottom:1rem;">اختر المنشأة وحدد رقم هاتف المالك ورمز الدخول (PIN)، ثم أرسل له بيانات الدخول مباشرة على واتساب:</p>
+                        <form id="admin-create-owner-form">
+                            <div class="form-row">
+                                <div class="form-group" style="flex:1.4;">
+                                    <label for="ao-facility">1. المنشأة</label>
+                                    <select class="form-control" id="ao-facility" required></select>
+                                </div>
+                                <div class="form-group" style="flex:1;">
+                                    <label for="ao-name">2. اسم صاحب المنشأة</label>
+                                    <input type="text" class="form-control" id="ao-name" required maxlength="80" placeholder="مثال: أبو محمد">
+                                </div>
+                                <div class="form-group" style="flex:1;">
+                                    <label for="ao-phone">3. رقم الهاتف للدخول</label>
+                                    <input type="tel" class="form-control" id="ao-phone" required maxlength="20" placeholder="0791234567" style="direction:ltr;">
+                                </div>
+                                <div class="form-group" style="flex:1.2;">
+                                    <label for="ao-pin">4. رمز الدخول (PIN)</label>
+                                    <div style="display:flex;gap:6px;">
+                                        <input type="text" class="form-control" id="ao-pin" required minlength="4" maxlength="20" placeholder="مثال: 482910" style="direction:ltr;flex:1;">
+                                        <button type="button" class="btn-details" id="btn-ao-gen-pin" style="margin:0;padding:0 0.75rem;white-space:nowrap;" title="توليد رمز عشوائي">🎲 عشوائي</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-action" id="btn-ao-submit" style="width:100%;padding:0.8rem;">💾 حفظ وتفعيل حساب المالك وتجهيز رسالة واتساب</button>
+                        </form>
+                        <div id="ao-share-box" style="display:none;margin-top:1rem;background:#E8F5E9;border:1.5px solid #66BB6A;border-radius:12px;padding:1rem;">
+                            <div style="font-weight:700;color:#1B5E20;margin-bottom:6px;">✅ تم تفعيل الحساب بنجاح! يمكنك إرسال بيانات الدخول للمالك الآن:</div>
+                            <pre id="ao-share-text" style="white-space:pre-wrap;font-family:inherit;font-size:0.85rem;background:#fff;padding:0.75rem;border-radius:8px;border:1px solid #C8E6C9;margin-bottom:8px;color:var(--text-dark);"></pre>
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                <button type="button" class="btn-action" id="btn-ao-copy-creds" style="background:var(--primary-dark);">📋 نسخ البيانات</button>
+                                <a id="btn-ao-wa-creds" href="#" target="_blank" rel="noopener noreferrer" class="btn-wa-share" style="text-decoration:none;">💬 إرسال للمالك عبر واتساب</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="admin-box">
+                        <h3 class="admin-section-title">👥 حسابات الملّاك المفعّلة حالياً</h3>
+                        <div class="table-card" style="margin-bottom:0;">
+                            <table class="admin-table">
+                                <thead><tr><th>المنشأة</th><th>اسم المالك</th><th>رقم الهاتف</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
+                                <tbody id="admin-owners-accounts-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -2192,6 +2254,7 @@
 
                 }
 
+                if (isAdminLoggedIn) { await loadAdminOwnersData(); }
                 if (isAdminLoggedIn && !admBookRes.error && Array.isArray(admBookRes.data)) {
                     pendingBookings = admBookRes.data.filter(b => b.status === 'pending').map(rowToBooking);
                     confirmedBookings = admBookRes.data.filter(b => b.status === 'confirmed').map(rowToBooking);
@@ -4476,6 +4539,7 @@
             const totalRev = realConfirmed.reduce((s, b) => s + (Number(b.deposit) || 0), 0);
             document.getElementById('stat-total-revenue').textContent  = `${totalRev.toFixed(2)} JOD`;
             renderAdminPromosSection();
+            renderAdminOwnersTab();
             populateQuickBlockFacilitiesDropdown();
             renderTelegramSettingsUI();
             if (document.getElementById('dash-listings')?.classList.contains('active')) {
@@ -4665,6 +4729,158 @@
         }
 
         
+        
+        let adminOwnerAccounts = [];
+        let adminOwnerRequests = [];
+
+        async function loadAdminOwnersData() {
+            if (!db || !isAdminLoggedIn) return;
+            try {
+                const [accRes, reqRes] = await Promise.all([
+                    db.from('facility_owners').select('*').order('id', { ascending: false }),
+                    db.from('owner_change_requests').select('*').order('id', { ascending: false }).limit(60)
+                ]);
+                adminOwnerAccounts = (!accRes.error && Array.isArray(accRes.data)) ? accRes.data : [];
+                adminOwnerRequests = (!reqRes.error && Array.isArray(reqRes.data)) ? reqRes.data : [];
+            } catch (e) {}
+        }
+
+        function renderAdminOwnersTab() {
+            const facSel = document.getElementById('ao-facility');
+            if (facSel) {
+                const prev = facSel.value;
+                facSel.innerHTML = items.map(it => `<option value="${it.id}">${escapeHtml(it.nameAr)}</option>`).join('') || '<option value="">لا توجد منشآت</option>';
+                if (prev && items.some(i => String(i.id) === prev)) facSel.value = prev;
+            }
+
+            // Requests Table
+            const reqTbody = document.getElementById('admin-owner-requests-table');
+            if (reqTbody) {
+                if (!adminOwnerRequests.length) {
+                    reqTbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:1.5rem;">لا توجد طلبات تعديل من الملّاك حالياً</td></tr>';
+                } else {
+                    reqTbody.innerHTML = adminOwnerRequests.map(r => {
+                        const fac = items.find(i => i.id === Number(r.facility_id));
+                        const facName = fac ? fac.nameAr : ('#' + r.facility_id);
+                        const stBadge = r.status === 'pending'
+                            ? '<span class="badge-status editing">⏳ بانتظار موافقتك</span>'
+                            : (r.status === 'approved' ? '<span class="badge-status active">✅ تمت الموافقة والتطبيق</span>' : '<span class="badge-status inactive">❌ مرفوض</span>');
+                        const actions = r.status === 'pending'
+                            ? `<div class="action-menu-inline">
+                                <button type="button" class="icon-btn approve" title="موافقة وتطبيق التعديل فوراً" data-action="resolve-owner-req" data-decision="approved" data-id="${r.id}">✓</button>
+                                <button type="button" class="icon-btn danger" title="رفض الطلب" data-action="resolve-owner-req" data-decision="rejected" data-id="${r.id}">✕</button>
+                               </div>`
+                            : '<small style="color:var(--text-muted);">مُعالَج</small>';
+                        return `<tr>
+                            <td><strong>${escapeHtml(facName)}</strong></td>
+                            <td>${escapeHtml(r.owner_name || '')}<br><small style="direction:ltr;display:inline-block;">${escapeHtml(r.owner_phone || '')}</small></td>
+                            <td><small>${escapeHtml(r.summary_ar || '')}</small></td>
+                            <td>${stBadge}</td>
+                            <td>${actions}</td>
+                        </tr>`;
+                    }).join('');
+                }
+            }
+
+            // Accounts Table
+            const accTbody = document.getElementById('admin-owners-accounts-table');
+            if (accTbody) {
+                if (!adminOwnerAccounts.length) {
+                    accTbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:1.5rem;">لم تقم بإنشاء حسابات ملّاك بعد — استخدم النموذج أعلاه لإنشاء أول حساب</td></tr>';
+                } else {
+                    accTbody.innerHTML = adminOwnerAccounts.map(a => {
+                        const fac = items.find(i => i.id === Number(a.facility_id));
+                        const facName = fac ? fac.nameAr : ('#' + a.facility_id);
+                        return `<tr>
+                            <td><strong>${escapeHtml(facName)}</strong></td>
+                            <td>${escapeHtml(a.owner_name || '')}</td>
+                            <td style="direction:ltr;text-align:right;">${escapeHtml(a.owner_phone || '')}</td>
+                            <td>${a.active ? '<span class="badge-status active">نشط ✅</span>' : '<span class="badge-status inactive">موقوف ⏸️</span>'}</td>
+                            <td>
+                                <div class="action-menu-inline">
+                                    <button type="button" class="icon-btn" title="تفعيل / إيقاف الحساب" data-action="toggle-owner-acc" data-id="${a.id}">${a.active ? '⏸️' : '▶️'}</button>
+                                    <button type="button" class="icon-btn danger" title="حذف الحساب" data-action="delete-owner-acc" data-id="${a.id}">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>`;
+                    }).join('');
+                }
+            }
+        }
+
+        async function handleAdminCreateOwnerSubmit(e) {
+            e.preventDefault();
+            if (!db || !isAdminLoggedIn) return;
+            const facId = Number(document.getElementById('ao-facility').value);
+            const name  = document.getElementById('ao-name').value.trim();
+            const phone = normalizePhone(document.getElementById('ao-phone').value);
+            const pin   = document.getElementById('ao-pin').value.trim();
+            const fac   = items.find(i => i.id === facId);
+
+            if (!facId || !isValidPhone(phone) || pin.length < 4) {
+                showToast('⚠️ يرجى التحقق من المنشأة ورقم الهاتف ورمز الدخول (4 أرقام على الأقل)');
+                return;
+            }
+            const btn = document.getElementById('btn-ao-submit');
+            if (btn) btn.disabled = true;
+            try {
+                const { error } = await db.rpc('admin_set_owner_access', {
+                    p_facility_id: facId, p_owner_phone: phone, p_owner_name: name, p_pin: pin
+                });
+                if (error) { showToast('❌ ' + error.message); return; }
+
+                const ownerUrl = `${window.location.origin}/owner`;
+                const shareMsg = `مرحباً ${name} 👋\nتم تفعيل حسابك في بوابة ملّاك منصة Weekend لمنشأة (${fac ? fac.nameAr : ''}):\n🔗 الرابط: ${ownerUrl}\n📞 رقم الهاتف: ${phone}\n🔐 رمز الدخول (PIN): ${pin}\n\nيمكنك من خلالها متابعة حجوزاتك وإرسال طلبات قفل المواعيد وتعديل الأسعار لتعتمدها الإدارة فوراً.`;
+                document.getElementById('ao-share-text').textContent = shareMsg;
+                document.getElementById('btn-ao-wa-creds').href = `https://wa.me/${toWhatsAppPhone(phone)}?text=${encodeURIComponent(shareMsg)}`;
+                document.getElementById('ao-share-box').style.display = 'block';
+
+                await loadAdminOwnersData();
+                renderAdminOwnersTab();
+                showToast('✅ تم إنشاء/تحديث حساب المالك بنجاح!');
+            } finally { if (btn) btn.disabled = false; }
+        }
+
+        async function resolveAdminOwnerRequest(reqId, decision) {
+            if (!db || !isAdminLoggedIn) return;
+            let note = '';
+            if (decision === 'rejected') {
+                note = prompt('سبب الرفض (اختياري — سيظهر للمالك):', '') || '';
+            } else if (!confirm('هل توافق على تطبيق هذا التعديل على الموقع فوراً؟')) {
+                return;
+            }
+            const { error } = await db.rpc('admin_resolve_owner_request', {
+                p_request_id: Number(reqId), p_decision: decision, p_admin_note: note
+            });
+            if (error) {
+                showToast(error.code === '23P01' ? '⛔ تعذر القفل لوجود حجز متعارض في نفس الموعد' : '❌ ' + error.message);
+                return;
+            }
+            await loadFromDatabase();
+            await loadAdminOwnersData();
+            renderAdminPanel();
+            showToast(decision === 'approved' ? '✅ تمت الموافقة وتطبيق التعديل على الموقع فوراً!' : 'تم رفض طلب المالك');
+        }
+
+        async function toggleAdminOwnerAccount(accId) {
+            const acc = adminOwnerAccounts.find(x => Number(x.id) === Number(accId));
+            if (!acc || !db) return;
+            const { error } = await db.from('facility_owners').update({ active: !acc.active }).eq('id', acc.id);
+            if (error) { showToast('❌ تعذر تحديث الحالة'); return; }
+            await loadAdminOwnersData();
+            renderAdminOwnersTab();
+            showToast(!acc.active ? '▶️ تم تفعيل حساب المالك' : '⏸️ تم إيقاف حساب المالك');
+        }
+
+        async function deleteAdminOwnerAccount(accId) {
+            if (!db || !confirm('هل أنت متأكد من حذف حساب دخول هذا المالك؟')) return;
+            const { error } = await db.from('facility_owners').delete().eq('id', Number(accId));
+            if (error) { showToast('❌ تعذر الحذف'); return; }
+            await loadAdminOwnersData();
+            renderAdminOwnersTab();
+            showToast('🗑️ تم حذف حساب المالك');
+        }
+
         function openEditBookingModal(bookingId) {
             const numId = Number(bookingId);
             const b = [...pendingBookings, ...confirmedBookings, ...archivedBookings].find(x => x.id === numId);
@@ -5742,6 +5958,7 @@ ${mapsHref}`
             safeSetStorage('wknd_promos_fallback', JSON.stringify(promoCodes));
             cancelPromoEdit();
             renderAdminPromosSection();
+            renderAdminOwnersTab();
             if (document.getElementById('items-container')) liveSearch();
             showToast(editingId ? '✅ تم تحديث العرض / الكود بنجاح' : '✅ تم إضافة وتفعيل كود الخصم بنجاح');
         }
@@ -5791,6 +6008,7 @@ ${mapsHref}`
             }
             safeSetStorage('wknd_promos_fallback', JSON.stringify(promoCodes));
             renderAdminPromosSection();
+            renderAdminOwnersTab();
             if (document.getElementById('items-container')) liveSearch();
             showToast(p.active ? `▶️ تم تفعيل الكود (${p.code})` : `⏸️ تم إيقاف الكود (${p.code}) مؤقتاً`);
         }
@@ -5805,6 +6023,7 @@ ${mapsHref}`
             promoCodes = promoCodes.filter(x => x.id !== numId);
             safeSetStorage('wknd_promos_fallback', JSON.stringify(promoCodes));
             renderAdminPromosSection();
+            renderAdminOwnersTab();
             if (document.getElementById('items-container')) liveSearch();
             showToast('🗑️ تم حذف كود الخصم');
         }
@@ -6630,6 +6849,10 @@ ${mapsHref}`
             document.getElementById('add-promo-form')?.addEventListener('submit', savePromoCode);
             document.getElementById('quick-block-form')?.addEventListener('submit', submitQuickBlockForm);
             document.getElementById('edit-booking-form')?.addEventListener('submit', saveAdminBookingEdit);
+            document.getElementById('admin-create-owner-form')?.addEventListener('submit', handleAdminCreateOwnerSubmit);
+            document.getElementById('btn-ao-gen-pin')?.addEventListener('click', () => { document.getElementById('ao-pin').value = String(Math.floor(100000 + Math.random() * 900000)); });
+            document.getElementById('btn-ao-copy-creds')?.addEventListener('click', () => { const t = document.getElementById('ao-share-text')?.textContent || ''; if (t && navigator.clipboard) navigator.clipboard.writeText(t).then(() => showToast('📋 تم نسخ بيانات الدخول!')); });
+            document.getElementById('ao-facility')?.addEventListener('change', function() { const f = items.find(i => String(i.id) === this.value); if (f && f.ownerPhone && document.getElementById('ao-phone')) document.getElementById('ao-phone').value = f.ownerPhone; });
             document.getElementById('edit-b-date')?.addEventListener('change', syncEditBookingDetailsPreview);
             document.getElementById('edit-b-shift')?.addEventListener('change', syncEditBookingDetailsPreview);
             document.getElementById('edit-b-hour-from')?.addEventListener('input', syncEditBookingDetailsPreview);
@@ -6725,6 +6948,12 @@ ${mapsHref}`
                     deleteReview(Number(el.dataset.id));
                 } else if (action === 'preview-receipt') {
                     openPrivateReceiptModal(el.dataset.receipt);
+                } else if (action === 'resolve-owner-req') {
+                    resolveAdminOwnerRequest(Number(el.dataset.id), el.dataset.decision);
+                } else if (action === 'toggle-owner-acc') {
+                    toggleAdminOwnerAccount(Number(el.dataset.id));
+                } else if (action === 'delete-owner-acc') {
+                    deleteAdminOwnerAccount(Number(el.dataset.id));
                 } else if (action === 'edit-booking') {
                     openEditBookingModal(Number(el.dataset.id));
                 } else if (action === 'resolve-change-req') {
