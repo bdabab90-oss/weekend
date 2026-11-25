@@ -130,6 +130,7 @@
             <div class="tabs">
                 <button type="button" class="tab-btn active" data-tab="tab-bookings">📅 حجوزاتي وقفل التواريخ</button>
                 <button type="button" class="tab-btn" data-tab="tab-facilities">🏡 منشآتي وتعديل الأسعار والصور</button>
+                <button type="button" class="tab-btn" data-tab="tab-requests">📬 حالة طلباتي لدى الإدارة</button>
             </div>
 
             <!-- Tab 1: Bookings & Quick External Block -->
@@ -246,8 +247,22 @@
                             <small id="oef-upload-status" style="display:block;margin-top:4px;color:var(--muted);"></small>
                             <div class="photos-strip" id="oef-photos-strip"></div>
                         </div>
-                        <button type="submit" class="btn btn-primary" id="btn-oef-save" style="width:100%;padding:0.85rem;">💾 حفظ التحديثات ونشرها فوراً</button>
+                        <button type="submit" class="btn btn-primary" id="btn-oef-save" style="width:100%;padding:0.85rem;">📤 إرسال التحديثات لموافقة الإدارة</button>
                     </form>
+                </div>
+            </div>
+
+            <!-- Tab 3: Owner Requests Status -->
+            <div id="tab-requests" class="tab-pane">
+                <div class="card">
+                    <h2 style="font-size:1.1rem;margin-bottom:0.4rem;">📬 سجل طلباتي وحالة موافقة الإدارة</h2>
+                    <p class="subtitle" style="margin-bottom:0.9rem;">جميع طلبات قفل المواعيد وتعديل الأسعار والصور تُراجع وتُعتمد من إدارة Weekend قبل نشرها:</p>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>المنشأة</th><th>تفاصيل الطلب</th><th>الحالة</th><th>ملاحظة الإدارة</th></tr></thead>
+                            <tbody id="owner-requests-tbody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </section>
@@ -264,6 +279,7 @@
         let ownerCreds = null;
         let ownerFacilities = [];
         let ownerBookings = [];
+        let ownerRequests = [];
         let editingPhotos = [];
 
         function escapeHtml(s) {
@@ -317,6 +333,7 @@
             try { sessionStorage.setItem('wknd_owner_session', JSON.stringify(ownerCreds)); } catch (e) {}
             ownerFacilities = Array.isArray(data.facilities) ? data.facilities : [];
             ownerBookings = Array.isArray(data.bookings) ? data.bookings : [];
+            ownerRequests = Array.isArray(data.requests) ? data.requests : [];
 
             document.getElementById('owner-login-section').style.display = 'none';
             document.getElementById('owner-dashboard-section').style.display = 'block';
@@ -368,6 +385,21 @@
                         <td>${badge}<br>${actionHtml}</td>
                     </tr>`;
                 }).join('');
+            }
+
+
+            const reqTbody = document.getElementById('owner-requests-tbody');
+            if (reqTbody) {
+                if (!ownerRequests.length) {
+                    reqTbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:1.5rem;">لا توجد طلبات مرسلة حالياً</td></tr>';
+                } else {
+                    reqTbody.innerHTML = ownerRequests.map(r => {
+                        const bdg = r.status === 'pending'
+                            ? '<span class="badge badge-pend">⏳ بانتظار موافقة الإدارة</span>'
+                            : (r.status === 'approved' ? '<span class="badge badge-ok">✅ تمت الموافقة والتطبيق</span>' : '<span class="badge" style="background:#FFEBEE;color:#D32F2F;">❌ مرفوض</span>');
+                        return `<tr><td><strong>${escapeHtml(r.facility_name || '')}</strong></td><td><small>${escapeHtml(r.summary_ar || '')}</small></td><td>${bdg}</td><td><small>${escapeHtml(r.admin_note || '—')}</small></td></tr>`;
+                    }).join('');
+                }
             }
 
             // Render Facilities cards
@@ -518,7 +550,7 @@
                     }
                     document.getElementById('ob-note').value = '';
                     await loadOwnerDashboard(ownerCreds.phone, ownerCreds.pin, true);
-                    showToast('🔒 تم قفل الموعد بنجاح في تقويم الموقع');
+                    showToast('⏳ تم إرسال طلب قفل الموعد للإدارة وبانتظار الموافقة!');
                 } finally { btn.disabled = false; }
             });
 
@@ -574,7 +606,7 @@
                     }
                     document.getElementById('owner-edit-fac-card').style.display = 'none';
                     await loadOwnerDashboard(ownerCreds.phone, ownerCreds.pin, true);
-                    showToast('✅ تم حفظ التحديثات ونشرها على الموقع فوراً!');
+                    showToast('⏳ تم إرسال طلب تعديل المنشأة للإدارة وبانتظار الموافقة!');
                 } finally { btn.disabled = false; }
             });
 
@@ -600,7 +632,7 @@
                     });
                     if (error) { showToast('❌ ' + error.message); return; }
                     await loadOwnerDashboard(ownerCreds.phone, ownerCreds.pin, true);
-                    showToast('🔓 تم فتح الموعد بنجاح');
+                    showToast('⏳ تم إرسال طلب فتح الموعد للإدارة وبانتظار الموافقة!');
                 }
             });
         });
