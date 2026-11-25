@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <title>بوابة الملّاك — منصة Weekend الأردن</title>
+    <link rel="preconnect" href="https://yeysruiowtjpwyicsukf.supabase.co" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #FBF8F3;
+            --dark: #0D2818;
+            --dark-2: #163E26;
+            --gold: #D4A359;
+            --ink: #1A241E;
+            --muted: #5A6960;
+            --card: #FFFFFF;
+            --ok: #2E7D32;
+            --danger: #D32F2F;
+            --border: #E2EAE5;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Readex Pro', sans-serif; }
+        body { background: var(--bg); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+        .navbar { background: var(--dark); color: white; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; box-shadow: 0 4px 18px rgba(0,0,0,0.1); }
+        .brand { color: var(--gold); font-weight: 700; font-size: 1.25rem; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .nav-actions { display: flex; gap: 8px; align-items: center; }
+        .btn { border: none; border-radius: 10px; padding: 0.6rem 1.1rem; font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+        .btn-primary { background: var(--dark); color: white; }
+        .btn-primary:hover { background: var(--dark-2); }
+        .btn-gold { background: var(--gold); color: var(--dark); }
+        .btn-gold:hover { opacity: 0.92; }
+        .btn-outline { background: transparent; border: 1.5px solid var(--gold); color: var(--gold); text-decoration: none; }
+        .btn-danger { background: #FFEBEE; color: var(--danger); border: 1px solid #FFCDD2; }
+        .btn-danger:hover { background: #FFCDD2; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .container { max-width: 1120px; width: 100%; margin: 1.8rem auto; padding: 0 1.1rem; flex: 1; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 1.4rem; box-shadow: 0 6px 22px rgba(13,40,24,0.05); margin-bottom: 1.4rem; }
+        .login-wrap { max-width: 440px; margin: 3rem auto; }
+        h1, h2, h3 { color: var(--dark); }
+        .subtitle { color: var(--muted); font-size: 0.88rem; margin-top: 4px; line-height: 1.6; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.35rem; color: var(--ink); }
+        .form-control { width: 100%; padding: 0.65rem 0.9rem; border: 1.5px solid #CFDAD3; border-radius: 10px; font-size: 0.92rem; font-family: inherit; background: #fff; outline: none; }
+        .form-control:focus { border-color: var(--dark); }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 1.4rem; }
+        .stat-box { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 1.1rem 1.3rem; }
+        .stat-label { font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; }
+        .stat-val { font-size: 1.6rem; font-weight: 700; color: var(--dark); }
+        .tabs { display: flex; gap: 8px; margin-bottom: 1.2rem; flex-wrap: wrap; }
+        .tab-btn { background: #EAEFED; color: var(--dark); border: none; padding: 0.6rem 1.15rem; border-radius: 12px; font-weight: 600; font-size: 0.88rem; cursor: pointer; }
+        .tab-btn.active { background: var(--dark); color: var(--gold); }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+        .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+        th { background: var(--dark); color: var(--gold); padding: 0.8rem; text-align: right; white-space: nowrap; }
+        td { padding: 0.75rem 0.8rem; border-bottom: 1px solid #F0F3F1; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+        .badge-ok { background: #E8F5E9; color: var(--ok); }
+        .badge-pend { background: #FFF3E0; color: #E65100; }
+        .badge-lock { background: #E3F2FD; color: #0D47A1; }
+        .fac-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
+        .fac-card { border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden; background: #fff; display: flex; flex-direction: column; }
+        .fac-card img { width: 100%; height: 155px; object-fit: cover; }
+        .fac-card-body { padding: 1rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; }
+        .photos-strip { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+        .photo-thumb { position: relative; width: 88px; height: 70px; border-radius: 10px; overflow: hidden; border: 2px solid var(--border); }
+        .photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-del { position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; border: none; background: rgba(211,47,47,0.9); color: white; font-weight: 700; cursor: pointer; font-size: 0.75rem; }
+        .upload-label { display: inline-flex; align-items: center; gap: 8px; background: #F0F8F4; border: 1.5px dashed var(--ok); color: var(--ok); padding: 0.65rem 1.1rem; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; position: relative; overflow: hidden; }
+        .upload-label input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: var(--dark); color: white; padding: 0.9rem 1.4rem; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.22); display: none; z-index: 3000; font-size: 0.88rem; max-width: calc(100vw - 40px); }
+        .toast.show { display: block; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            بوابة ملّاك Weekend
+        </a>
+        <div class="nav-actions">
+            <a href="/" class="btn btn-outline">العودة للموقع العام</a>
+            <button type="button" class="btn btn-gold" id="btn-owner-logout" style="display:none;">تسجيل الخروج</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Login View -->
+        <section id="owner-login-section" class="login-wrap">
+            <div class="card">
+                <h1 style="font-size:1.35rem;margin-bottom:4px;">🔑 دخول صاحب المنشأة</h1>
+                <p class="subtitle" style="margin-bottom:1.2rem;">أدخل رقم هاتفك المعتمد ورمز الدخول (PIN) الذي زوّدتك به إدارة Weekend لإدارة حجوزاتك وتقويمك وأسعارك مباشرةً:</p>
+                <form id="owner-login-form">
+                    <div class="form-group">
+                        <label for="own-login-phone">📞 رقم الهاتف المعتمد</label>
+                        <input type="tel" class="form-control" id="own-login-phone" required placeholder="مثال: 0791234567" style="direction:ltr;">
+                    </div>
+                    <div class="form-group">
+                        <label for="own-login-pin">🔐 رمز الدخول (PIN)</label>
+                        <input type="password" class="form-control" id="own-login-pin" required minlength="4" maxlength="20" placeholder="••••••" style="direction:ltr;">
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="btn-own-login" style="width:100%;padding:0.8rem;">دخول إلى لوحتي</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Dashboard View -->
+        <section id="owner-dashboard-section" style="display:none;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:1.1rem;">
+                <div>
+                    <h1 id="owner-welcome-title" style="font-size:1.4rem;">مرحباً بك في بوابة الملّاك</h1>
+                    <p class="subtitle">إدارة كاملة لحجوزاتك، قفل المواعيد الخارجية، وتحديث أسعارك وصورك في أي وقت.</p>
+                </div>
+                <button type="button" class="btn btn-gold" id="btn-owner-refresh">🔄 تحديث البيانات</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box"><div class="stat-label">منشآتي النشطة</div><div class="stat-val" id="stat-own-facs">0</div></div>
+                <div class="stat-box"><div class="stat-label">حجوزات مؤكدة قادمة</div><div class="stat-val" id="stat-own-confirmed" style="color:var(--ok);">0</div></div>
+                <div class="stat-box"><div class="stat-label">طلبات قيد التأكيد</div><div class="stat-val" id="stat-own-pending" style="color:#E65100;">0</div></div>
+                <div class="stat-box"><div class="stat-label">إجمالي قيمة حجوزاتي المؤكدة</div><div class="stat-val" id="stat-own-total">0 JOD</div></div>
+            </div>
+
+            <div class="tabs">
+                <button type="button" class="tab-btn active" data-tab="tab-bookings">📅 حجوزاتي وقفل التواريخ</button>
+                <button type="button" class="tab-btn" data-tab="tab-facilities">🏡 منشآتي وتعديل الأسعار والصور</button>
+            </div>
+
+            <!-- Tab 1: Bookings & Quick External Block -->
+            <div id="tab-bookings" class="tab-pane active">
+                <div class="card" style="background:linear-gradient(135deg,#FFF9EF,#FFFDF9);border-color:var(--gold);">
+                    <h2 style="font-size:1.1rem;margin-bottom:4px;">🔒 قفل موعد محجوز خارجياً (هاتفياً أو صيانة)</h2>
+                    <p class="subtitle" style="margin-bottom:1rem;">أقفل أي يوم أو شفت أو ساعات ملعب فوراً لمنع الحجز المزدوج على الموقع:</p>
+                    <form id="owner-block-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ob-facility">1. اختر المنشأة</label>
+                                <select class="form-control" id="ob-facility" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="ob-date">2. التاريخ</label>
+                                <input type="date" class="form-control" id="ob-date" required>
+                            </div>
+                            <div class="form-group" id="ob-shift-wrap">
+                                <label for="ob-shift">3. الشفت</label>
+                                <select class="form-control" id="ob-shift">
+                                    <option value="fullday">🔒 يوم كامل</option>
+                                    <option value="morning">☀️ صباحي فقط</option>
+                                    <option value="evening">🌙 مسائي فقط</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="ob-pitch-wrap" style="display:none;">
+                                <label for="ob-start-hour">3. ساعة البدء وعدد الساعات</label>
+                                <div style="display:flex;gap:6px;">
+                                    <select class="form-control" id="ob-start-hour">
+                                        <option value="all">اليوم بالكامل</option>
+                                        <option value="6">06:00 ص</option><option value="8">08:00 ص</option><option value="10">10:00 ص</option>
+                                        <option value="12">12:00 ظ</option><option value="14">02:00 م</option><option value="16">04:00 م</option>
+                                        <option value="18">06:00 م</option><option value="20">08:00 م</option><option value="22">10:00 م</option>
+                                    </select>
+                                    <input type="number" class="form-control" id="ob-hours" min="2" max="18" value="2" style="width:76px;display:none;" placeholder="ساعات">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row" style="align-items:end;">
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label for="ob-note">4. ملاحظة (اختياري)</label>
+                                <input type="text" class="form-control" id="ob-note" maxlength="80" placeholder="مثال: حجز عائلة عبر الهاتف / تنظيف مسبح">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <button type="submit" class="btn btn-primary" id="btn-ob-submit" style="width:100%;padding:0.72rem;color:var(--gold);border:1.5px solid var(--gold);">🔒 قفل الموعد الآن</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2 style="font-size:1.1rem;margin-bottom:0.9rem;">📋 جدول حجوزات منشآتي</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>التذكرة / النوع</th>
+                                    <th>المنشأة</th>
+                                    <th>العميل والهاتف</th>
+                                    <th>الموعد والتفاصيل</th>
+                                    <th>الإجمالي / المتبقي عندك</th>
+                                    <th>الحالة والإجراء</th>
+                                </tr>
+                            </thead>
+                            <tbody id="owner-bookings-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: My Facilities & Self-Edit Prices / Photos -->
+            <div id="tab-facilities" class="tab-pane">
+                <div class="fac-grid" id="owner-facilities-grid" style="margin-bottom:1.4rem;"></div>
+
+                <div class="card" id="owner-edit-fac-card" style="display:none;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                        <h2 id="oef-title" style="font-size:1.15rem;">✏️ تعديل الأسعار والصور</h2>
+                        <button type="button" class="btn btn-danger" id="btn-oef-cancel">إغلاق التعديل</button>
+                    </div>
+                    <form id="owner-edit-fac-form">
+                        <input type="hidden" id="oef-id">
+                        <input type="hidden" id="oef-category">
+
+                        <div id="oef-farm-prices" class="form-row">
+                            <div class="form-group"><label>سعر الصباحي (JOD)</label><input type="number" step="0.5" min="1" class="form-control" id="oef-price-day"></div>
+                            <div class="form-group"><label>سعر المسائي (JOD)</label><input type="number" step="0.5" min="1" class="form-control" id="oef-price-night"></div>
+                            <div class="form-group"><label>سعر اليوم الكامل (JOD)</label><input type="number" step="0.5" min="1" class="form-control" id="oef-price-full"></div>
+                        </div>
+                        <div id="oef-field-prices" class="form-row" style="display:none;">
+                            <div class="form-group"><label>سعر الساعة (JOD)</label><input type="number" step="0.5" min="0.5" class="form-control" id="oef-hourly-rate"></div>
+                        </div>
+                        <div id="oef-transport-prices" class="form-row" style="display:none;">
+                            <div class="form-group"><label>سعر الكيلومتر (JOD)</label><input type="number" step="0.05" min="0" class="form-control" id="oef-price-km"></div>
+                            <div class="form-group"><label>سعر الراكب (JOD)</label><input type="number" step="0.1" min="0" class="form-control" id="oef-price-person"></div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group"><label>🛡️ مبلغ التأمين المسترد عند الوصول (JOD)</label><input type="number" step="1" min="0" class="form-control" id="oef-security-deposit"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>الوصف والمواصفات</label>
+                            <textarea class="form-control" id="oef-specs" rows="3" maxlength="2500"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>سياسة الإلغاء والاسترداد</label>
+                            <textarea class="form-control" id="oef-cancel-policy" rows="2" maxlength="1200"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>📸 صور المنشأة (يمكنك إضافة صور جديدة أو حذف الصور القديمة مباشرةً):</label>
+                            <label class="upload-label">
+                                <span>➕ رفع صور جديدة من جهازك</span>
+                                <input type="file" id="oef-photo-upload" accept="image/jpeg,image/png,image/webp" multiple>
+                            </label>
+                            <small id="oef-upload-status" style="display:block;margin-top:4px;color:var(--muted);"></small>
+                            <div class="photos-strip" id="oef-photos-strip"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="btn-oef-save" style="width:100%;padding:0.85rem;">💾 حفظ التحديثات ونشرها فوراً</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
+    <script>
+        const SUPABASE_URL = 'https://yeysruiowtjpwyicsukf.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_--ZBMiy0SK8D-IQ4_Ab0hw_XneXxcCJ';
+        const db = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+        let ownerCreds = null;
+        let ownerFacilities = [];
+        let ownerBookings = [];
+        let editingPhotos = [];
+
+        function escapeHtml(s) {
+            return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+        function normalizePhone(p) { return String(p || '').trim().replace(/[\s\-()]/g, ''); }
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 4000);
+        }
+
+        function compressImageToBlob(file, maxDim = 1200, quality = 0.8) {
+            return new Promise((resolve, reject) => {
+                if (!file || !/^image\/(jpeg|jpg|png|webp)$/i.test(file.type)) {
+                    return reject(new Error('يرجى اختيار صورة JPEG أو PNG أو WebP فقط'));
+                }
+                const reader = new FileReader();
+                reader.onerror = () => reject(new Error('تعذر قراءة الصورة'));
+                reader.onload = ev => {
+                    const img = new Image();
+                    img.onerror = () => reject(new Error('ملف غير صالح'));
+                    img.onload = () => {
+                        let w = img.naturalWidth, h = img.naturalHeight;
+                        if (w > maxDim || h > maxDim) {
+                            if (w >= h) { h = Math.round(h * maxDim / w); w = maxDim; }
+                            else { w = Math.round(w * maxDim / h); h = maxDim; }
+                        }
+                        const c = document.createElement('canvas');
+                        c.width = w; c.height = h;
+                        const ctx = c.getContext('2d');
+                        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
+                        ctx.drawImage(img, 0, 0, w, h);
+                        c.toBlob(blob => blob ? resolve(blob) : reject(new Error('فشل ضغط الصورة')), 'image/jpeg', quality);
+                    };
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function loadOwnerDashboard(phone, pin, silent = false) {
+            if (!db) return false;
+            const { data, error } = await db.rpc('owner_get_dashboard', { p_phone: phone, p_pin: pin });
+            if (error || !data || !data.ok) {
+                if (!silent) showToast('❌ ' + (error?.message || 'رقم الهاتف أو رمز الدخول غير صحيح'));
+                return false;
+            }
+            ownerCreds = { phone, pin, name: data.owner_name || 'صاحب المنشأة' };
+            try { sessionStorage.setItem('wknd_owner_session', JSON.stringify(ownerCreds)); } catch (e) {}
+            ownerFacilities = Array.isArray(data.facilities) ? data.facilities : [];
+            ownerBookings = Array.isArray(data.bookings) ? data.bookings : [];
+
+            document.getElementById('owner-login-section').style.display = 'none';
+            document.getElementById('owner-dashboard-section').style.display = 'block';
+            document.getElementById('btn-owner-logout').style.display = 'inline-block';
+            document.getElementById('owner-welcome-title').textContent = `مرحباً ${ownerCreds.name} 👋`;
+            renderOwnerUI();
+            return true;
+        }
+
+        function renderOwnerUI() {
+            const realConfirmed = ownerBookings.filter(b => b.status === 'confirmed' && !b.is_owner_block && !String(b.client_name || '').includes('قفل إداري'));
+            const pendingList = ownerBookings.filter(b => b.status === 'pending');
+            const totalSum = realConfirmed.reduce((s, b) => s + (Number(b.total) || 0), 0);
+
+            document.getElementById('stat-own-facs').textContent = ownerFacilities.length;
+            document.getElementById('stat-own-confirmed').textContent = realConfirmed.length;
+            document.getElementById('stat-own-pending').textContent = pendingList.length;
+            document.getElementById('stat-own-total').textContent = `${totalSum.toFixed(0)} JOD`;
+
+            // Populate quick block facility dropdown
+            const sel = document.getElementById('ob-facility');
+            const prev = sel.value;
+            sel.innerHTML = ownerFacilities.map(f => `<option value="${f.id}">${escapeHtml(f.name_ar)}</option>`).join('');
+            if (prev && ownerFacilities.some(f => String(f.id) === prev)) sel.value = prev;
+            const dateInp = document.getElementById('ob-date');
+            if (dateInp && !dateInp.value) dateInp.value = new Date().toISOString().split('T')[0];
+            syncOwnerBlockUI();
+
+            // Render Bookings table
+            const tbody = document.getElementById('owner-bookings-tbody');
+            if (!ownerBookings.length) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:2rem;">لا توجد حجوزات قادمة لمنشآتك حالياً</td></tr>';
+            } else {
+                tbody.innerHTML = ownerBookings.map(b => {
+                    const isBlock = Boolean(b.is_owner_block) || String(b.client_name || '').includes('قفل');
+                    const rem = Math.max(0, Number(b.total || 0) - Number(b.deposit || 0));
+                    const badge = isBlock
+                        ? '<span class="badge badge-lock">🔒 قفل خارجي</span>'
+                        : (b.status === 'confirmed' ? '<span class="badge badge-ok">✅ مؤكد</span>' : '<span class="badge badge-pend">⏳ قيد المراجعة</span>');
+                    const actionHtml = b.is_owner_block
+                        ? `<button type="button" class="btn btn-danger" style="padding:0.35rem 0.7rem;font-size:0.78rem;margin-top:4px;" data-action="unblock" data-id="${b.id}">🔓 فتح الموعد</button>`
+                        : '';
+                    return `<tr>
+                        <td><strong style="direction:ltr;display:inline-block;">#${escapeHtml(b.ticket_code || ('WKND-' + b.id))}</strong></td>
+                        <td>${escapeHtml(b.item_name_ar)}</td>
+                        <td><strong>${escapeHtml(b.client_name)}</strong><br><small style="direction:ltr;display:inline-block;">${isBlock ? '—' : escapeHtml(b.phone)}</small></td>
+                        <td><small>${escapeHtml(b.details)}</small></td>
+                        <td>${isBlock ? '—' : `الإجمالي: ${Number(b.total || 0).toFixed(2)} JOD<br><strong style="color:var(--ok);">المتبقي عندك: ${rem.toFixed(2)} JOD</strong>`}</td>
+                        <td>${badge}<br>${actionHtml}</td>
+                    </tr>`;
+                }).join('');
+            }
+
+            // Render Facilities cards
+            const grid = document.getElementById('owner-facilities-grid');
+            grid.innerHTML = ownerFacilities.map(f => {
+                const img = (Array.isArray(f.images) && f.images[0]) ? f.images[0] : 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80';
+                const priceLine = f.category === 'field'
+                    ? `${f.hourly_rate || 0} JOD / ساعة`
+                    : (f.category === 'transport' ? `${f.price_per_km || 0} JOD/كم | ${f.price_per_person || 0} JOD/شخص` : `صباحي ${f.price_day || 0} | مسائي ${f.price_night || 0} | كامل ${f.price_full || 0} JOD`);
+                return `<div class="fac-card">
+                    <img src="${escapeHtml(img)}" alt="${escapeHtml(f.name_ar)}">
+                    <div class="fac-card-body">
+                        <div>
+                            <h3 style="font-size:1rem;margin-bottom:4px;">${escapeHtml(f.name_ar)}</h3>
+                            <div style="font-size:0.82rem;color:var(--muted);margin-bottom:6px;">📍 ${escapeHtml(f.location_ar)}</div>
+                            <div style="font-size:0.84rem;font-weight:700;color:var(--dark);">${escapeHtml(priceLine)}</div>
+                        </div>
+                        <button type="button" class="btn btn-primary" data-action="edit-fac" data-id="${f.id}" style="width:100%;">✏️ تعديل الأسعار والصور</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function syncOwnerBlockUI() {
+            const fac = ownerFacilities.find(f => String(f.id) === String(document.getElementById('ob-facility').value));
+            const sh = document.getElementById('ob-shift-wrap');
+            const pt = document.getElementById('ob-pitch-wrap');
+            const hrs = document.getElementById('ob-hours');
+            if (!fac || fac.category === 'farm') {
+                sh.style.display = 'block'; pt.style.display = 'none';
+            } else if (fac.category === 'field') {
+                sh.style.display = 'none'; pt.style.display = 'block';
+                hrs.style.display = document.getElementById('ob-start-hour').value === 'all' ? 'none' : 'block';
+            } else {
+                sh.style.display = 'none'; pt.style.display = 'none';
+            }
+        }
+
+        function openOwnerEditFacility(facId) {
+            const f = ownerFacilities.find(x => Number(x.id) === Number(facId));
+            if (!f) return;
+            document.getElementById('oef-id').value = f.id;
+            document.getElementById('oef-category').value = f.category;
+            document.getElementById('oef-title').textContent = `✏️ تعديل: ${f.name_ar}`;
+            document.getElementById('oef-farm-prices').style.display = f.category === 'farm' ? 'grid' : 'none';
+            document.getElementById('oef-field-prices').style.display = f.category === 'field' ? 'grid' : 'none';
+            document.getElementById('oef-transport-prices').style.display = f.category === 'transport' ? 'grid' : 'none';
+
+            document.getElementById('oef-price-day').value = f.price_day ?? '';
+            document.getElementById('oef-price-night').value = f.price_night ?? '';
+            document.getElementById('oef-price-full').value = f.price_full ?? '';
+            document.getElementById('oef-hourly-rate').value = f.hourly_rate ?? '';
+            document.getElementById('oef-price-km').value = f.price_per_km ?? '';
+            document.getElementById('oef-price-person').value = f.price_per_person ?? '';
+            document.getElementById('oef-security-deposit').value = f.security_deposit ?? 0;
+            document.getElementById('oef-specs').value = f.specs_ar || '';
+            document.getElementById('oef-cancel-policy').value = f.cancel_policy_ar || '';
+            editingPhotos = Array.isArray(f.images) ? [...f.images] : [];
+            renderEditingPhotos();
+            const card = document.getElementById('owner-edit-fac-card');
+            card.style.display = 'block';
+            card.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function renderEditingPhotos() {
+            const strip = document.getElementById('oef-photos-strip');
+            strip.innerHTML = editingPhotos.map((u, i) => `
+                <div class="photo-thumb">
+                    <img src="${escapeHtml(u)}" alt="صورة ${i + 1}">
+                    <button type="button" class="photo-del" data-action="del-photo" data-idx="${i}" title="حذف الصورة">&times;</button>
+                </div>`).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Auto restore session if present
+            try {
+                const saved = JSON.parse(sessionStorage.getItem('wknd_owner_session') || 'null');
+                if (saved && saved.phone && saved.pin) {
+                    await loadOwnerDashboard(saved.phone, saved.pin, true);
+                }
+            } catch (e) {}
+
+            document.getElementById('owner-login-form').addEventListener('submit', async e => {
+                e.preventDefault();
+                const phone = normalizePhone(document.getElementById('own-login-phone').value);
+                const pin = document.getElementById('own-login-pin').value.trim();
+                const btn = document.getElementById('btn-own-login');
+                btn.disabled = true;
+                try { await loadOwnerDashboard(phone, pin, false); } finally { btn.disabled = false; }
+            });
+
+            document.getElementById('btn-owner-logout').addEventListener('click', () => {
+                ownerCreds = null;
+                try { sessionStorage.removeItem('wknd_owner_session'); } catch (e) {}
+                document.getElementById('owner-dashboard-section').style.display = 'none';
+                document.getElementById('owner-login-section').style.display = 'block';
+                document.getElementById('btn-owner-logout').style.display = 'none';
+                document.getElementById('own-login-pin').value = '';
+            });
+
+            document.getElementById('btn-owner-refresh').addEventListener('click', async () => {
+                if (ownerCreds) {
+                    await loadOwnerDashboard(ownerCreds.phone, ownerCreds.pin, true);
+                    showToast('✅ تم تحديث الحجوزات والمنشآت');
+                }
+            });
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById(btn.dataset.tab).classList.add('active');
+                });
+            });
+
+            document.getElementById('ob-facility').addEventListener('change', syncOwnerBlockUI);
+            document.getElementById('ob-start-hour').addEventListener('change', syncOwnerBlockUI);
+
+            document.getElementById('owner-block-form').addEventListener('submit', async e => {
+                e.preventDefault();
+                if (!ownerCreds) return;
+                const facId = Number(document.getElementById('ob-facility').value);
+                const fac = ownerFacilities.find(f => Number(f.id) === facId);
+                const dateVal = document.getElementById('ob-date').value;
+                const note = document.getElementById('ob-note').value.trim();
+                let shiftType = 'fullday', startHour = null, hours = null;
+                if (fac?.category === 'farm') {
+                    shiftType = document.getElementById('ob-shift').value;
+                } else if (fac?.category === 'field') {
+                    const stVal = document.getElementById('ob-start-hour').value;
+                    if (stVal !== 'all') {
+                        startHour = parseInt(stVal, 10);
+                        hours = parseInt(document.getElementById('ob-hours').value, 10) || 2;
+                    }
+                }
+                const btn = document.getElementById('btn-ob-submit');
+                btn.disabled = true;
+                try {
+                    const { error } = await db.rpc('owner_block_slot', {
+                        p_phone: ownerCreds.phone, p_pin: ownerCreds.pin,
+                        p_facility_id: facId, p_booking_date: dateVal,
+                        p_shift_type: shiftType, p_start_hour: startHour, p_hours: hours, p_note: note || null
+                    });
+                    if (error) {
+                        showToast(error.code === '23P01' ? '⛔ هذا الموعد محجوز مسبقاً' : '❌ ' + error.message);
+                        return;
+                    }
+                    document.getElementById('ob-note').value = '';
+                    await loadOwnerDashboard(ownerCreds.phone, ownerCreds.pin, true);
+                    showToast('🔒 تم قفل الموعد بنجاح في تقويم الموقع');
+                } finally { btn.disabled = false; }
+            });
+
+            document.getElementById('oef-photo-upload').addEventListener('change', async function() {
+                const files = Array.from(this.files || []);
+                if (!files.length) return;
+                const st = document.getElementById('oef-upload-status');
+                st.textContent = `⏳ جاري ضغط ورفع ${files.length} صورة...`;
+                for (const file of files) {
+                    try {
+                        const blob = await compressImageToBlob(file);
+                        const path = `facilities/owner-uploads/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
+                        const { error } = await db.storage.from('weekend-media').upload(path, blob, { contentType: 'image/jpeg', upsert: false });
+                        if (!error) {
+                            const { data } = db.storage.from('weekend-media').getPublicUrl(path);
+                            if (data?.publicUrl) {
+                                editingPhotos.push(data.publicUrl);
+                                renderEditingPhotos();
+                            }
+                        }
+                    } catch (err) {
+                        showToast('⚠️ ' + (err.message || 'تعذر رفع صورة'));
+                    }
+                }
+                this.value = '';
+                st.textContent = '✅ تم تجهيز الصور؛ اضغط «حفظ التحديثات» لنشرها.';
+            });
+
+            document.getElementById('owner-edit-fac-form').addEventListener('submit', async e => {
+                e.preventDefault();
+                if (!ownerCreds) return;
+                const btn = document.getElementById('btn-oef-save');
+                btn.disabled = true;
+                try {
+                    const { error } = await db.rpc('owner_update_facility', {
+                        p_phone: ownerCreds.phone,
+                        p_pin: ownerCreds.pin,
+                        p_facility_id: Number(document.getElementById('oef-id').value),
+                        p_price_day: parseFloat(document.getElementById('oef-price-day').value) || null,
+                        p_price_night: parseFloat(document.getElementById('oef-price-night').value) || null,
+                        p_price_full: parseFloat(document.getElementById('oef-price-full').value) || null,
+                        p_hourly_rate: parseFloat(document.getElementById('oef-hourly-rate').value) || null,
+                        p_price_per_km: parseFloat(document.getElementById('oef-price-km').value) ?? null,
+                        p_price_per_person: parseFloat(document.getElementById('oef-price-person').value) ?? null,
+                        p_security_deposit: parseFloat(document.getElementById('oef-security-deposit').value) || 0,
+                        p_specs_ar: document.getElementById('oef-specs').value.trim(),
+                        p_cancel_policy_ar: document.getElementById('oef-cancel-policy').value.trim(),
+                        p_images: editingPhotos
+                    });
+                    if (error) {
+                        showToast('❌ ' + error.message);
+                        return;
+                    }
+                    document.getElementById('owner-edit-fac-card').style.display = 'none';
+                    await loadOwnerDashboard(ownerCreds.phone, ownerCreds.pin, true);
+                    showToast('✅ تم حفظ التحديثات ونشرها على الموقع فوراً!');
+                } finally { btn.disabled = false; }
+            });
+
+            document.getElementById('btn-oef-cancel').addEventListener('click', () => {
+                document.getElementById('owner-edit-fac-card').style.display = 'none';
+            });
+
+            document.addEventListener('click', async e => {
+                const el = e.target.closest('[data-action]');
+                if (!el) return;
+                const act = el.dataset.action;
+                if (act === 'edit-fac') {
+                    openOwnerEditFacility(el.dataset.id);
+                } else if (act === 'del-photo') {
+                    const idx = Number(el.dataset.idx);
+                    if (editingPhotos.length <= 1) { showToast('⚠️ يجب الإبقاء على صورة واحدة على الأقل'); return; }
+                    editingPhotos.splice(idx, 1);
+                    renderEditingPhotos();
+                } else if (act === 'unblock') {
+                    if (!ownerCreds || !confirm('هل تريد إلغاء القفل وفتح هذا الموعد للحجز على الموقع؟')) return;
+                    const { error } = await db.rpc('owner_unblock_slot', {
+                        p_phone: ownerCreds.phone, p_pin: ownerCreds.pin, p_booking_id: Number(el.dataset.id)
+                    });
+                    if (error) { showToast('❌ ' + error.message); return; }
+                    await loadOwnerDashboard(ownerCreds.phone, ownerCreds.pin, true);
+                    showToast('🔓 تم فتح الموعد بنجاح');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
