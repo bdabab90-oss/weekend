@@ -503,7 +503,7 @@
             <h3>رابعاً: العربون والإلغاء والاسترداد</h3>
             <ul>
                 <li><strong>تأكيد الحجز:</strong> لا يُعدّ الحجز مؤكداً إلا بعد إتمام تحويل مبلغ العربون وإرفاق صورة الوصل الرسمية وموافقة الإدارة.</li>
-                <li><strong>مهلة المراجعة:</strong> الطلبات المعلقة غير المؤكدة تنتهي صلاحيتها تلقائياً بعد ساعتين إذا لم يتم اعتمادها.</li>
+                <li><strong>مهلة المراجعة:</strong> الطلبات المرفق بها وصل تحويل العربون تبقى محجوزة باسمك بانتظار مراجعة الإدارة ولا تُلغى تلقائياً، وسيتم تأكيدها أو التواصل معك في أقرب وقت.</li>
             </ul>
 
             <h3>خامساً: سياسة الخصوصية وحماية البيانات (Privacy Policy)</h3>
@@ -721,8 +721,8 @@
                                     <input type="tel" class="form-control" id="adm-v-guard-phone" required maxlength="20" placeholder="مثال: 0781234567" style="direction:ltr;">
                                 </div>
                                 <div class="form-group" style="flex:1;margin-bottom:0;">
-                                    <label for="adm-v-owner-pin" style="color:#0D47A1;">🔑 رمز دخول بوابة الملّاك /owner (4–10 أرقام)</label>
-                                    <input type="text" class="form-control" id="adm-v-owner-pin" maxlength="20" placeholder="مثال: 482910 (اختياري)" style="direction:ltr;">
+                                    <label for="adm-v-owner-pin" style="color:#0D47A1;">🔑 رمز دخول بوابة الملّاك /owner (6–8 أرقام)</label>
+                                    <input type="text" class="form-control" id="adm-v-owner-pin" maxlength="8" placeholder="مثال: 482910 (اختياري)" style="direction:ltr;">
                                 </div>
                             </div>
                             <div class="form-row">
@@ -840,8 +840,8 @@
                                     <input type="tel" class="form-control" id="adm-t-guard-phone" required maxlength="20" placeholder="مثال: 0781234567" style="direction:ltr;">
                                 </div>
                                 <div class="form-group" style="flex:1;margin-bottom:0;">
-                                    <label for="adm-t-owner-pin" style="color:#0D47A1;">🔑 رمز دخول بوابة الملّاك /owner (4–10 أرقام)</label>
-                                    <input type="text" class="form-control" id="adm-t-owner-pin" maxlength="20" placeholder="مثال: 482910 (اختياري)" style="direction:ltr;">
+                                    <label for="adm-t-owner-pin" style="color:#0D47A1;">🔑 رمز دخول بوابة الملّاك /owner (6–8 أرقام)</label>
+                                    <input type="text" class="form-control" id="adm-t-owner-pin" maxlength="8" placeholder="مثال: 482910 (اختياري)" style="direction:ltr;">
                                 </div>
                             </div>
                             <div class="form-row">
@@ -1131,7 +1131,7 @@
                                 <div class="form-group" style="flex:1.2;">
                                     <label for="ao-pin">4. رمز الدخول (PIN)</label>
                                     <div style="display:flex;gap:6px;">
-                                        <input type="text" class="form-control" id="ao-pin" required minlength="4" maxlength="20" placeholder="مثال: 482910" style="direction:ltr;flex:1;">
+                                        <input type="text" class="form-control" id="ao-pin" required minlength="6" maxlength="8" placeholder="مثال: 482910" style="direction:ltr;flex:1;">
                                         <button type="button" class="btn-details" id="btn-ao-gen-pin" style="margin:0;padding:0 0.75rem;white-space:nowrap;" title="توليد رمز عشوائي">🎲 عشوائي</button>
                                     </div>
                                 </div>
@@ -3941,6 +3941,7 @@
                 var guardPhoneVal = normalizePhone(document.getElementById('adm-v-guard-phone')?.value || '');
                 var ownerPinVal   = (document.getElementById('adm-v-owner-pin')?.value || '').trim();
                 if (!isValidPhone(ownerPhoneVal) || !isValidPhone(guardPhoneVal)) { showToast('⚠️ يرجى إدخال رقم صاحب المنشأة ورقم الحارس بشكل صحيح (إجباري)'); return; }
+                if (ownerPinVal && !/^[0-9]{6,8}$/.test(ownerPinVal)) { showToast('⚠️ رمز دخول بوابة الملّاك يجب أن يكون من 6 إلى 8 أرقام (أو اتركه فارغاً)'); return; }
                 amenities     = ['featured','private_screened','families_only','youth_allowed','events_allowed','pool','bbq','wifi','heating','outdoor'].filter(a => document.getElementById(`adm-v-am-${a}`)?.checked);
             } else {
                 category       = 'transport';
@@ -3971,6 +3972,7 @@
                 var guardPhoneVal = normalizePhone(document.getElementById('adm-t-guard-phone')?.value || '');
                 var ownerPinVal   = (document.getElementById('adm-t-owner-pin')?.value || '').trim();
                 if (!isValidPhone(ownerPhoneVal) || !isValidPhone(guardPhoneVal)) { showToast('⚠️ يرجى إدخال رقم صاحب المركبة ورقم السائق بشكل صحيح (إجباري)'); return; }
+                if (ownerPinVal && !/^[0-9]{6,8}$/.test(ownerPinVal)) { showToast('⚠️ رمز دخول بوابة الملّاك يجب أن يكون من 6 إلى 8 أرقام (أو اتركه فارغاً)'); return; }
                 amenities     = ['featured','wifi','heating','outdoor'].filter(a => document.getElementById(`adm-t-am-${a}`)?.checked);
             }
 
@@ -4045,7 +4047,7 @@
                 }
                 if (idx !== -1 && data) {
                     await db.from('facility_contacts').upsert({ facility_id: editingId, owner_phone: ownerPhoneVal, guard_phone: guardPhoneVal, updated_at: new Date().toISOString() });
-                    if (typeof ownerPinVal !== 'undefined' && ownerPinVal.length >= 4) { await db.rpc('admin_set_owner_access', { p_facility_id: editingId, p_owner_phone: ownerPhoneVal, p_owner_name: nameAr, p_pin: ownerPinVal }); }
+                    if (typeof ownerPinVal !== 'undefined' && /^[0-9]{6,8}$/.test(ownerPinVal)) { await db.rpc('admin_set_owner_access', { p_facility_id: editingId, p_owner_phone: ownerPhoneVal, p_owner_name: nameAr, p_pin: ownerPinVal }); }
                     const updated = rowToItem(data);
                     updated.reviews = items[idx].reviews || [];
                     updated.ownerPhone = ownerPhoneVal;
@@ -4065,7 +4067,7 @@
                 }
                 if (data) {
                     await db.from('facility_contacts').upsert({ facility_id: Number(data.id), owner_phone: ownerPhoneVal, guard_phone: guardPhoneVal, updated_at: new Date().toISOString() });
-                    if (typeof ownerPinVal !== 'undefined' && ownerPinVal.length >= 4) { await db.rpc('admin_set_owner_access', { p_facility_id: Number(data.id), p_owner_phone: ownerPhoneVal, p_owner_name: nameAr, p_pin: ownerPinVal }); }
+                    if (typeof ownerPinVal !== 'undefined' && /^[0-9]{6,8}$/.test(ownerPinVal)) { await db.rpc('admin_set_owner_access', { p_facility_id: Number(data.id), p_owner_phone: ownerPhoneVal, p_owner_name: nameAr, p_pin: ownerPinVal }); }
                     const createdIt = rowToItem(data);
                     createdIt.ownerPhone = ownerPhoneVal;
                     createdIt.guardPhone = guardPhoneVal;
@@ -4817,8 +4819,8 @@
             const pin   = document.getElementById('ao-pin').value.trim();
             const fac   = items.find(i => i.id === facId);
 
-            if (!facId || !isValidPhone(phone) || pin.length < 4) {
-                showToast('⚠️ يرجى التحقق من المنشأة ورقم الهاتف ورمز الدخول (4 أرقام على الأقل)');
+            if (!facId || !isValidPhone(phone) || !/^[0-9]{6,8}$/.test(pin)) {
+                showToast('⚠️ يرجى التحقق من المنشأة ورقم الهاتف ورمز الدخول (من 6 إلى 8 أرقام)');
                 return;
             }
             const btn = document.getElementById('btn-ao-submit');
