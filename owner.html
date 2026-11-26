@@ -276,7 +276,8 @@
         const SUPABASE_KEY = 'sb_publishable_--ZBMiy0SK8D-IQ4_Ab0hw_XneXxcCJ';
         const db = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-        let ownerCreds = null;
+        // جلسة المالك: رمز مؤقت يصدره السيرفر (لا يُحفظ رقم الهاتف أو الـ PIN في المتصفح)
+        let ownerSession = null;
         let ownerFacilities = [];
         let ownerBookings = [];
         let ownerRequests = [];
@@ -322,15 +323,61 @@
             });
         }
 
-        async function loadOwnerDashboard(phone, pin, silent = false) {
+        function resetOwnerToLogin() {
+            ownerSession = null;
+            try { sessionStorage.removeItem('wknd_owner_token'); sessionStorage.removeItem('wknd_owner_session'); } catch (e) {}
+            document.getElementById('owner-dashboard-section').style.display = 'none';
+            document.getElementById('owner-login-section').style.display = 'block';
+            document.getElementById('btn-owner-logout').style.display = 'none';
+            document.getElementById('own-login-pin').value = '';
+        }
+
+        // التعامل الموحّد مع ردود دوال الملّاك: خطأ اتصال، أو ok=false، أو انتهاء الجلسة
+        function handleOwnerRpcFailure(data, error) {
+            if (data && data.session_expired) {
+                resetOwnerToLogin();
+                showToast('⌛ ' + (data.error || 'انتهت الجلسة، يرجى تسجيل الدخول مجدداً.'));
+                return true;
+            }
+            if (error || !data || data.ok === false) {
+                showToast('❌ ' + (error?.message || data?.error || 'تعذر تنفيذ الطلب حالياً'));
+                return true;
+            }
+            return false;
+        }
+
+        async function ownerLogin(phone, pin) {
             if (!db) return false;
-            const { data, error } = await db.rpc('owner_get_dashboard', { p_phone: phone, p_pin: pin });
-            if (error || !data || !data.ok) {
-                if (!silent) showToast('❌ ' + (error?.message || 'رقم الهاتف أو رمز الدخول غير صحيح'));
+            const { data, error } = await db.rpc('owner_login', { p_phone: phone, p_pin: pin });
+            if (error || !data || !data.ok || !data.token) {
+                showToast('❌ ' + (error?.message || data?.error || 'رقم الهاتف أو رمز الدخول غير صحيح'));
                 return false;
             }
-            ownerCreds = { phone, pin, name: data.owner_name || 'صاحب المنشأة' };
-            try { sessionStorage.setItem('wknd_owner_session', JSON.stringify(ownerCreds)); } catch (e) {}
+            ownerSession = { token: data.token, name: data.owner_name || 'صاحب المنشأة' };
+            try {
+                sessionStorage.removeItem('wknd_owner_session');
+                sessionStorage.setItem('wknd_owner_token', data.token);
+            } catch (e) {}
+            const ok = await loadOwnerDashboard(false);
+            if (ok && data.weak_pin) {
+                showToast('⚠️ رمز دخولك قصير وأقل أماناً. يرجى طلب رمز جديد من 6 إلى 8 أرقام من إدارة المنصة.');
+            }
+            return ok;
+        }
+
+        async function loadOwnerDashboard(silent = false) {
+            if (!db || !ownerSession) return false;
+            const { data, error } = await db.rpc('owner_get_dashboard', { p_token: ownerSession.token });
+            if (error || !data || !data.ok) {
+                if (data && data.session_expired) {
+                    resetOwnerToLogin();
+                    if (!silent) showToast('⌛ ' + (data.error || 'انتهت الجلسة، يرجى تسجيل الدخول مجدداً.'));
+                } else if (!silent) {
+                    showToast('❌ ' + (error?.message || data?.error || 'تعذر تحميل لوحة المالك'));
+                }
+                return false;
+            }
+            ownerSession.name = data.owner_name || ownerSession.name || 'صاحب المنشأة';
             ownerFacilities = Array.isArray(data.facilities) ? data.facilities : [];
             ownerBookings = Array.isArray(data.bookings) ? data.bookings : [];
             ownerRequests = Array.isArray(data.requests) ? data.requests : [];
@@ -338,7 +385,7 @@
             document.getElementById('owner-login-section').style.display = 'none';
             document.getElementById('owner-dashboard-section').style.display = 'block';
             document.getElementById('btn-owner-logout').style.display = 'inline-block';
-            document.getElementById('owner-welcome-title').textContent = `مرحباً ${ownerCreds.name} 👋`;
+            document.getElementById('owner-welcome-title').textContent = `مرحباً ${ownerSession.name} 👋`;
             renderOwnerUI();
             return true;
         }
@@ -474,11 +521,14 @@
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            // Auto restore session if present
+            // استعادة الجلسة برمز الجلسة المؤقت فقط (وحذف أي بيانات دخول قديمة محفوظة بالمتصفح)
             try {
-                const saved = JSON.parse(sessionStorage.getItem('wknd_owner_session') || 'null');
-                if (saved && saved.phone && saved.pin) {
-                    await loadOwnerDashboard(saved.phone, saved.pin, true);
+                sessionStorage.removeItem('wknd_owner_session');
+                const savedToken = sessionStorage.getItem('wknd_owner_token');
+                if (savedToken) {
+                    ownerSession = { token: savedToken, name: 'صاحب المنشأة' };
+                    const restored = await loadOwnerDashboard(true);
+                    if (!restored) resetOwnerToLogin();
                 }
             } catch (e) {}
 
@@ -488,22 +538,19 @@
                 const pin = document.getElementById('own-login-pin').value.trim();
                 const btn = document.getElementById('btn-own-login');
                 btn.disabled = true;
-                try { await loadOwnerDashboard(phone, pin, false); } finally { btn.disabled = false; }
+                try { await ownerLogin(phone, pin); } finally { btn.disabled = false; }
             });
 
-            document.getElementById('btn-owner-logout').addEventListener('click', () => {
-                ownerCreds = null;
-                try { sessionStorage.removeItem('wknd_owner_session'); } catch (e) {}
-                document.getElementById('owner-dashboard-section').style.display = 'none';
-                document.getElementById('owner-login-section').style.display = 'block';
-                document.getElementById('btn-owner-logout').style.display = 'none';
-                document.getElementById('own-login-pin').value = '';
+            document.getElementById('btn-owner-logout').addEventListener('click', async () => {
+                const token = ownerSession ? ownerSession.token : null;
+                resetOwnerToLogin();
+                if (db && token) { try { await db.rpc('owner_logout', { p_token: token }); } catch (e) {} }
             });
 
             document.getElementById('btn-owner-refresh').addEventListener('click', async () => {
-                if (ownerCreds) {
-                    await loadOwnerDashboard(ownerCreds.phone, ownerCreds.pin, true);
-                    showToast('✅ تم تحديث الحجوزات والمنشآت');
+                if (ownerSession) {
+                    const ok = await loadOwnerDashboard(false);
+                    if (ok) showToast('✅ تم تحديث الحجوزات والمنشآت');
                 }
             });
 
@@ -521,7 +568,7 @@
 
             document.getElementById('owner-block-form').addEventListener('submit', async e => {
                 e.preventDefault();
-                if (!ownerCreds) return;
+                if (!ownerSession) return;
                 const facId = Number(document.getElementById('ob-facility').value);
                 const fac = ownerFacilities.find(f => Number(f.id) === facId);
                 const dateVal = document.getElementById('ob-date').value;
@@ -539,17 +586,18 @@
                 const btn = document.getElementById('btn-ob-submit');
                 btn.disabled = true;
                 try {
-                    const { error } = await db.rpc('owner_block_slot', {
-                        p_phone: ownerCreds.phone, p_pin: ownerCreds.pin,
+                    const { data, error } = await db.rpc('owner_block_slot', {
+                        p_token: ownerSession.token,
                         p_facility_id: facId, p_booking_date: dateVal,
                         p_shift_type: shiftType, p_start_hour: startHour, p_hours: hours, p_note: note || null
                     });
-                    if (error) {
-                        showToast(error.code === '23P01' ? '⛔ هذا الموعد محجوز مسبقاً' : '❌ ' + error.message);
+                    if (error && error.code === '23P01') {
+                        showToast('⛔ هذا الموعد محجوز مسبقاً');
                         return;
                     }
+                    if (handleOwnerRpcFailure(data, error)) return;
                     document.getElementById('ob-note').value = '';
-                    await loadOwnerDashboard(ownerCreds.phone, ownerCreds.pin, true);
+                    await loadOwnerDashboard(true);
                     showToast('⏳ تم إرسال طلب قفل الموعد للإدارة وبانتظار الموافقة!');
                 } finally { btn.disabled = false; }
             });
@@ -581,13 +629,12 @@
 
             document.getElementById('owner-edit-fac-form').addEventListener('submit', async e => {
                 e.preventDefault();
-                if (!ownerCreds) return;
+                if (!ownerSession) return;
                 const btn = document.getElementById('btn-oef-save');
                 btn.disabled = true;
                 try {
-                    const { error } = await db.rpc('owner_update_facility', {
-                        p_phone: ownerCreds.phone,
-                        p_pin: ownerCreds.pin,
+                    const { data, error } = await db.rpc('owner_update_facility', {
+                        p_token: ownerSession.token,
                         p_facility_id: Number(document.getElementById('oef-id').value),
                         p_price_day: parseFloat(document.getElementById('oef-price-day').value) || null,
                         p_price_night: parseFloat(document.getElementById('oef-price-night').value) || null,
@@ -600,12 +647,9 @@
                         p_cancel_policy_ar: document.getElementById('oef-cancel-policy').value.trim(),
                         p_images: editingPhotos
                     });
-                    if (error) {
-                        showToast('❌ ' + error.message);
-                        return;
-                    }
+                    if (handleOwnerRpcFailure(data, error)) return;
                     document.getElementById('owner-edit-fac-card').style.display = 'none';
-                    await loadOwnerDashboard(ownerCreds.phone, ownerCreds.pin, true);
+                    await loadOwnerDashboard(true);
                     showToast('⏳ تم إرسال طلب تعديل المنشأة للإدارة وبانتظار الموافقة!');
                 } finally { btn.disabled = false; }
             });
@@ -626,12 +670,12 @@
                     editingPhotos.splice(idx, 1);
                     renderEditingPhotos();
                 } else if (act === 'unblock') {
-                    if (!ownerCreds || !confirm('هل تريد إلغاء القفل وفتح هذا الموعد للحجز على الموقع؟')) return;
-                    const { error } = await db.rpc('owner_unblock_slot', {
-                        p_phone: ownerCreds.phone, p_pin: ownerCreds.pin, p_booking_id: Number(el.dataset.id)
+                    if (!ownerSession || !confirm('هل تريد إلغاء القفل وفتح هذا الموعد للحجز على الموقع؟')) return;
+                    const { data, error } = await db.rpc('owner_unblock_slot', {
+                        p_token: ownerSession.token, p_booking_id: Number(el.dataset.id)
                     });
-                    if (error) { showToast('❌ ' + error.message); return; }
-                    await loadOwnerDashboard(ownerCreds.phone, ownerCreds.pin, true);
+                    if (handleOwnerRpcFailure(data, error)) return;
+                    await loadOwnerDashboard(true);
                     showToast('⏳ تم إرسال طلب فتح الموعد للإدارة وبانتظار الموافقة!');
                 }
             });
