@@ -585,7 +585,7 @@
             <h3>رابعاً: العربون والإلغاء والاسترداد</h3>
             <ul>
                 <li><strong>تأكيد الحجز:</strong> لا يُعدّ الحجز مؤكداً إلا بعد إتمام تحويل مبلغ العربون وإرفاق صورة الوصل الرسمية وموافقة الإدارة.</li>
-                <li><strong>مهلة المراجعة:</strong> الطلبات المعلقة غير المؤكدة تنتهي صلاحيتها تلقائياً بعد ساعتين إذا لم يتم اعتمادها.</li>
+                <li><strong>مهلة المراجعة:</strong> الطلبات المرفق بها وصل تحويل العربون تبقى محجوزة باسمك بانتظار مراجعة الإدارة ولا تُلغى تلقائياً، وسيتم تأكيدها أو التواصل معك في أقرب وقت.</li>
             </ul>
 
             <h3>خامساً: سياسة الخصوصية وحماية البيانات (Privacy Policy)</h3>
@@ -2487,7 +2487,7 @@
             }
             btn.disabled = true;
             try {
-                const { error } = await db.rpc('submit_review', {
+                const { data: revRes, error } = await db.rpc('submit_review', {
                     p_facility_id: selectedItem.id,
                     p_user_name: name,
                     p_rating: rating,
@@ -2495,8 +2495,8 @@
                     p_phone: phone,
                     p_ticket_code: ticketCode
                 });
-                if (error) {
-                    showToast('⚠️ ' + (error.message || 'تعذر إرسال التقييم حالياً'));
+                if (error || (revRes && revRes.ok === false)) {
+                    showToast('⚠️ ' + (error?.message || revRes?.error || 'تعذر إرسال التقييم حالياً'));
                     return;
                 }
                 document.getElementById('rev-comment').value = '';
@@ -4881,11 +4881,14 @@
             let serverResults = null;
             if (db && targetPhone && isValidPhone(targetPhone) && targetCode) {
                 try {
-                    // استدعاء قاعدة البيانات دائماً برقم الهاتف ورمز التذكرة (النصي العشوائي أو الرقمي)
+                    // استدعاء قاعدة البيانات دائماً برقم الهاتف ورمز التذكرة العشوائي
                     const { data, error } = await db.rpc('track_my_bookings', {
                         p_phone: targetPhone,
                         p_ticket_code: targetCode
                     });
+                    if (error && /إيقاف المحاولات/.test(String(error.message || ''))) {
+                        showToast('⛔ ' + error.message);
+                    }
                     if (!error && Array.isArray(data)) {
                         serverResults = data.map(r => ({
                             id: Number(r.id),
@@ -6088,8 +6091,8 @@
                 p_request_type: reqType,
                 p_note: note
             });
-            if (error) {
-                showToast('⚠️ ' + (error.message || 'تعذر إرسال الطلب حالياً'));
+            if (error || (data && data.ok === false)) {
+                showToast('⚠️ ' + (error?.message || data?.error || 'تعذر إرسال الطلب حالياً'));
                 return;
             }
             currentTicketBooking.changeRequestType = reqType;
