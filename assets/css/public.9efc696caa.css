@@ -1,0 +1,18 @@
+/* منصة Weekend — أنماط الواجهة العامة فقط (public.css) */
+        /* V2 Customer Features: Compare, Sticky CTA, Split Cost, Verified Badge, Bundle */
+        .verified-pill { display:inline-flex; align-items:center; gap:4px; background:#E8F5E9; color:#1B5E20; border:1px solid #A5D6A7; padding:2px 9px; border-radius:14px; font-size:0.73rem; font-weight:700; margin-bottom:6px; }
+        .deposit-info-pill { background:#EFF8FF; border:1px solid #90CAF9; color:#0D47A1; border-radius:12px; padding:0.7rem 1rem; margin-bottom:1rem; font-size:0.86rem; font-weight:600; display:none; }
+        .bundle-offer-box { background:linear-gradient(135deg,#F0F8F4,#E8F5E9); border:1.5px solid #66BB6A; border-radius:14px; padding:0.9rem 1.1rem; margin-bottom:1.1rem; display:none; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+        .sticky-mobile-cta { position:sticky; bottom:-1.2rem; background:rgba(255,255,255,0.97); backdrop-filter:blur(8px); border-top:1.5px solid #E0EAE4; margin:0 -2rem -2rem -2rem; padding:0.85rem 1.5rem; display:flex; justify-content:space-between; align-items:center; gap:12px; z-index:20; border-radius:0 0 20px 20px; box-shadow:0 -6px 20px rgba(13,40,24,0.08); }
+        @media (max-width:768px) { .sticky-mobile-cta { margin:0 -1.2rem -1.2rem -1.2rem; padding:0.8rem 1rem; } }
+        .card-footer > div:last-child { display:flex; align-items:center; gap:6px; flex-wrap:nowrap; }
+        .card-footer .btn-details, .card-footer .btn-action { padding:0.45rem 0.78rem; font-size:0.84rem; margin:0 !important; white-space:nowrap; }
+        .btn-compare-card { background:#F5F9F6; border:1.5px solid #C8E0D0; color:var(--primary-dark); padding:0.42rem 0.7rem; border-radius:10px; cursor:pointer; font-size:0.8rem; font-weight:600; transition:all 0.2s; min-height:40px; }
+        .btn-compare-card.selected { background:var(--accent-gold); color:var(--primary-dark); border-color:var(--accent-gold); }
+        .compare-float-bar { position:fixed; bottom:20px; right:50%; transform:translateX(50%); background:var(--primary-dark); color:white; padding:0.7rem 1.2rem; border-radius:30px; box-shadow:0 10px 30px rgba(0,0,0,0.28); display:none; align-items:center; gap:12px; z-index:1600; border:1.5px solid var(--accent-gold); max-width:calc(100vw - 32px); }
+        .compare-float-bar.active { display:flex; }
+        .compare-table { width:100%; border-collapse:collapse; font-size:0.86rem; margin-top:0.5rem; }
+        .compare-table th, .compare-table td { border:1px solid #EAEAEA; padding:0.7rem; text-align:right; vertical-align:top; }
+        .compare-table th { background:#F5F9F6; color:var(--primary-dark); font-weight:700; width:24%; }
+        .split-cost-box { background:#EFF8FF; border:1.5px dashed #1565C0; border-radius:14px; padding:0.95rem 1.1rem; margin:0.9rem 0; }
+        .change-req-box { background:#FFF9EF; border:1px solid #E5C384; border-radius:12px; padding:0.9rem; margin-top:0.8rem; }
